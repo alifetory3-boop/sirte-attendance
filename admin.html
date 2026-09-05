@@ -8,65 +8,84 @@
   * { box-sizing: border-box; }
   body {
     font-family: -apple-system, "Segoe UI", Tahoma, sans-serif;
-    background: #f4f6f8;
     margin: 0;
     padding: 16px;
+    min-height: 100vh;
+    background: linear-gradient(160deg, #0f766e 0%, #134e4a 45%, #0c2b28 100%);
+    background-attachment: fixed;
   }
   .card {
-    background: white;
-    border-radius: 14px;
+    background: rgba(255,255,255,0.14);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    backdrop-filter: blur(18px) saturate(160%);
+    border: 1px solid rgba(255,255,255,0.35);
+    border-radius: 18px;
     padding: 20px;
     margin-bottom: 16px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
   }
-  h1 { font-size: 20px; color: #00695c; text-align: center; }
-  h2 { font-size: 16px; color: #333; }
-  h3 { font-size: 14px; color: #00695c; margin: 18px 0 8px; }
+  h1 { font-size: 20px; color: #ffffff; text-align: center; text-shadow: 0 1px 4px rgba(0,0,0,0.3); }
+  h2 { font-size: 16px; color: #ffffff; }
+  h3 { font-size: 14px; color: #ffffff; margin: 18px 0 8px; }
   input, select, button {
     width: 100%;
     padding: 12px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.4);
     font-size: 15px;
     margin-bottom: 10px;
+    background: rgba(255,255,255,0.2);
+    color: #ffffff;
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
   }
-  button { background: #00897b; color: white; border: none; font-weight: bold; }
+  input::placeholder { color: rgba(255,255,255,0.6); }
+  select option { color: #111; }
+  button { background: rgba(0,150,136,0.55); color: white; border: 1px solid rgba(255,255,255,0.45); font-weight: bold; }
   .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
   .tab {
-    flex: 1; text-align: center; padding: 10px; border-radius: 8px;
-    background: white; color: #555; font-weight: bold; cursor: pointer;
-    border: 1px solid #ddd;
+    flex: 1; text-align: center; padding: 10px; border-radius: 10px;
+    background: rgba(255,255,255,0.14); color: rgba(255,255,255,0.85); font-weight: bold; cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.35);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
   }
-  .tab.active { background: #00897b; color: white; border-color: #00897b; }
+  .tab.active { background: rgba(0,150,136,0.6); color: white; border-color: rgba(255,255,255,0.5); }
   .stats { display: flex; flex-wrap: wrap; gap: 10px; }
   .stat {
     flex: 1; min-width: 100px;
-    padding: 14px; border-radius: 10px; text-align: center;
+    padding: 14px; border-radius: 12px; text-align: center;
+    background: rgba(255,255,255,0.14);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: #fff;
   }
   .stat .num { font-size: 22px; font-weight: bold; display: block; }
   .row {
     display: flex; align-items: center; gap: 12px;
-    padding: 10px 0; border-bottom: 1px solid #eee;
+    padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
   }
-  .row img { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; background:#eee; }
+  .row img { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; background:rgba(255,255,255,0.2); }
   .row .info { flex: 1; font-size: 14px; }
   .badge { padding: 4px 10px; border-radius: 20px; color: white; font-size: 12px; white-space: nowrap; }
-  #error { color: #c62828; text-align: center; }
+  #error { color: #ffcdd2; text-align: center; }
   #loginCard { max-width: 380px; margin: 40px auto; }
   #dashboard { display: none; }
   .team-group { margin-bottom: 18px; }
   .team-title {
-    background: #e0f2f1; color: #00695c; padding: 8px 12px;
-    border-radius: 8px; font-weight: bold; font-size: 14px; margin-bottom: 6px;
+    background: rgba(255,255,255,0.2); color: #ffffff; padding: 8px 12px;
+    border-radius: 10px; font-weight: bold; font-size: 14px; margin-bottom: 6px;
+    border: 1px solid rgba(255,255,255,0.3);
   }
   .worker-row {
     display: flex; align-items: center; gap: 10px;
-    padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px;
+    padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.15); font-size: 14px;
+    color: #fff;
   }
   .worker-row .name { flex: 1; }
   .del-btn {
-    width: auto; padding: 6px 10px; background: #ffebee; color: #c62828;
-    border: 1px solid #ef9a9a; margin: 0; font-size: 13px;
+    width: auto; padding: 6px 10px; background: rgba(198,40,40,0.35); color: #ffcdd2;
+    border: 1px solid rgba(255,120,120,0.5); margin: 0; font-size: 13px;
   }
 </style>
 </head>
@@ -99,16 +118,25 @@
 
     <div class="card">
       <h2>سجل الحضور اللحظي</h2>
+      <button id="exportBtn">📊 تصدير Excel (اليوم)</button>
       <div id="list">جاري التحميل...</div>
     </div>
   </div>
 
   <div id="tab-workers" style="display:none;">
     <div class="card">
-      <h2>➕ إضافة عامل جديد</h2>
-      <input id="newWorkerName" placeholder="اسم العامل">
+      <h2>➕ تسجيل عامل جديد</h2>
+      <label style="color:#fff;font-size:13px;display:block;margin-bottom:6px;">1️⃣ التقط صورة العامل</label>
+      <input type="file" id="newWorkerPhoto" accept="image/*" capture="user">
+      <img id="newWorkerPreview" style="width:100%;border-radius:10px;display:none;margin-bottom:10px;">
+
+      <label style="color:#fff;font-size:13px;display:block;margin-bottom:6px;">2️⃣ اسم العامل</label>
+      <input id="newWorkerName" placeholder="اكتب الاسم الكامل">
+
+      <label style="color:#fff;font-size:13px;display:block;margin-bottom:6px;">3️⃣ الوظيفة</label>
       <select id="newWorkerTeam"></select>
-      <button id="addWorkerBtn">إضافة العامل</button>
+
+      <button id="addWorkerBtn">✅ تسجيل العامل</button>
       <div id="addWorkerMsg"></div>
     </div>
 
@@ -130,21 +158,49 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 const TEAMS = [
-  { id: 'compactor_drivers',       label: 'سائقين كبسات' },
-  { id: 'box_drivers',             label: 'سائقين صناديق' },
-  { id: 'bobcat_drivers',          label: 'سائقين بوبكات' },
-  { id: 'large_compactor_drivers', label: 'سائقين كبسات كبيرة' },
-  { id: 'large_box_drivers',       label: 'سائقين صناديق سيارات كبيرة' },
-  { id: 'cleaning_workers',        label: 'عمال نظافة' },
-  { id: 'compactor_workers',       label: 'عمال كبسات' },
-  { id: 'ghafra_workers',          label: 'عمال الغفرة' },
-  { id: '',                        label: 'أخرى / غير مصنّف' },
+  { id: 'dump_truck_drivers',      label: 'سائقين شاحنة دنبر' },
+  { id: 'container_drivers',       label: 'سائقين صندوق كنتر' },
+  { id: 'large_compactor_drivers', label: 'سائقين كباسة كبيرة' },
+  { id: 'small_compactor_drivers', label: 'سائقين كباسة صغيرة' },
+  { id: 'guards',                  label: 'غفير' },
+  { id: 'gardens_workers',         label: 'عمال حدائق' },
+  { id: '',                        label: 'أخرى / غير مصنف' },
 ];
 
 function teamLabel(id) {
   const t = TEAMS.find(t => t.id === (id || ''));
   return t ? t.label : 'أخرى / غير مصنّف';
 }
+
+function compressImageToBase64(file, maxWidth = 480, quality = 0.6) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const reader = new FileReader();
+    reader.onload = (e) => { img.src = e.target.result; };
+    reader.onerror = reject;
+    img.onload = () => {
+      const scale = Math.min(1, maxWidth / img.width);
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+let newWorkerPhotoBase64 = '';
+document.getElementById('newWorkerPhoto').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  newWorkerPhotoBase64 = await compressImageToBase64(file);
+  const preview = document.getElementById('newWorkerPreview');
+  preview.src = newWorkerPhotoBase64;
+  preview.style.display = 'block';
+});
 
 const loginCard = document.getElementById('loginCard');
 const dashboard = document.getElementById('dashboard');
@@ -200,21 +256,30 @@ document.getElementById('addWorkerBtn').addEventListener('click', async () => {
   const name = document.getElementById('newWorkerName').value.trim();
   const team = document.getElementById('newWorkerTeam').value;
   const msg = document.getElementById('addWorkerMsg');
-  if (!name) {
-    msg.innerHTML = '<p style="color:#c62828;">اكتب اسم العامل أولاً</p>';
+
+  if (!newWorkerPhotoBase64) {
+    msg.innerHTML = '<p style="color:#ffcdd2;">التقط صورة العامل أولاً</p>';
     return;
   }
+  if (!name) {
+    msg.innerHTML = '<p style="color:#ffcdd2;">اكتب اسم العامل</p>';
+    return;
+  }
+
   try {
     await db.collection('workers').add({
       name: name,
       team: team,
       role: 'worker',
-      referencePhotoUrl: ''
+      referencePhotoUrl: newWorkerPhotoBase64
     });
     document.getElementById('newWorkerName').value = '';
-    msg.innerHTML = `<p style="color:#2e7d32;">✅ تمت إضافة ${name}</p>`;
+    document.getElementById('newWorkerPhoto').value = '';
+    document.getElementById('newWorkerPreview').style.display = 'none';
+    newWorkerPhotoBase64 = '';
+    msg.innerHTML = `<p style="color:#c8f7d4;">✅ تمت إضافة ${name}</p>`;
   } catch (err) {
-    msg.innerHTML = '<p style="color:#c62828;">خطأ: ' + err.message + '</p>';
+    msg.innerHTML = '<p style="color:#ffcdd2;">خطأ: ' + err.message + '</p>';
   }
 });
 
@@ -227,7 +292,7 @@ function watchWorkers() {
       const data = doc.data();
       if (data.role === 'admin' || data.role === 'supervisor') return;
       const teamId = TEAMS.some(t => t.id === (data.team || '')) ? (data.team || '') : '';
-      byTeam[teamId].push({ id: doc.id, name: data.name || doc.id });
+      byTeam[teamId].push({ id: doc.id, name: data.name || doc.id, photo: data.referencePhotoUrl || '' });
     });
 
     const container = document.getElementById('workersByTeam');
@@ -239,6 +304,7 @@ function watchWorkers() {
         <div class="team-title">${team.label} (${members.length})</div>`;
       members.forEach(w => {
         html += `<div class="worker-row">
+          <img src="${w.photo}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;background:rgba(255,255,255,0.2);" onerror="this.style.visibility='hidden'">
           <span class="name">${w.name}</span>
           <button class="del-btn" onclick="deleteWorker('${w.id}','${w.name.replace(/'/g,"\\'")}')">حذف</button>
         </div>`;
@@ -254,6 +320,46 @@ function deleteWorker(id, name) {
   db.collection('workers').doc(id).delete();
 }
 
+let latestRecords = [];
+let latestInfoMap = {};
+
+function exportToExcel() {
+  if (!latestRecords.length) {
+    alert('لا يوجد بيانات لتصديرها بعد');
+    return;
+  }
+  const statusLabels = { present: 'حاضر', late: 'متأخر', sick: 'مريض', rejected: 'مرفوض' };
+  const headers = ['الاسم', 'الفريق', 'الحالة', 'الوقت', 'دقة الموقع (م)'];
+  const rows = latestRecords.map(r => {
+    const info = latestInfoMap[r.workerId] || { name: r.workerId, team: '' };
+    const time = r.timestamp ? new Date(r.timestamp.seconds * 1000).toLocaleString('ar-LY') : '';
+    return [
+      info.name,
+      teamLabel(info.team),
+      statusLabels[r.status] || r.status,
+      time,
+      r.accuracy || ''
+    ];
+  });
+
+  const csvContent = [headers, ...rows]
+    .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+    .join('\r\n');
+
+  const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  const dateStr = new Date().toISOString().slice(0, 10);
+  link.href = url;
+  link.download = `حضور-سرت-${dateStr}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+document.getElementById('exportBtn').addEventListener('click', exportToExcel);
+
 function watchAttendance() {
   const startOfDay = new Date();
   startOfDay.setHours(0, 0, 0, 0);
@@ -263,6 +369,7 @@ function watchAttendance() {
     .orderBy('timestamp', 'desc')
     .onSnapshot(async (snapshot) => {
       const records = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      latestRecords = records;
 
       const present = records.filter(r => r.status === 'present').length;
       const late = records.filter(r => r.status === 'late').length;
@@ -282,6 +389,7 @@ function watchAttendance() {
           team: wDoc.data()?.team || ''
         };
       }));
+      latestInfoMap = infoMap;
 
       const listDiv = document.getElementById('list');
       if (records.length === 0) {
@@ -305,7 +413,7 @@ function watchAttendance() {
             <img src="${r.photoBase64 || ''}" onerror="this.style.display='none'">
             <div class="info">
               <div>${info.name}</div>
-              <div style="color:#888; font-size:12px;">${teamLabel(info.team)} • ${time}</div>
+              <div style="color:rgba(255,255,255,0.7); font-size:12px;">${teamLabel(info.team)} • ${time}${r.accuracy ? ' • دقة ' + r.accuracy + ' م' : ''}</div>
             </div>
             <span class="badge" style="background:${meta.color}">${meta.label}</span>
           </div>
@@ -317,4 +425,3 @@ function watchAttendance() {
 
 </body>
 </html>
-

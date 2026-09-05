@@ -68,9 +68,6 @@
   .row img { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; background:rgba(255,255,255,0.2); }
   .row .info { flex: 1; font-size: 14px; }
   .badge { padding: 4px 10px; border-radius: 20px; color: white; font-size: 12px; white-space: nowrap; }
-  #error { color: #ffcdd2; text-align: center; }
-  #loginCard { max-width: 380px; margin: 40px auto; }
-  #dashboard { display: none; }
   .team-group { margin-bottom: 18px; }
   .team-title {
     background: rgba(255,255,255,0.2); color: #ffffff; padding: 8px 12px;
@@ -90,14 +87,6 @@
 </style>
 </head>
 <body>
-
-<div id="loginCard" class="card">
-  <h1>🔐 دخول الإدارة</h1>
-  <input id="email" type="email" placeholder="البريد الإلكتروني">
-  <input id="password" type="password" placeholder="كلمة المرور">
-  <button id="loginBtn">دخول</button>
-  <div id="error"></div>
-</div>
 
 <div id="dashboard">
   <div class="tabs">
@@ -164,7 +153,7 @@ const TEAMS = [
   { id: 'small_compactor_drivers', label: 'سائقين كباسة صغيرة' },
   { id: 'guards',                  label: 'غفير' },
   { id: 'gardens_workers',         label: 'عمال حدائق' },
-  { id: '',                        label: 'أخرى / غير مصنف' },
+  { id: '',                        label: 'أخرى / غير مصنّف' },
 ];
 
 function teamLabel(id) {
@@ -202,18 +191,10 @@ document.getElementById('newWorkerPhoto').addEventListener('change', async (e) =
   preview.style.display = 'block';
 });
 
-const loginCard = document.getElementById('loginCard');
 const dashboard = document.getElementById('dashboard');
-const errorDiv = document.getElementById('error');
 
-document.getElementById('loginBtn').addEventListener('click', async () => {
-  const email = document.getElementById('email').value.trim();
-  const password = document.getElementById('password').value;
-  try {
-    await auth.signInWithEmailAndPassword(email, password);
-  } catch (err) {
-    errorDiv.textContent = 'فشل الدخول: تحقق من البريد وكلمة المرور';
-  }
+auth.signInAnonymously().catch(err => {
+  console.error('خطأ في الاتصال: ' + err.message);
 });
 
 document.querySelectorAll('.tab').forEach(tab => {
@@ -226,21 +207,8 @@ document.querySelectorAll('.tab').forEach(tab => {
 });
 
 auth.onAuthStateChanged(async (user) => {
-  if (!user) {
-    loginCard.style.display = 'block';
-    dashboard.style.display = 'none';
-    return;
-  }
+  if (!user) return;
 
-  const doc = await db.collection('workers').doc(user.uid).get();
-  const role = doc.data()?.role;
-  if (role !== 'admin' && role !== 'supervisor') {
-    errorDiv.textContent = 'هذا الحساب لا يملك صلاحية الدخول';
-    await auth.signOut();
-    return;
-  }
-
-  loginCard.style.display = 'none';
   dashboard.style.display = 'block';
   populateTeamSelect();
   watchAttendance();

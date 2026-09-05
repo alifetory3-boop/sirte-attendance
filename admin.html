@@ -1,1 +1,320 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة إدارة حضور سرت</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Segoe UI", Tahoma, sans-serif;
+    background: #f4f6f8;
+    margin: 0;
+    padding: 16px;
+  }
+  .card {
+    background: white;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  }
+  h1 { font-size: 20px; color: #00695c; text-align: center; }
+  h2 { font-size: 16px; color: #333; }
+  h3 { font-size: 14px; color: #00695c; margin: 18px 0 8px; }
+  input, select, button {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 15px;
+    margin-bottom: 10px;
+  }
+  button { background: #00897b; color: white; border: none; font-weight: bold; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+  .tab {
+    flex: 1; text-align: center; padding: 10px; border-radius: 8px;
+    background: white; color: #555; font-weight: bold; cursor: pointer;
+    border: 1px solid #ddd;
+  }
+  .tab.active { background: #00897b; color: white; border-color: #00897b; }
+  .stats { display: flex; flex-wrap: wrap; gap: 10px; }
+  .stat {
+    flex: 1; min-width: 100px;
+    padding: 14px; border-radius: 10px; text-align: center;
+  }
+  .stat .num { font-size: 22px; font-weight: bold; display: block; }
+  .row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 0; border-bottom: 1px solid #eee;
+  }
+  .row img { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; background:#eee; }
+  .row .info { flex: 1; font-size: 14px; }
+  .badge { padding: 4px 10px; border-radius: 20px; color: white; font-size: 12px; white-space: nowrap; }
+  #error { color: #c62828; text-align: center; }
+  #loginCard { max-width: 380px; margin: 40px auto; }
+  #dashboard { display: none; }
+  .team-group { margin-bottom: 18px; }
+  .team-title {
+    background: #e0f2f1; color: #00695c; padding: 8px 12px;
+    border-radius: 8px; font-weight: bold; font-size: 14px; margin-bottom: 6px;
+  }
+  .worker-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px;
+  }
+  .worker-row .name { flex: 1; }
+  .del-btn {
+    width: auto; padding: 6px 10px; background: #ffebee; color: #c62828;
+    border: 1px solid #ef9a9a; margin: 0; font-size: 13px;
+  }
+</style>
+</head>
+<body>
+
+<div id="loginCard" class="card">
+  <h1>🔐 دخول الإدارة</h1>
+  <input id="email" type="email" placeholder="البريد الإلكتروني">
+  <input id="password" type="password" placeholder="كلمة المرور">
+  <button id="loginBtn">دخول</button>
+  <div id="error"></div>
+</div>
+
+<div id="dashboard">
+  <div class="tabs">
+    <div class="tab active" data-tab="overview">📊 نظرة عامة</div>
+    <div class="tab" data-tab="workers">👷 إدارة العمال</div>
+  </div>
+
+  <div id="tab-overview">
+    <div class="card">
+      <h1>حضور اليوم</h1>
+      <div class="stats">
+        <div class="stat" style="background:#e8f5e9;"><span class="num" id="presentCount">0</span>حاضر</div>
+        <div class="stat" style="background:#fff3e0;"><span class="num" id="lateCount">0</span>متأخر</div>
+        <div class="stat" style="background:#fce4ec;"><span class="num" id="sickCount">0</span>مريض</div>
+        <div class="stat" style="background:#eceff1;"><span class="num" id="totalCount">0</span>إجمالي</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>سجل الحضور اللحظي</h2>
+      <div id="list">جاري التحميل...</div>
+    </div>
+  </div>
+
+  <div id="tab-workers" style="display:none;">
+    <div class="card">
+      <h2>➕ إضافة عامل جديد</h2>
+      <input id="newWorkerName" placeholder="اسم العامل">
+      <select id="newWorkerTeam"></select>
+      <button id="addWorkerBtn">إضافة العامل</button>
+      <div id="addWorkerMsg"></div>
+    </div>
+
+    <div class="card">
+      <h2>العمال حسب الفريق</h2>
+      <div id="workersByTeam">جاري التحميل...</div>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+
+<script>
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+const TEAMS = [
+  { id: 'compactor_drivers',       label: 'سائقين كبسات' },
+  { id: 'box_drivers',             label: 'سائقين صناديق' },
+  { id: 'bobcat_drivers',          label: 'سائقين بوبكات' },
+  { id: 'large_compactor_drivers', label: 'سائقين كبسات كبيرة' },
+  { id: 'large_box_drivers',       label: 'سائقين صناديق سيارات كبيرة' },
+  { id: 'cleaning_workers',        label: 'عمال نظافة' },
+  { id: 'compactor_workers',       label: 'عمال كبسات' },
+  { id: 'ghafra_workers',          label: 'عمال الغفرة' },
+  { id: '',                        label: 'أخرى / غير مصنّف' },
+];
+
+function teamLabel(id) {
+  const t = TEAMS.find(t => t.id === (id || ''));
+  return t ? t.label : 'أخرى / غير مصنّف';
+}
+
+const loginCard = document.getElementById('loginCard');
+const dashboard = document.getElementById('dashboard');
+const errorDiv = document.getElementById('error');
+
+document.getElementById('loginBtn').addEventListener('click', async () => {
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  try {
+    await auth.signInWithEmailAndPassword(email, password);
+  } catch (err) {
+    errorDiv.textContent = 'فشل الدخول: تحقق من البريد وكلمة المرور';
+  }
+});
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-overview').style.display = tab.dataset.tab === 'overview' ? 'block' : 'none';
+    document.getElementById('tab-workers').style.display = tab.dataset.tab === 'workers' ? 'block' : 'none';
+  });
+});
+
+auth.onAuthStateChanged(async (user) => {
+  if (!user) {
+    loginCard.style.display = 'block';
+    dashboard.style.display = 'none';
+    return;
+  }
+
+  const doc = await db.collection('workers').doc(user.uid).get();
+  const role = doc.data()?.role;
+  if (role !== 'admin' && role !== 'supervisor') {
+    errorDiv.textContent = 'هذا الحساب لا يملك صلاحية الدخول';
+    await auth.signOut();
+    return;
+  }
+
+  loginCard.style.display = 'none';
+  dashboard.style.display = 'block';
+  populateTeamSelect();
+  watchAttendance();
+  watchWorkers();
+});
+
+function populateTeamSelect() {
+  const select = document.getElementById('newWorkerTeam');
+  select.innerHTML = TEAMS.map(t => `<option value="${t.id}">${t.label}</option>`).join('');
+}
+
+document.getElementById('addWorkerBtn').addEventListener('click', async () => {
+  const name = document.getElementById('newWorkerName').value.trim();
+  const team = document.getElementById('newWorkerTeam').value;
+  const msg = document.getElementById('addWorkerMsg');
+  if (!name) {
+    msg.innerHTML = '<p style="color:#c62828;">اكتب اسم العامل أولاً</p>';
+    return;
+  }
+  try {
+    await db.collection('workers').add({
+      name: name,
+      team: team,
+      role: 'worker',
+      referencePhotoUrl: ''
+    });
+    document.getElementById('newWorkerName').value = '';
+    msg.innerHTML = `<p style="color:#2e7d32;">✅ تمت إضافة ${name}</p>`;
+  } catch (err) {
+    msg.innerHTML = '<p style="color:#c62828;">خطأ: ' + err.message + '</p>';
+  }
+});
+
+function watchWorkers() {
+  db.collection('workers').orderBy('name').onSnapshot(snapshot => {
+    const byTeam = {};
+    TEAMS.forEach(t => byTeam[t.id] = []);
+
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      if (data.role === 'admin' || data.role === 'supervisor') return;
+      const teamId = TEAMS.some(t => t.id === (data.team || '')) ? (data.team || '') : '';
+      byTeam[teamId].push({ id: doc.id, name: data.name || doc.id });
+    });
+
+    const container = document.getElementById('workersByTeam');
+    let html = '';
+    TEAMS.forEach(team => {
+      const members = byTeam[team.id];
+      if (!members.length) return;
+      html += `<div class="team-group">
+        <div class="team-title">${team.label} (${members.length})</div>`;
+      members.forEach(w => {
+        html += `<div class="worker-row">
+          <span class="name">${w.name}</span>
+          <button class="del-btn" onclick="deleteWorker('${w.id}','${w.name.replace(/'/g,"\\'")}')">حذف</button>
+        </div>`;
+      });
+      html += `</div>`;
+    });
+    container.innerHTML = html || '<p style="text-align:center;color:#888;">لا يوجد عمال مسجلين بعد</p>';
+  });
+}
+
+function deleteWorker(id, name) {
+  if (!confirm('حذف ' + name + ' نهائياً؟')) return;
+  db.collection('workers').doc(id).delete();
+}
+
+function watchAttendance() {
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+
+  db.collection('attendance')
+    .where('timestamp', '>=', startOfDay)
+    .orderBy('timestamp', 'desc')
+    .onSnapshot(async (snapshot) => {
+      const records = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+
+      const present = records.filter(r => r.status === 'present').length;
+      const late = records.filter(r => r.status === 'late').length;
+      const sick = records.filter(r => r.status === 'sick').length;
+
+      document.getElementById('presentCount').textContent = present;
+      document.getElementById('lateCount').textContent = late;
+      document.getElementById('sickCount').textContent = sick;
+      document.getElementById('totalCount').textContent = records.length;
+
+      const workerIds = [...new Set(records.map(r => r.workerId))];
+      const infoMap = {};
+      await Promise.all(workerIds.map(async (id) => {
+        const wDoc = await db.collection('workers').doc(id).get();
+        infoMap[id] = {
+          name: wDoc.data()?.name || id,
+          team: wDoc.data()?.team || ''
+        };
+      }));
+
+      const listDiv = document.getElementById('list');
+      if (records.length === 0) {
+        listDiv.innerHTML = '<p style="text-align:center; color:#888;">لا يوجد حضور مسجل اليوم بعد</p>';
+        return;
+      }
+
+      const statusMeta = {
+        present: { color: '#2e7d32', label: 'حاضر' },
+        late:    { color: '#ef6c00', label: 'متأخر' },
+        sick:    { color: '#ad1457', label: 'مريض' },
+        rejected:{ color: '#c62828', label: 'مرفوض' }
+      };
+
+      listDiv.innerHTML = records.map(r => {
+        const time = r.timestamp ? new Date(r.timestamp.seconds * 1000).toLocaleTimeString('ar-LY') : '--';
+        const meta = statusMeta[r.status] || { color: '#607d8b', label: r.status };
+        const info = infoMap[r.workerId] || { name: r.workerId, team: '' };
+        return `
+          <div class="row">
+            <img src="${r.photoBase64 || ''}" onerror="this.style.display='none'">
+            <div class="info">
+              <div>${info.name}</div>
+              <div style="color:#888; font-size:12px;">${teamLabel(info.team)} • ${time}</div>
+            </div>
+            <span class="badge" style="background:${meta.color}">${meta.label}</span>
+          </div>
+        `;
+      }).join('');
+    });
+}
+</script>
+
+</body>
+</html>
 

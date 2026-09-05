@@ -11,60 +11,72 @@
   * { box-sizing: border-box; }
   body {
     font-family: -apple-system, "Segoe UI", Tahoma, sans-serif;
-    background: #f4f6f8;
     margin: 0;
     padding: 20px;
     min-height: 100vh;
+    background: linear-gradient(160deg, #0f766e 0%, #134e4a 45%, #0c2b28 100%);
+    background-attachment: fixed;
   }
   .card {
     max-width: 420px;
     margin: 0 auto;
-    background: white;
-    border-radius: 16px;
+    background: rgba(255,255,255,0.14);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    backdrop-filter: blur(18px) saturate(160%);
+    border: 1px solid rgba(255,255,255,0.35);
+    border-radius: 20px;
     padding: 24px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
   }
-  h1 { font-size: 20px; text-align: center; color: #00695c; margin-bottom: 20px; }
+  h1 { font-size: 20px; text-align: center; color: #ffffff; margin-bottom: 20px; text-shadow: 0 1px 4px rgba(0,0,0,0.3); }
   select, button {
     width: 100%;
     padding: 14px;
-    border-radius: 10px;
-    border: 1px solid #ddd;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.4);
     font-size: 16px;
     margin-bottom: 12px;
+    background: rgba(255,255,255,0.22);
+    color: #ffffff;
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
   }
+  select option, select optgroup { color: #111; }
   button {
-    background: #00897b;
+    background: rgba(0,150,136,0.55);
     color: white;
-    border: none;
+    border: 1px solid rgba(255,255,255,0.45);
     font-weight: bold;
     cursor: pointer;
   }
-  button:disabled { background: #b0bec5; }
+  button:disabled { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.5); }
   button.secondary {
-    background: white;
-    color: #c62828;
-    border: 1px solid #c62828;
+    background: rgba(198,40,40,0.35);
+    color: #fff;
+    border: 1px solid rgba(255,120,120,0.6);
   }
   #preview {
     width: 100%;
-    border-radius: 12px;
+    border-radius: 14px;
     margin-bottom: 12px;
     display: none;
+    border: 1px solid rgba(255,255,255,0.4);
   }
   #status {
     text-align: center;
     padding: 12px;
-    border-radius: 10px;
+    border-radius: 12px;
     margin-top: 12px;
     font-weight: bold;
     display: none;
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
   }
-  .ok { background: #e8f5e9; color: #2e7d32; }
-  .warn { background: #fff3e0; color: #ef6c00; }
-  .err { background: #ffebee; color: #c62828; }
-  label { font-size: 14px; color: #555; margin-bottom: 6px; display: block; }
-  .divider { text-align: center; color: #999; font-size: 13px; margin: 6px 0 14px; }
+  .ok { background: rgba(76,175,80,0.35); color: #ffffff; border: 1px solid rgba(76,175,80,0.6); }
+  .warn { background: rgba(255,167,38,0.35); color: #ffffff; border: 1px solid rgba(255,167,38,0.6); }
+  .err { background: rgba(239,83,80,0.35); color: #ffffff; border: 1px solid rgba(239,83,80,0.6); }
+  label { font-size: 14px; color: rgba(255,255,255,0.85); margin-bottom: 6px; display: block; }
+  .divider { text-align: center; color: rgba(255,255,255,0.6); font-size: 13px; margin: 6px 0 14px; }
 </style>
 </head>
 <body>
@@ -212,7 +224,15 @@ checkInBtn.addEventListener('click', async () => {
 
   navigator.geolocation.getCurrentPosition(async (position) => {
     try {
-      showStatus('جاري تجهيز الصورة...', 'warn');
+      const accuracy = Math.round(position.coords.accuracy || 0);
+
+      if (accuracy > 150) {
+        showStatus(`⚠️ دقة الموقع ضعيفة (${accuracy} م) - حاول في مكان مفتوح`, 'warn');
+        checkInBtn.disabled = false;
+        return;
+      }
+
+      showStatus(`جاري تجهيز الصورة... (دقة الموقع ${accuracy} م)`, 'warn');
       const workerId = workerSelect.value;
       const photoBase64 = await compressImageToBase64(selectedFile);
 
@@ -228,11 +248,12 @@ checkInBtn.addEventListener('click', async () => {
         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
         lat: position.coords.latitude,
         lng: position.coords.longitude,
+        accuracy: accuracy,
         photoBase64: photoBase64,
         status: status
       });
 
-      showStatus(status === 'present' ? '✅ تم تسجيل حضورك بنجاح' : '⏰ تم تسجيل حضورك (متأخر)', 'ok');
+      showStatus(status === 'present' ? `✅ تم تسجيل حضورك بدقة ${accuracy} م` : `⏰ تم تسجيل حضورك (متأخر) بدقة ${accuracy} م`, 'ok');
     } catch (err) {
       showStatus('خطأ: ' + err.message, 'err');
     } finally {
@@ -241,7 +262,7 @@ checkInBtn.addEventListener('click', async () => {
   }, (err) => {
     showStatus('تعذر تحديد الموقع: فعّل خدمة الموقع للمتصفح من الإعدادات', 'err');
     checkInBtn.disabled = false;
-  }, { enableHighAccuracy: true, timeout: 15000 });
+  }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
 });
 
 sickBtn.addEventListener('click', async () => {

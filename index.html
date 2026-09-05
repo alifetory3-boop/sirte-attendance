@@ -41,6 +41,11 @@
     cursor: pointer;
   }
   button:disabled { background: #b0bec5; }
+  button.secondary {
+    background: white;
+    color: #c62828;
+    border: 1px solid #c62828;
+  }
   #preview {
     width: 100%;
     border-radius: 12px;
@@ -59,6 +64,7 @@
   .warn { background: #fff3e0; color: #ef6c00; }
   .err { background: #ffebee; color: #c62828; }
   label { font-size: 14px; color: #555; margin-bottom: 6px; display: block; }
+  .divider { text-align: center; color: #999; font-size: 13px; margin: 6px 0 14px; }
 </style>
 </head>
 <body>
@@ -66,7 +72,7 @@
 <div class="card">
   <h1>📍 تسجيل الحضور - سرت</h1>
 
-  <label>اختر اسمك</label>
+  <label>اختر فريقك ثم اسمك</label>
   <select id="workerSelect">
     <option value="">جاري تحميل قائمة العمال...</option>
   </select>
@@ -77,10 +83,13 @@
 
   <button id="checkInBtn" disabled>تسجيل الحضور الآن</button>
 
+  <div class="divider">— أو —</div>
+
+  <button id="sickBtn" class="secondary" disabled>🤒 الإبلاغ عن مرض اليوم</button>
+
   <div id="status"></div>
 </div>
 
-<!-- Firebase SDK (compat - لا يحتاج أي عملية بناء) -->
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
@@ -91,7 +100,18 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// يصغّر الصورة ويحوّلها لنص base64 (بدون الحاجة لـ Firebase Storage المدفوعة)
+const TEAMS = [
+  { id: 'compactor_drivers',       label: 'سائقين كبسات' },
+  { id: 'box_drivers',             label: 'سائقين صناديق' },
+  { id: 'bobcat_drivers',          label: 'سائقين بوبكات' },
+  { id: 'large_compactor_drivers', label: 'سائقين كبسات كبيرة' },
+  { id: 'large_box_drivers',       label: 'سائقين صناديق سيارات كبيرة' },
+  { id: 'cleaning_workers',        label: 'عمال نظافة' },
+  { id: 'compactor_workers',       label: 'عمال كبسات' },
+  { id: 'ghafra_workers',          label: 'عمال الغفرة' },
+  { id: '',                        label: 'أخرى / غير مصنّف' },
+];
+
 function compressImageToBase64(file, maxWidth = 480, quality = 0.6) {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -116,6 +136,7 @@ const workerSelect = document.getElementById('workerSelect');
 const photoInput = document.getElementById('photoInput');
 const preview = document.getElementById('preview');
 const checkInBtn = document.getElementById('checkInBtn');
+const sickBtn = document.getElementById('sickBtn');
 const statusDiv = document.getElementById('status');
 
 let selectedFile = null;
@@ -128,25 +149,42 @@ function showStatus(msg, type) {
 
 function updateButtonState() {
   checkInBtn.disabled = !(workerSelect.value && selectedFile);
+  sickBtn.disabled = !workerSelect.value;
 }
 
-// تسجيل دخول مجهول تلقائي (كافي لتطبيق داخلي بسيط)
 auth.signInAnonymously().catch(err => {
   showStatus('خطأ في الاتصال: ' + err.message, 'err');
 });
 
-// تحميل قائمة العمال من Firestore
 db.collection('workers').orderBy('name').get().then(snapshot => {
-  workerSelect.innerHTML = '<option value="">-- اختر اسمك --</option>';
-  snapshot.forEach(doc => {
-    const opt = document.createElement('option');
-    opt.value = doc.id;
-    opt.textContent = doc.data().name || doc.id;
-    workerSelect.appendChild(opt);
-  });
   if (snapshot.empty) {
     workerSelect.innerHTML = '<option value="">لا يوجد عمال مسجلين بعد - راجع الإدارة</option>';
+    return;
   }
+
+  const byTeam = {};
+  TEAMS.forEach(t => byTeam[t.id] = []);
+
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    const teamId = TEAMS.some(t => t.id === (data.team || '')) ? (data.team || '') : '';
+    byTeam[teamId].push({ id: doc.id, name: data.name || doc.id });
+  });
+
+  workerSelect.innerHTML = '<option value="">-- اختر اسمك --</option>';
+  TEAMS.forEach(team => {
+    const members = byTeam[team.id];
+    if (!members.length) return;
+    const group = document.createElement('optgroup');
+    group.label = team.label;
+    members.forEach(w => {
+      const opt = document.createElement('option');
+      opt.value = w.id;
+      opt.textContent = w.name;
+      group.appendChild(opt);
+    });
+    workerSelect.appendChild(group);
+  });
 }).catch(err => {
   showStatus('تعذر تحميل قائمة العمال: ' + err.message, 'err');
 });
@@ -180,7 +218,6 @@ checkInBtn.addEventListener('click', async () => {
 
       showStatus('جاري حفظ سجل الحضور...', 'warn');
 
-      // تحديد الحالة: حاضر قبل 8:00 صباحاً، متأخر بعدها (عدّل الوقت حسب دوامك)
       const now = new Date();
       const cutoff = new Date(now);
       cutoff.setHours(8, 0, 0, 0);
@@ -205,6 +242,27 @@ checkInBtn.addEventListener('click', async () => {
     showStatus('تعذر تحديد الموقع: فعّل خدمة الموقع للمتصفح من الإعدادات', 'err');
     checkInBtn.disabled = false;
   }, { enableHighAccuracy: true, timeout: 15000 });
+});
+
+sickBtn.addEventListener('click', async () => {
+  sickBtn.disabled = true;
+  showStatus('جاري تسجيل الحالة...', 'warn');
+  try {
+    const workerId = workerSelect.value;
+    await db.collection('attendance').add({
+      workerId: workerId,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      lat: null,
+      lng: null,
+      photoBase64: '',
+      status: 'sick'
+    });
+    showStatus('🤒 تم تسجيل حالتك (مريض) اليوم - سلامتك', 'ok');
+  } catch (err) {
+    showStatus('خطأ: ' + err.message, 'err');
+  } finally {
+    sickBtn.disabled = false;
+  }
 });
 </script>
 

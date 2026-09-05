@@ -92,6 +92,7 @@
   <div class="tabs">
     <div class="tab active" data-tab="overview">📊 نظرة عامة</div>
     <div class="tab" data-tab="workers">👷 إدارة العمال</div>
+    <div class="tab" data-tab="monthly">📅 التقرير الشهري</div>
   </div>
 
   <div id="tab-overview">
@@ -137,6 +138,23 @@
     <div class="card">
       <h2>العمال حسب الفريق</h2>
       <div id="workersByTeam">جاري التحميل...</div>
+    </div>
+  </div>
+
+  <div id="tab-monthly" style="display:none;">
+    <div class="card">
+      <h2>📅 حضور الشهر</h2>
+      <select id="monthSelect"></select>
+      <button id="exportMonthlyBtn">📊 تصدير التقرير الشهري Excel</button>
+      <div style="overflow-x:auto; margin-top:10px;">
+        <div id="monthlyGrid" style="min-width:600px;">جاري التحميل...</div>
+      </div>
+      <div style="display:flex; gap:14px; margin-top:12px; font-size:12px; color:rgba(255,255,255,0.8);">
+        <span>✅ حاضر</span>
+        <span>⏰ متأخر</span>
+        <span>🤒 مريض</span>
+        <span>✗ غائب</span>
+      </div>
     </div>
   </div>
 </div>
@@ -213,6 +231,8 @@ document.querySelectorAll('.tab').forEach(tab => {
     tab.classList.add('active');
     document.getElementById('tab-overview').style.display = tab.dataset.tab === 'overview' ? 'block' : 'none';
     document.getElementById('tab-workers').style.display = tab.dataset.tab === 'workers' ? 'block' : 'none';
+    document.getElementById('tab-monthly').style.display = tab.dataset.tab === 'monthly' ? 'block' : 'none';
+    if (tab.dataset.tab === 'monthly') loadMonthlyReport();
   });
 });
 
@@ -221,8 +241,110 @@ auth.onAuthStateChanged(async (user) => {
 
   dashboard.style.display = 'block';
   populateTeamSelect();
+  populateMonthSelect();
   watchAttendance();
   watchWorkers();
+});
+
+function populateMonthSelect() {
+  const select = document.getElementById('monthSelect');
+  const now = new Date();
+  const options = [];
+  for (let i = 0; i < 6; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    const label = d.toLocaleDateString('ar-LY', { year: 'numeric', month: 'long' });
+    options.push(`<option value="${value}">${label}</option>`);
+  }
+  select.innerHTML = options.join('');
+  select.addEventListener('change', loadMonthlyReport);
+}
+
+let monthlyData = null;
+
+async function loadMonthlyReport() {
+  const gridDiv = document.getElementById('monthlyGrid');
+  gridDiv.innerHTML = 'جاري التحميل...';
+
+  const [year, month] = document.getElementById('monthSelect').value.split('-').map(Number);
+  const from = new Date(year, month - 1, 1);
+  const to = new Date(year, month, 1);
+  const daysInMonth = new Date(year, month, 0).getDate();
+
+  const snapshot = await db.collection('attendance')
+    .where('timestamp', '>=', from)
+    .where('timestamp', '<', to)
+    .get();
+
+  const perWorkerDay = {};
+  snapshot.forEach(doc => {
+    const r = doc.data();
+    if (!r.timestamp) return;
+    const d = r.timestamp.toDate();
+    const day = d.getDate();
+    if (!perWorkerDay[r.workerId]) perWorkerDay[r.workerId] = {};
+    const priority = { present: 3, late: 2, sick: 1, rejected: 0 };
+    const existing = perWorkerDay[r.workerId][day];
+    if (!existing || (priority[r.status] || 0) > (priority[existing] || 0)) {
+      perWorkerDay[r.workerId][day] = r.status;
+    }
+  });
+
+  monthlyData = { year, month, daysInMonth, perWorkerDay, workers: allWorkers };
+
+  if (!allWorkers.length) {
+    gridDiv.innerHTML = '<p style="color:rgba(255,255,255,0.7);">لا يوجد عمال مسجلين بعد</p>';
+    return;
+  }
+
+  const symbolFor = (status) => {
+    if (status === 'present') return '✅';
+    if (status === 'late') return '⏰';
+    if (status === 'sick') return '🤒';
+    return '✗';
+  };
+
+  let html = '<table style="border-collapse:collapse; font-size:11px; color:#fff;">';
+  html += '<tr><th style="padding:4px 8px; text-align:right; position:sticky; right:0; background:#134e4a;">الاسم</th>';
+  for (let d = 1; d <= daysInMonth; d++) {
+    html += `<th style="padding:2px 4px;">${d}</th>`;
+  }
+  html += '</tr>';
+
+  allWorkers.forEach(w => {
+    html += `<tr><td style="padding:4px 8px; white-space:nowrap; position:sticky; right:0; background:#134e4a;">${w.name}</td>`;
+    for (let d = 1; d <= daysInMonth; d++) {
+      const status = (perWorkerDay[w.id] || {})[d];
+      html += `<td style="padding:2px 4px; text-align:center;">${symbolFor(status)}</td>`;
+    }
+    html += '</tr>';
+  });
+  html += '</table>';
+
+  gridDiv.innerHTML = html;
+}
+
+document.getElementById('exportMonthlyBtn').addEventListener('click', () => {
+  if (!monthlyData || !monthlyData.workers.length) {
+    alert('لا يوجد بيانات لتصديرها بعد');
+    return;
+  }
+  const { daysInMonth, perWorkerDay, workers, year, month } = monthlyData;
+  const statusLabels = { present: 'حاضر', late: 'متأخر', sick: 'مريض', rejected: 'مرفوض' };
+
+  const headers = ['الاسم', 'الفريق', ...Array.from({ length: daysInMonth }, (_, i) => String(i + 1))];
+  const rows = workers.map(w => {
+    const days = Array.from({ length: daysInMonth }, (_, i) => {
+      const status = (perWorkerDay[w.id] || {})[i + 1];
+      return status ? statusLabels[status] || status : 'غائب';
+    });
+    return [w.name, teamLabel(w.team), ...days];
+  });
+
+  const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'التقرير الشهري');
+  XLSX.writeFile(workbook, `تقرير-شهري-${year}-${String(month).padStart(2, '0')}.xlsx`);
 });
 
 function populateTeamSelect() {

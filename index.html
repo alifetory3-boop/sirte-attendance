@@ -119,6 +119,10 @@ const TEAMS = [
   { id: 'small_compactor_drivers', label: 'سائقين كباسة صغيرة' },
   { id: 'guards',                  label: 'غفير' },
   { id: 'gardens_workers',         label: 'عمال حدائق' },
+  { id: 'cleaning_workers',        label: 'عمال نظافة' },
+  { id: 'compactor_workers',       label: 'عمال كباسات' },
+  { id: 'electricians',           label: 'عمال كهربائي' },
+  { id: 'cleaning_supervisors',    label: 'مشرف نظافة' },
   { id: '',                        label: 'أخرى / غير مصنّف' },
 ];
 
@@ -258,7 +262,7 @@ checkInBtn.addEventListener('click', async () => {
       checkInBtn.disabled = false;
     }
   }, (err) => {
-    showStatus('تعذر تحديد الموقع: فعّل خدمة الموقع للمتصفح من الإعدادات', 'err');
+    showStatus('تعذر تحديد الموقع: فعل خدمة الموقع للمتصفح من الإعدادات', 'err');
     checkInBtn.disabled = false;
   }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
 });

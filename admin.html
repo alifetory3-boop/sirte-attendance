@@ -2,138 +2,104 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>لوحة إدارة حضور سرت</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>تسجيل الحضور - سرت</title>
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>
   * { box-sizing: border-box; }
   body {
     font-family: -apple-system, "Segoe UI", Tahoma, sans-serif;
     margin: 0;
-    padding: 16px;
+    padding: 20px;
     min-height: 100vh;
     background: linear-gradient(160deg, #0f766e 0%, #134e4a 45%, #0c2b28 100%);
     background-attachment: fixed;
   }
   .card {
+    max-width: 420px;
+    margin: 0 auto;
     background: rgba(255,255,255,0.14);
     -webkit-backdrop-filter: blur(18px) saturate(160%);
     backdrop-filter: blur(18px) saturate(160%);
     border: 1px solid rgba(255,255,255,0.35);
-    border-radius: 18px;
-    padding: 20px;
-    margin-bottom: 16px;
+    border-radius: 20px;
+    padding: 24px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.25);
   }
-  h1 { font-size: 20px; color: #ffffff; text-align: center; text-shadow: 0 1px 4px rgba(0,0,0,0.3); }
-  h2 { font-size: 16px; color: #ffffff; }
-  h3 { font-size: 14px; color: #ffffff; margin: 18px 0 8px; }
-  input, select, button {
+  h1 { font-size: 20px; text-align: center; color: #ffffff; margin-bottom: 20px; text-shadow: 0 1px 4px rgba(0,0,0,0.3); }
+  select, button {
     width: 100%;
-    padding: 12px;
-    border-radius: 10px;
+    padding: 14px;
+    border-radius: 12px;
     border: 1px solid rgba(255,255,255,0.4);
-    font-size: 15px;
-    margin-bottom: 10px;
-    background: rgba(255,255,255,0.2);
+    font-size: 16px;
+    margin-bottom: 12px;
+    background: rgba(255,255,255,0.22);
     color: #ffffff;
     -webkit-backdrop-filter: blur(6px);
     backdrop-filter: blur(6px);
   }
-  input::placeholder { color: rgba(255,255,255,0.6); }
-  select option { color: #111; }
-  button { background: rgba(0,150,136,0.55); color: white; border: 1px solid rgba(255,255,255,0.45); font-weight: bold; }
-  .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
-  .tab {
-    flex: 1; text-align: center; padding: 10px; border-radius: 10px;
-    background: rgba(255,255,255,0.14); color: rgba(255,255,255,0.85); font-weight: bold; cursor: pointer;
-    border: 1px solid rgba(255,255,255,0.35);
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
+  select option, select optgroup { color: #111; }
+  button {
+    background: rgba(0,150,136,0.55);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.45);
+    font-weight: bold;
+    cursor: pointer;
   }
-  .tab.active { background: rgba(0,150,136,0.6); color: white; border-color: rgba(255,255,255,0.5); }
-  .stats { display: flex; flex-wrap: wrap; gap: 10px; }
-  .stat {
-    flex: 1; min-width: 100px;
-    padding: 14px; border-radius: 12px; text-align: center;
-    background: rgba(255,255,255,0.14);
-    border: 1px solid rgba(255,255,255,0.3);
+  button:disabled { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.5); }
+  button.secondary {
+    background: rgba(198,40,40,0.35);
     color: #fff;
+    border: 1px solid rgba(255,120,120,0.6);
   }
-  .stat .num { font-size: 22px; font-weight: bold; display: block; }
-  .row {
-    display: flex; align-items: center; gap: 12px;
-    padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.2);
-    color: #fff;
+  #preview {
+    width: 100%;
+    border-radius: 14px;
+    margin-bottom: 12px;
+    display: none;
+    border: 1px solid rgba(255,255,255,0.4);
   }
-  .row img { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; background:rgba(255,255,255,0.2); }
-  .row .info { flex: 1; font-size: 14px; }
-  .badge { padding: 4px 10px; border-radius: 20px; color: white; font-size: 12px; white-space: nowrap; }
-  .team-group { margin-bottom: 18px; }
-  .team-title {
-    background: rgba(255,255,255,0.2); color: #ffffff; padding: 8px 12px;
-    border-radius: 10px; font-weight: bold; font-size: 14px; margin-bottom: 6px;
-    border: 1px solid rgba(255,255,255,0.3);
+  #status {
+    text-align: center;
+    padding: 12px;
+    border-radius: 12px;
+    margin-top: 12px;
+    font-weight: bold;
+    display: none;
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
   }
-  .worker-row {
-    display: flex; align-items: center; gap: 10px;
-    padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.15); font-size: 14px;
-    color: #fff;
-  }
-  .worker-row .name { flex: 1; }
-  .del-btn {
-    width: auto; padding: 6px 10px; background: rgba(198,40,40,0.35); color: #ffcdd2;
-    border: 1px solid rgba(255,120,120,0.5); margin: 0; font-size: 13px;
-  }
+  .ok { background: rgba(76,175,80,0.35); color: #ffffff; border: 1px solid rgba(76,175,80,0.6); }
+  .warn { background: rgba(255,167,38,0.35); color: #ffffff; border: 1px solid rgba(255,167,38,0.6); }
+  .err { background: rgba(239,83,80,0.35); color: #ffffff; border: 1px solid rgba(239,83,80,0.6); }
+  label { font-size: 14px; color: rgba(255,255,255,0.85); margin-bottom: 6px; display: block; }
+  .divider { text-align: center; color: rgba(255,255,255,0.6); font-size: 13px; margin: 6px 0 14px; }
 </style>
 </head>
 <body>
 
-<div id="dashboard">
-  <div class="tabs">
-    <div class="tab active" data-tab="overview">📊 نظرة عامة</div>
-    <div class="tab" data-tab="workers">👷 إدارة العمال</div>
-  </div>
+<div class="card">
+  <h1>📍 تسجيل الحضور - سرت</h1>
 
-  <div id="tab-overview">
-    <div class="card">
-      <h1>حضور اليوم</h1>
-      <div class="stats">
-        <div class="stat" style="background:#e8f5e9;"><span class="num" id="presentCount">0</span>حاضر</div>
-        <div class="stat" style="background:#fff3e0;"><span class="num" id="lateCount">0</span>متأخر</div>
-        <div class="stat" style="background:#fce4ec;"><span class="num" id="sickCount">0</span>مريض</div>
-        <div class="stat" style="background:#eceff1;"><span class="num" id="totalCount">0</span>إجمالي</div>
-      </div>
-    </div>
+  <label>اختر فريقك ثم اسمك</label>
+  <select id="workerSelect">
+    <option value="">جاري تحميل قائمة العمال...</option>
+  </select>
 
-    <div class="card">
-      <h2>سجل الحضور اللحظي</h2>
-      <button id="exportBtn">📊 تصدير Excel (اليوم)</button>
-      <div id="list">جاري التحميل...</div>
-    </div>
-  </div>
+  <label>التقط صورة وجهك</label>
+  <input type="file" id="photoInput" accept="image/*" capture="user" style="width:100%; margin-bottom:12px;">
+  <img id="preview" alt="معاينة الصورة">
 
-  <div id="tab-workers" style="display:none;">
-    <div class="card">
-      <h2>➕ تسجيل عامل جديد</h2>
-      <label style="color:#fff;font-size:13px;display:block;margin-bottom:6px;">1️⃣ التقط صورة العامل</label>
-      <input type="file" id="newWorkerPhoto" accept="image/*" capture="user">
-      <img id="newWorkerPreview" style="width:100%;border-radius:10px;display:none;margin-bottom:10px;">
+  <button id="checkInBtn" disabled>تسجيل الحضور الآن</button>
 
-      <label style="color:#fff;font-size:13px;display:block;margin-bottom:6px;">2️⃣ اسم العامل</label>
-      <input id="newWorkerName" placeholder="اكتب الاسم الكامل">
+  <div class="divider">— أو —</div>
 
-      <label style="color:#fff;font-size:13px;display:block;margin-bottom:6px;">3️⃣ الوظيفة</label>
-      <select id="newWorkerTeam"></select>
+  <button id="sickBtn" class="secondary" disabled>🤒 الإبلاغ عن مرض اليوم</button>
 
-      <button id="addWorkerBtn">✅ تسجيل العامل</button>
-      <div id="addWorkerMsg"></div>
-    </div>
-
-    <div class="card">
-      <h2>العمال حسب الفريق</h2>
-      <div id="workersByTeam">جاري التحميل...</div>
-    </div>
-  </div>
+  <div id="status"></div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
@@ -153,13 +119,12 @@ const TEAMS = [
   { id: 'small_compactor_drivers', label: 'سائقين كباسة صغيرة' },
   { id: 'guards',                  label: 'غفير' },
   { id: 'gardens_workers',         label: 'عمال حدائق' },
+  { id: 'cleaning_workers',        label: 'عمال نظافة' },
+  { id: 'compactor_workers',       label: 'عمال كباسات' },
+  { id: 'electricians',           label: 'عمال كهربائي' },
+  { id: 'cleaning_supervisors',    label: 'مشرف نظافة' },
   { id: '',                        label: 'أخرى / غير مصنّف' },
 ];
-
-function teamLabel(id) {
-  const t = TEAMS.find(t => t.id === (id || ''));
-  return t ? t.label : 'أخرى / غير مصنّف';
-}
 
 function compressImageToBase64(file, maxWidth = 480, quality = 0.6) {
   return new Promise((resolve, reject) => {
@@ -181,214 +146,147 @@ function compressImageToBase64(file, maxWidth = 480, quality = 0.6) {
   });
 }
 
-let newWorkerPhotoBase64 = '';
-document.getElementById('newWorkerPhoto').addEventListener('change', async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  newWorkerPhotoBase64 = await compressImageToBase64(file);
-  const preview = document.getElementById('newWorkerPreview');
-  preview.src = newWorkerPhotoBase64;
-  preview.style.display = 'block';
-});
+const workerSelect = document.getElementById('workerSelect');
+const photoInput = document.getElementById('photoInput');
+const preview = document.getElementById('preview');
+const checkInBtn = document.getElementById('checkInBtn');
+const sickBtn = document.getElementById('sickBtn');
+const statusDiv = document.getElementById('status');
 
-const dashboard = document.getElementById('dashboard');
+let selectedFile = null;
+
+function showStatus(msg, type) {
+  statusDiv.textContent = msg;
+  statusDiv.className = type;
+  statusDiv.style.display = 'block';
+}
+
+function updateButtonState() {
+  checkInBtn.disabled = !(workerSelect.value && selectedFile);
+  sickBtn.disabled = !workerSelect.value;
+}
 
 auth.signInAnonymously().catch(err => {
-  console.error('خطأ في الاتصال: ' + err.message);
+  showStatus('خطأ في الاتصال: ' + err.message, 'err');
 });
 
-document.querySelectorAll('.tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    document.getElementById('tab-overview').style.display = tab.dataset.tab === 'overview' ? 'block' : 'none';
-    document.getElementById('tab-workers').style.display = tab.dataset.tab === 'workers' ? 'block' : 'none';
-  });
-});
-
-auth.onAuthStateChanged(async (user) => {
-  if (!user) return;
-
-  dashboard.style.display = 'block';
-  populateTeamSelect();
-  watchAttendance();
-  watchWorkers();
-});
-
-function populateTeamSelect() {
-  const select = document.getElementById('newWorkerTeam');
-  select.innerHTML = TEAMS.map(t => `<option value="${t.id}">${t.label}</option>`).join('');
-}
-
-document.getElementById('addWorkerBtn').addEventListener('click', async () => {
-  const name = document.getElementById('newWorkerName').value.trim();
-  const team = document.getElementById('newWorkerTeam').value;
-  const msg = document.getElementById('addWorkerMsg');
-
-  if (!newWorkerPhotoBase64) {
-    msg.innerHTML = '<p style="color:#ffcdd2;">التقط صورة العامل أولاً</p>';
-    return;
-  }
-  if (!name) {
-    msg.innerHTML = '<p style="color:#ffcdd2;">اكتب اسم العامل</p>';
+db.collection('workers').orderBy('name').get().then(snapshot => {
+  if (snapshot.empty) {
+    workerSelect.innerHTML = '<option value="">لا يوجد عمال مسجلين بعد - راجع الإدارة</option>';
     return;
   }
 
-  try {
-    await db.collection('workers').add({
-      name: name,
-      team: team,
-      role: 'worker',
-      referencePhotoUrl: newWorkerPhotoBase64
+  const byTeam = {};
+  TEAMS.forEach(t => byTeam[t.id] = []);
+
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    const teamId = TEAMS.some(t => t.id === (data.team || '')) ? (data.team || '') : '';
+    byTeam[teamId].push({ id: doc.id, name: data.name || doc.id });
+  });
+
+  workerSelect.innerHTML = '<option value="">-- اختر اسمك --</option>';
+  TEAMS.forEach(team => {
+    const members = byTeam[team.id];
+    if (!members.length) return;
+    const group = document.createElement('optgroup');
+    group.label = team.label;
+    members.forEach(w => {
+      const opt = document.createElement('option');
+      opt.value = w.id;
+      opt.textContent = w.name;
+      group.appendChild(opt);
     });
-    document.getElementById('newWorkerName').value = '';
-    document.getElementById('newWorkerPhoto').value = '';
-    document.getElementById('newWorkerPreview').style.display = 'none';
-    newWorkerPhotoBase64 = '';
-    msg.innerHTML = `<p style="color:#c8f7d4;">✅ تمت إضافة ${name}</p>`;
-  } catch (err) {
-    msg.innerHTML = '<p style="color:#ffcdd2;">خطأ: ' + err.message + '</p>';
-  }
+    workerSelect.appendChild(group);
+  });
+}).catch(err => {
+  showStatus('تعذر تحميل قائمة العمال: ' + err.message, 'err');
 });
 
-function watchWorkers() {
-  db.collection('workers').orderBy('name').onSnapshot(snapshot => {
-    const byTeam = {};
-    TEAMS.forEach(t => byTeam[t.id] = []);
+workerSelect.addEventListener('change', updateButtonState);
 
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      if (data.role === 'admin' || data.role === 'supervisor') return;
-      const teamId = TEAMS.some(t => t.id === (data.team || '')) ? (data.team || '') : '';
-      byTeam[teamId].push({ id: doc.id, name: data.name || doc.id, photo: data.referencePhotoUrl || '' });
-    });
+photoInput.addEventListener('change', () => {
+  selectedFile = photoInput.files[0] || null;
+  if (selectedFile) {
+    preview.src = URL.createObjectURL(selectedFile);
+    preview.style.display = 'block';
+  }
+  updateButtonState();
+});
 
-    const container = document.getElementById('workersByTeam');
-    let html = '';
-    TEAMS.forEach(team => {
-      const members = byTeam[team.id];
-      if (!members.length) return;
-      html += `<div class="team-group">
-        <div class="team-title">${team.label} (${members.length})</div>`;
-      members.forEach(w => {
-        html += `<div class="worker-row">
-          <img src="${w.photo}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;background:rgba(255,255,255,0.2);" onerror="this.style.visibility='hidden'">
-          <span class="name">${w.name}</span>
-          <button class="del-btn" onclick="deleteWorker('${w.id}','${w.name.replace(/'/g,"\\'")}')">حذف</button>
-        </div>`;
-      });
-      html += `</div>`;
-    });
-    container.innerHTML = html || '<p style="text-align:center;color:#888;">لا يوجد عمال مسجلين بعد</p>';
-  });
-}
+checkInBtn.addEventListener('click', async () => {
+  checkInBtn.disabled = true;
+  showStatus('جاري تحديد موقعك...', 'warn');
 
-function deleteWorker(id, name) {
-  if (!confirm('حذف ' + name + ' نهائياً؟')) return;
-  db.collection('workers').doc(id).delete();
-}
-
-let latestRecords = [];
-let latestInfoMap = {};
-
-function exportToExcel() {
-  if (!latestRecords.length) {
-    alert('لا يوجد بيانات لتصديرها بعد');
+  if (!navigator.geolocation) {
+    showStatus('المتصفح لا يدعم تحديد الموقع', 'err');
+    checkInBtn.disabled = false;
     return;
   }
-  const statusLabels = { present: 'حاضر', late: 'متأخر', sick: 'مريض', rejected: 'مرفوض' };
-  const headers = ['الاسم', 'الفريق', 'الحالة', 'الوقت', 'دقة الموقع (م)'];
-  const rows = latestRecords.map(r => {
-    const info = latestInfoMap[r.workerId] || { name: r.workerId, team: '' };
-    const time = r.timestamp ? new Date(r.timestamp.seconds * 1000).toLocaleString('ar-LY') : '';
-    return [
-      info.name,
-      teamLabel(info.team),
-      statusLabels[r.status] || r.status,
-      time,
-      r.accuracy || ''
-    ];
-  });
 
-  const csvContent = [headers, ...rows]
-    .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
-    .join('\r\n');
+  navigator.geolocation.getCurrentPosition(async (position) => {
+    try {
+      const accuracy = Math.round(position.coords.accuracy || 0);
 
-  const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  const dateStr = new Date().toISOString().slice(0, 10);
-  link.href = url;
-  link.download = `حضور-سرت-${dateStr}.csv`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
-}
-
-document.getElementById('exportBtn').addEventListener('click', exportToExcel);
-
-function watchAttendance() {
-  const startOfDay = new Date();
-  startOfDay.setHours(0, 0, 0, 0);
-
-  db.collection('attendance')
-    .where('timestamp', '>=', startOfDay)
-    .orderBy('timestamp', 'desc')
-    .onSnapshot(async (snapshot) => {
-      const records = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-      latestRecords = records;
-
-      const present = records.filter(r => r.status === 'present').length;
-      const late = records.filter(r => r.status === 'late').length;
-      const sick = records.filter(r => r.status === 'sick').length;
-
-      document.getElementById('presentCount').textContent = present;
-      document.getElementById('lateCount').textContent = late;
-      document.getElementById('sickCount').textContent = sick;
-      document.getElementById('totalCount').textContent = records.length;
-
-      const workerIds = [...new Set(records.map(r => r.workerId))];
-      const infoMap = {};
-      await Promise.all(workerIds.map(async (id) => {
-        const wDoc = await db.collection('workers').doc(id).get();
-        infoMap[id] = {
-          name: wDoc.data()?.name || id,
-          team: wDoc.data()?.team || ''
-        };
-      }));
-      latestInfoMap = infoMap;
-
-      const listDiv = document.getElementById('list');
-      if (records.length === 0) {
-        listDiv.innerHTML = '<p style="text-align:center; color:#888;">لا يوجد حضور مسجل اليوم بعد</p>';
+      if (accuracy > 150) {
+        showStatus(`⚠️ دقة الموقع ضعيفة (${accuracy} م) - حاول في مكان مفتوح`, 'warn');
+        checkInBtn.disabled = false;
         return;
       }
 
-      const statusMeta = {
-        present: { color: '#2e7d32', label: 'حاضر' },
-        late:    { color: '#ef6c00', label: 'متأخر' },
-        sick:    { color: '#ad1457', label: 'مريض' },
-        rejected:{ color: '#c62828', label: 'مرفوض' }
-      };
+      showStatus(`جاري تجهيز الصورة... (دقة الموقع ${accuracy} م)`, 'warn');
+      const workerId = workerSelect.value;
+      const photoBase64 = await compressImageToBase64(selectedFile);
 
-      listDiv.innerHTML = records.map(r => {
-        const time = r.timestamp ? new Date(r.timestamp.seconds * 1000).toLocaleTimeString('ar-LY') : '--';
-        const meta = statusMeta[r.status] || { color: '#607d8b', label: r.status };
-        const info = infoMap[r.workerId] || { name: r.workerId, team: '' };
-        return `
-          <div class="row">
-            <img src="${r.photoBase64 || ''}" onerror="this.style.display='none'">
-            <div class="info">
-              <div>${info.name}</div>
-              <div style="color:rgba(255,255,255,0.7); font-size:12px;">${teamLabel(info.team)} • ${time}${r.accuracy ? ' • دقة ' + r.accuracy + ' م' : ''}</div>
-            </div>
-            <span class="badge" style="background:${meta.color}">${meta.label}</span>
-          </div>
-        `;
-      }).join('');
+      showStatus('جاري حفظ سجل الحضور...', 'warn');
+
+      const now = new Date();
+      const cutoff = new Date(now);
+      cutoff.setHours(8, 0, 0, 0);
+      const status = now > cutoff ? 'late' : 'present';
+
+      await db.collection('attendance').add({
+        workerId: workerId,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+        accuracy: accuracy,
+        photoBase64: photoBase64,
+        status: status
+      });
+
+      showStatus(status === 'present' ? `✅ تم تسجيل حضورك بدقة ${accuracy} م` : `⏰ تم تسجيل حضورك (متأخر) بدقة ${accuracy} م`, 'ok');
+    } catch (err) {
+      showStatus('خطأ: ' + err.message, 'err');
+    } finally {
+      checkInBtn.disabled = false;
+    }
+  }, (err) => {
+    showStatus('تعذر تحديد الموقع: فعّل خدمة الموقع للمتصفح من الإعدادات', 'err');
+    checkInBtn.disabled = false;
+  }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
+});
+
+sickBtn.addEventListener('click', async () => {
+  sickBtn.disabled = true;
+  showStatus('جاري تسجيل الحالة...', 'warn');
+  try {
+    const workerId = workerSelect.value;
+    await db.collection('attendance').add({
+      workerId: workerId,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      lat: null,
+      lng: null,
+      photoBase64: '',
+      status: 'sick'
     });
-}
+    showStatus('🤒 تم تسجيل حالتك (مريض) اليوم - سلامتك', 'ok');
+  } catch (err) {
+    showStatus('خطأ: ' + err.message, 'err');
+  } finally {
+    sickBtn.disabled = false;
+  }
+});
 </script>
 
 </body>

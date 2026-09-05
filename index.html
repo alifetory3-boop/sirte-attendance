@@ -113,14 +113,12 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 const TEAMS = [
-  { id: 'compactor_drivers',       label: 'سائقين كبسات' },
-  { id: 'box_drivers',             label: 'سائقين صناديق' },
-  { id: 'bobcat_drivers',          label: 'سائقين بوبكات' },
-  { id: 'large_compactor_drivers', label: 'سائقين كبسات كبيرة' },
-  { id: 'large_box_drivers',       label: 'سائقين صناديق سيارات كبيرة' },
-  { id: 'cleaning_workers',        label: 'عمال نظافة' },
-  { id: 'compactor_workers',       label: 'عمال كبسات' },
-  { id: 'ghafra_workers',          label: 'عمال الغفرة' },
+  { id: 'dump_truck_drivers',      label: 'سائقين شاحنة دنبر' },
+  { id: 'container_drivers',       label: 'سائقين صندوق كنتر' },
+  { id: 'large_compactor_drivers', label: 'سائقين كباسة كبيرة' },
+  { id: 'small_compactor_drivers', label: 'سائقين كباسة صغيرة' },
+  { id: 'guards',                  label: 'غفير' },
+  { id: 'gardens_workers',         label: 'عمال حدائق' },
   { id: '',                        label: 'أخرى / غير مصنّف' },
 ];
 

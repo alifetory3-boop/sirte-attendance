@@ -55,13 +55,6 @@
     color: #fff;
     border: 1px solid rgba(255,120,120,0.6);
   }
-  #preview {
-    width: 100%;
-    border-radius: 14px;
-    margin-bottom: 12px;
-    display: none;
-    border: 1px solid rgba(255,255,255,0.4);
-  }
   #status {
     text-align: center;
     padding: 12px;
@@ -118,10 +111,6 @@
   <select id="workerSelect">
     <option value="">جاري تحميل قائمة العمال...</option>
   </select>
-
-  <label>التقط صورة وجهك</label>
-  <input type="file" id="photoInput" accept="image/*" capture="user" style="width:100%; margin-bottom:12px;">
-  <img id="preview" alt="معاينة الصورة">
 
   <button id="checkInBtn" disabled>✅ تسجيل الحضور الآن</button>
 
@@ -316,15 +305,11 @@ function compressImageToBase64(file, maxWidth = 480, quality = 0.6) {
 }
 
 const workerSelect = document.getElementById('workerSelect');
-const photoInput = document.getElementById('photoInput');
-const preview = document.getElementById('preview');
 const checkInBtn = document.getElementById('checkInBtn');
 const absentBtn = document.getElementById('absentBtn');
 const sickBtn = document.getElementById('sickBtn');
 const leaveBtn = document.getElementById('leaveBtn');
 const statusDiv = document.getElementById('status');
-
-let selectedFile = null;
 
 function showStatus(msg, type) {
   statusDiv.textContent = msg;
@@ -333,7 +318,7 @@ function showStatus(msg, type) {
 }
 
 function updateButtonState() {
-  checkInBtn.disabled = !(workerSelect.value && selectedFile);
+  checkInBtn.disabled = !workerSelect.value;
   absentBtn.disabled = !workerSelect.value;
   sickBtn.disabled = !workerSelect.value;
   leaveBtn.disabled = !workerSelect.value;
@@ -386,15 +371,6 @@ function loadWorkerSelect() {
 
 workerSelect.addEventListener('change', updateButtonState);
 
-photoInput.addEventListener('change', () => {
-  selectedFile = photoInput.files[0] || null;
-  if (selectedFile) {
-    preview.src = URL.createObjectURL(selectedFile);
-    preview.style.display = 'block';
-  }
-  updateButtonState();
-});
-
 checkInBtn.addEventListener('click', async () => {
   checkInBtn.disabled = true;
   showStatus('جاري تحديد موقعك...', 'warn');
@@ -415,11 +391,8 @@ checkInBtn.addEventListener('click', async () => {
         return;
       }
 
-      showStatus(`جاري تجهيز الصورة... (دقة الموقع ${accuracy} م)`, 'warn');
+      showStatus(`جاري حفظ سجل الحضور... (دقة الموقع ${accuracy} م)`, 'warn');
       const workerId = workerSelect.value;
-      const photoBase64 = await compressImageToBase64(selectedFile);
-
-      showStatus('جاري حفظ سجل الحضور...', 'warn');
 
       const now = new Date();
       const cutoff = new Date(now);
@@ -432,7 +405,6 @@ checkInBtn.addEventListener('click', async () => {
         lat: position.coords.latitude,
         lng: position.coords.longitude,
         accuracy: accuracy,
-        photoBase64: photoBase64,
         status: status
       });
 

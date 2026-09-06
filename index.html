@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>نظام حضور سرت</title>
+<title>تسجيل الحضور اليومي - سرت</title>
 <link rel="manifest" href="manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -105,14 +105,14 @@
   <img src="logo.png" alt="شعار الشركة" style="width:100%; max-width:200px; display:block; margin:0 auto 16px; border-radius:16px; box-shadow:0 6px 20px rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.4);">
   <h1 style="margin-bottom:4px;">نظام حضور سرت</h1>
   <p style="color:rgba(255,255,255,0.7); font-size:13px; margin:0 0 22px;">اختر الدخول المناسب لك</p>
-  <button onclick="showWorker()" style="padding:16px; font-size:16px;">👷 أنا عامل - تسجيل الحضور</button>
+  <button onclick="showWorker()" style="padding:16px; font-size:16px;">👷 تسجيل الحضور اليومي</button>
   <button onclick="showAdmin()" style="background:rgba(103,58,183,0.5); padding:16px; font-size:16px;">🖥️ لوحة الإدارة</button>
 </div>
 
 <div id="workerView" style="display:none;">
   <button onclick="showLanding()" style="max-width:420px;margin:0 auto 12px;display:block;background:rgba(255,255,255,0.14);">⬅ رجوع للصفحة الرئيسية</button>
 <div class="card">
-  <h1>📍 تسجيل الحضور - سرت</h1>
+  <h1>📍 تسجيل الحضور اليومي</h1>
 
   <label>اختر فريقك ثم اسمك</label>
   <select id="workerSelect">
@@ -123,12 +123,13 @@
   <input type="file" id="photoInput" accept="image/*" capture="user" style="width:100%; margin-bottom:12px;">
   <img id="preview" alt="معاينة الصورة">
 
-  <button id="checkInBtn" disabled>تسجيل الحضور الآن</button>
+  <button id="checkInBtn" disabled>✅ تسجيل الحضور الآن</button>
 
   <div class="divider">— أو —</div>
 
-  <button id="sickBtn" class="secondary" disabled>🤒 الإبلاغ عن مرض اليوم</button>
+  <button id="absentBtn" class="secondary" disabled>✗ غائب اليوم</button>
   <button id="leaveBtn" class="secondary" disabled>📝 أخذت إذن اليوم</button>
+  <button id="sickBtn" class="secondary" disabled>🤒 الإبلاغ عن مرض اليوم</button>
 
   <div id="status"></div>
 </div>
@@ -139,6 +140,7 @@
 <div id="dashboard">
   <div class="tabs" style="flex-wrap:wrap;">
     <div class="tab active" data-tab="overview">📊 نظرة عامة</div>
+    <div class="tab" data-tab="daily">✅ تسجيل الحضور اليومي</div>
     <div class="tab" data-tab="workers">👷 إدارة العمال</div>
     <div class="tab" data-tab="monthly">📅 التقرير الشهري</div>
     <div class="tab" data-tab="inventory">📦 المخزن</div>
@@ -165,6 +167,14 @@
       <h2>سجل الحضور اللحظي</h2>
       <button id="exportBtn">📊 تصدير Excel (اليوم)</button>
       <div id="list">جاري التحميل...</div>
+    </div>
+  </div>
+
+  <div id="tab-daily" style="display:none;">
+    <div class="card">
+      <h2>✅ سجّل حالة اليوم لكل عامل</h2>
+      <input id="dailySearch" placeholder="🔍 ابحث باسم العامل">
+      <div id="dailyMarkList">جاري التحميل...</div>
     </div>
   </div>
 
@@ -309,6 +319,7 @@ const workerSelect = document.getElementById('workerSelect');
 const photoInput = document.getElementById('photoInput');
 const preview = document.getElementById('preview');
 const checkInBtn = document.getElementById('checkInBtn');
+const absentBtn = document.getElementById('absentBtn');
 const sickBtn = document.getElementById('sickBtn');
 const leaveBtn = document.getElementById('leaveBtn');
 const statusDiv = document.getElementById('status');
@@ -323,46 +334,55 @@ function showStatus(msg, type) {
 
 function updateButtonState() {
   checkInBtn.disabled = !(workerSelect.value && selectedFile);
+  absentBtn.disabled = !workerSelect.value;
   sickBtn.disabled = !workerSelect.value;
   leaveBtn.disabled = !workerSelect.value;
 }
 
-auth.signInAnonymously().catch(err => {
+auth.signInAnonymously().then(() => {
+  loadWorkerSelect();
+}).catch(err => {
   showStatus('خطأ في الاتصال: ' + err.message, 'err');
 });
 
-db.collection('workers').orderBy('name').get().then(snapshot => {
-  if (snapshot.empty) {
-    workerSelect.innerHTML = '<option value="">لا يوجد عمال مسجلين بعد - راجع الإدارة</option>';
-    return;
-  }
+if (auth.currentUser) {
+  loadWorkerSelect();
+}
 
-  const byTeam = {};
-  TEAMS.forEach(t => byTeam[t.id] = []);
+function loadWorkerSelect() {
+  db.collection('workers').orderBy('name').get().then(snapshot => {
+    if (snapshot.empty) {
+      workerSelect.innerHTML = '<option value="">لا يوجد عمال مسجلين بعد - راجع الإدارة</option>';
+      return;
+    }
 
-  snapshot.forEach(doc => {
-    const data = doc.data();
-    const teamId = TEAMS.some(t => t.id === (data.team || '')) ? (data.team || '') : '';
-    byTeam[teamId].push({ id: doc.id, name: data.name || doc.id });
-  });
+    const byTeam = {};
+    TEAMS.forEach(t => byTeam[t.id] = []);
 
-  workerSelect.innerHTML = '<option value="">-- اختر اسمك --</option>';
-  TEAMS.forEach(team => {
-    const members = byTeam[team.id];
-    if (!members.length) return;
-    const group = document.createElement('optgroup');
-    group.label = team.label;
-    members.forEach(w => {
-      const opt = document.createElement('option');
-      opt.value = w.id;
-      opt.textContent = w.name;
-      group.appendChild(opt);
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const teamId = TEAMS.some(t => t.id === (data.team || '')) ? (data.team || '') : '';
+      byTeam[teamId].push({ id: doc.id, name: data.name || doc.id });
     });
-    workerSelect.appendChild(group);
+
+    workerSelect.innerHTML = '<option value="">-- اختر اسمك --</option>';
+    TEAMS.forEach(team => {
+      const members = byTeam[team.id];
+      if (!members.length) return;
+      const group = document.createElement('optgroup');
+      group.label = team.label;
+      members.forEach(w => {
+        const opt = document.createElement('option');
+        opt.value = w.id;
+        opt.textContent = w.name;
+        group.appendChild(opt);
+      });
+      workerSelect.appendChild(group);
+    });
+  }).catch(err => {
+    showStatus('تعذر تحميل قائمة العمال: ' + err.message, 'err');
   });
-}).catch(err => {
-  showStatus('تعذر تحميل قائمة العمال: ' + err.message, 'err');
-});
+}
 
 workerSelect.addEventListener('change', updateButtonState);
 
@@ -426,6 +446,27 @@ checkInBtn.addEventListener('click', async () => {
     showStatus('تعذر تحديد الموقع: فعّل خدمة الموقع للمتصفح من الإعدادات', 'err');
     checkInBtn.disabled = false;
   }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
+});
+
+absentBtn.addEventListener('click', async () => {
+  absentBtn.disabled = true;
+  showStatus('جاري تسجيل الحالة...', 'warn');
+  try {
+    const workerId = workerSelect.value;
+    await db.collection('attendance').add({
+      workerId: workerId,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      lat: null,
+      lng: null,
+      photoBase64: '',
+      status: 'absent'
+    });
+    showStatus('✗ تم تسجيل غيابك اليوم', 'ok');
+  } catch (err) {
+    showStatus('خطأ: ' + err.message, 'err');
+  } finally {
+    absentBtn.disabled = false;
+  }
 });
 
 sickBtn.addEventListener('click', async () => {
@@ -492,10 +533,12 @@ document.querySelectorAll('.tab').forEach(tab => {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     tab.classList.add('active');
     document.getElementById('tab-overview').style.display = tab.dataset.tab === 'overview' ? 'block' : 'none';
+    document.getElementById('tab-daily').style.display = tab.dataset.tab === 'daily' ? 'block' : 'none';
     document.getElementById('tab-workers').style.display = tab.dataset.tab === 'workers' ? 'block' : 'none';
     document.getElementById('tab-monthly').style.display = tab.dataset.tab === 'monthly' ? 'block' : 'none';
     document.getElementById('tab-inventory').style.display = tab.dataset.tab === 'inventory' ? 'block' : 'none';
     if (tab.dataset.tab === 'monthly') loadMonthlyReport();
+    if (tab.dataset.tab === 'daily') renderDailyMarkList();
   });
 });
 
@@ -811,6 +854,7 @@ function watchWorkers() {
     allWorkersRaw = workersList;
     renderAbsentList();
     renderWorkersList();
+    renderDailyMarkList();
     populateIssueWorkerSelect();
   });
 }
@@ -840,11 +884,7 @@ function renderWorkersList() {
       html += `<div class="worker-row" style="flex-wrap:wrap;">
         <img src="${w.photo}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;background:rgba(255,255,255,0.2);" onerror="this.style.visibility='hidden'">
         <span class="name">${w.name}</span>
-        <button onclick="manualMark('${w.id}','present')" style="width:auto;padding:5px 8px;margin:0;font-size:15px;background:rgba(46,125,50,0.4);border:1px solid rgba(255,255,255,0.3);">✅</button>
-        <button onclick="manualMark('${w.id}','absent')" style="width:auto;padding:5px 8px;margin:0;font-size:15px;background:rgba(198,40,40,0.4);border:1px solid rgba(255,255,255,0.3);">✗</button>
-        <button onclick="manualMark('${w.id}','leave')" style="width:auto;padding:5px 8px;margin:0;font-size:15px;background:rgba(103,58,183,0.4);border:1px solid rgba(255,255,255,0.3);">📝</button>
-        <button onclick="manualMark('${w.id}','sick')" style="width:auto;padding:5px 8px;margin:0;font-size:15px;background:rgba(173,20,87,0.4);border:1px solid rgba(255,255,255,0.3);">🤒</button>
-        <button onclick="openEquipmentEditor('${w.id}')" style="width:auto;padding:5px 8px;margin:0;font-size:13px;background:rgba(255,152,0,0.4);border:1px solid rgba(255,255,255,0.3);">🧰</button>
+        <button onclick="openEquipmentEditor('${w.id}')" style="width:auto;padding:5px 8px;margin:0;font-size:13px;background:rgba(255,152,0,0.4);border:1px solid rgba(255,255,255,0.3);">🧰 المعدات</button>
         <button class="del-btn" onclick="deleteWorker('${w.id}','${w.name.replace(/'/g,"\\'")}')">حذف</button>
         <div style="width:100%; display:flex; flex-wrap:wrap; gap:4px; margin-top:4px;">${equipTags}</div>
         <div id="equipEditor-${w.id}" style="display:none; width:100%; background:rgba(0,0,0,0.2); border-radius:8px; padding:8px; margin-top:6px;"></div>
@@ -854,6 +894,43 @@ function renderWorkersList() {
   });
   container.innerHTML = html || '<p style="text-align:center;color:#888;">لا يوجد عامل مطابق</p>';
 }
+
+function renderDailyMarkList() {
+  const searchInput = document.getElementById('dailySearch');
+  const searchTerm = (searchInput?.value || '').trim();
+  const filtered = searchTerm
+    ? allWorkersRaw.filter(w => w.name.includes(searchTerm))
+    : allWorkersRaw;
+
+  const byTeam = {};
+  TEAMS.forEach(t => byTeam[t.id] = []);
+  filtered.forEach(w => byTeam[w.team].push(w));
+
+  const container = document.getElementById('dailyMarkList');
+  if (!container) return;
+
+  let html = '';
+  TEAMS.forEach(team => {
+    const members = byTeam[team.id];
+    if (!members.length) return;
+    html += `<div class="team-group">
+      <div class="team-title">${team.label} (${members.length})</div>`;
+    members.forEach(w => {
+      html += `<div class="worker-row">
+        <img src="${w.photo}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;background:rgba(255,255,255,0.2);" onerror="this.style.visibility='hidden'">
+        <span class="name">${w.name}</span>
+        <button onclick="manualMark('${w.id}','present')" style="width:auto;padding:6px 10px;margin:0;font-size:16px;background:rgba(46,125,50,0.4);border:1px solid rgba(255,255,255,0.3);">✅</button>
+        <button onclick="manualMark('${w.id}','absent')" style="width:auto;padding:6px 10px;margin:0;font-size:16px;background:rgba(198,40,40,0.4);border:1px solid rgba(255,255,255,0.3);">✗</button>
+        <button onclick="manualMark('${w.id}','leave')" style="width:auto;padding:6px 10px;margin:0;font-size:16px;background:rgba(103,58,183,0.4);border:1px solid rgba(255,255,255,0.3);">📝</button>
+        <button onclick="manualMark('${w.id}','sick')" style="width:auto;padding:6px 10px;margin:0;font-size:16px;background:rgba(173,20,87,0.4);border:1px solid rgba(255,255,255,0.3);">🤒</button>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+  container.innerHTML = html || '<p style="text-align:center;color:#888;">لا يوجد عامل مطابق</p>';
+}
+
+document.getElementById('dailySearch')?.addEventListener('input', renderDailyMarkList);
 
 function openEquipmentEditor(workerId) {
   const panel = document.getElementById('equipEditor-' + workerId);

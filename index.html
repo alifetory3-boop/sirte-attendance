@@ -82,6 +82,7 @@
 <body>
 
 <div class="card">
+  <img src="logo.png" alt="شعار الشركة" style="width:100%; max-width:220px; display:block; margin:0 auto 16px;">
   <h1>📍 تسجيل الحضور - سرت</h1>
 
   <label>اختر فريقك ثم اسمك</label>
@@ -98,6 +99,7 @@
   <div class="divider">— أو —</div>
 
   <button id="sickBtn" class="secondary" disabled>🤒 الإبلاغ عن مرض اليوم</button>
+  <button id="leaveBtn" class="secondary" disabled>📝 أخذت إذن اليوم</button>
 
   <div id="status"></div>
 </div>
@@ -151,6 +153,7 @@ const photoInput = document.getElementById('photoInput');
 const preview = document.getElementById('preview');
 const checkInBtn = document.getElementById('checkInBtn');
 const sickBtn = document.getElementById('sickBtn');
+const leaveBtn = document.getElementById('leaveBtn');
 const statusDiv = document.getElementById('status');
 
 let selectedFile = null;
@@ -164,6 +167,7 @@ function showStatus(msg, type) {
 function updateButtonState() {
   checkInBtn.disabled = !(workerSelect.value && selectedFile);
   sickBtn.disabled = !workerSelect.value;
+  leaveBtn.disabled = !workerSelect.value;
 }
 
 auth.signInAnonymously().catch(err => {
@@ -262,7 +266,7 @@ checkInBtn.addEventListener('click', async () => {
       checkInBtn.disabled = false;
     }
   }, (err) => {
-    showStatus('تعذر تحديد الموقع: فعل خدمة الموقع للمتصفح من الإعدادات', 'err');
+    showStatus('تعذر تحديد الموقع: فعّل خدمة الموقع للمتصفح من الإعدادات', 'err');
     checkInBtn.disabled = false;
   }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
 });
@@ -285,6 +289,27 @@ sickBtn.addEventListener('click', async () => {
     showStatus('خطأ: ' + err.message, 'err');
   } finally {
     sickBtn.disabled = false;
+  }
+});
+
+leaveBtn.addEventListener('click', async () => {
+  leaveBtn.disabled = true;
+  showStatus('جاري تسجيل الحالة...', 'warn');
+  try {
+    const workerId = workerSelect.value;
+    await db.collection('attendance').add({
+      workerId: workerId,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      lat: null,
+      lng: null,
+      photoBase64: '',
+      status: 'leave'
+    });
+    showStatus('📝 تم تسجيل إذنك اليوم', 'ok');
+  } catch (err) {
+    showStatus('خطأ: ' + err.message, 'err');
+  } finally {
+    leaveBtn.disabled = false;
   }
 });
 </script>

@@ -155,6 +155,7 @@
     <div class="card">
       <h2>سجل الحضور اللحظي</h2>
       <button id="exportBtn">📊 تصدير Excel (اليوم)</button>
+      <button id="clearTodayBtn" style="background:rgba(198,40,40,0.4);">🗑️ مسح سجل اليوم</button>
       <div id="list">جاري التحميل...</div>
     </div>
   </div>
@@ -1024,6 +1025,25 @@ function exportToExcel() {
 }
 
 document.getElementById('exportBtn').addEventListener('click', exportToExcel);
+
+document.getElementById('clearTodayBtn').addEventListener('click', async () => {
+  if (!latestRecords.length) {
+    alert('لا يوجد سجل اليوم لمسحه');
+    return;
+  }
+  if (!confirm(`هل أنت متأكد من مسح ${latestRecords.length} سجل حضور لليوم؟ هذا الإجراء لا يمكن التراجع عنه.`)) return;
+
+  try {
+    const batch = db.batch();
+    latestRecords.forEach(r => {
+      batch.delete(db.collection('attendance').doc(r.id));
+    });
+    await batch.commit();
+    alert('تم مسح سجل اليوم بنجاح');
+  } catch (err) {
+    alert('خطأ: ' + err.message);
+  }
+});
 
 function watchAttendance() {
   const startOfDay = new Date();

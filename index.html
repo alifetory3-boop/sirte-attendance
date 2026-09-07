@@ -55,6 +55,13 @@
     color: #fff;
     border: 1px solid rgba(255,120,120,0.6);
   }
+  #preview {
+    width: 100%;
+    border-radius: 14px;
+    margin-bottom: 12px;
+    display: none;
+    border: 1px solid rgba(255,255,255,0.4);
+  }
   #status {
     text-align: center;
     padding: 12px;
@@ -138,6 +145,7 @@
   <div id="tab-overview">
     <div class="card">
       <h1>حضور اليوم</h1>
+      <p id="todayDateDisplay" style="text-align:center; color:rgba(255,255,255,0.75); font-size:13px; margin-top:-10px; margin-bottom:14px;"></p>
       <div class="stats">
         <div class="stat" style="background:#e8f5e9;"><span class="num" id="presentCount">0</span>حاضر</div>
         <div class="stat" style="background:#fff3e0;"><span class="num" id="lateCount">0</span>متأخر</div>
@@ -163,6 +171,7 @@
   <div id="tab-daily" style="display:none;">
     <div class="card">
       <h2>✅ سجّل حالة اليوم لكل عامل</h2>
+      <p id="dailyDateDisplay" style="text-align:center; color:rgba(255,255,255,0.75); font-size:13px; margin-top:-6px; margin-bottom:12px;"></p>
       <input id="dailySearch" placeholder="🔍 ابحث باسم العامل">
       <div id="dailyMarkList">جاري التحميل...</div>
     </div>
@@ -216,6 +225,7 @@
 
     <div class="card">
       <h2>📦 محتوى المخزن</h2>
+      <button id="exportInventoryBtn">📊 تصدير المخزن Excel</button>
       <div id="inventoryList">جاري التحميل...</div>
     </div>
   </div>
@@ -522,10 +532,21 @@ auth.onAuthStateChanged(async (user) => {
   populateTeamSelect();
   populateEquipmentCheckboxes();
   populateMonthSelect();
+  displayTodayDate();
   watchAttendance();
   watchWorkers();
   watchInventory();
 });
+
+function displayTodayDate() {
+  const todayStr = new Date().toLocaleDateString('ar-LY', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+  });
+  const el1 = document.getElementById('todayDateDisplay');
+  const el2 = document.getElementById('dailyDateDisplay');
+  if (el1) el1.textContent = '📅 ' + todayStr;
+  if (el2) el2.textContent = '📅 ' + todayStr;
+}
 
 function populateEquipmentCheckboxes() {
   const container = document.getElementById('newWorkerEquipment');
@@ -702,6 +723,23 @@ document.getElementById('addWorkerBtn').addEventListener('click', async () => {
 
 let allInventory = [];
 let allWorkersRaw = [];
+
+document.getElementById('exportInventoryBtn').addEventListener('click', () => {
+  if (!allInventory.length) {
+    alert('المخزن فارغ، لا يوجد شيء لتصديره');
+    return;
+  }
+  const headers = ['اسم الصنف', 'الكمية', 'الوحدة'];
+  const rows = allInventory.map(item => [item.name, item.quantity, item.unit || '']);
+
+  const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+  worksheet['!cols'] = [{ wch: 24 }, { wch: 12 }, { wch: 16 }];
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'المخزن');
+
+  const dateStr = new Date().toISOString().slice(0, 10);
+  XLSX.writeFile(workbook, `مخزن-سرت-${dateStr}.xlsx`);
+});
 
 function watchInventory() {
   db.collection('inventory').orderBy('name').onSnapshot(snapshot => {

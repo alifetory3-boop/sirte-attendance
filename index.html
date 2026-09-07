@@ -19,16 +19,7 @@
     align-items: center;
     justify-content: center;
   }
-  #loginScreen {
-    width: 100%;
-    max-width: 400px;
-    padding: 20px;
-  }
-  #loginScreen .logo { text-align: center; margin-bottom: 20px; }
-  #loginScreen .logo img {
-    width: 80px; height: 80px; border-radius: 50%;
-    border: 3px solid rgba(255,255,255,0.5);
-  }
+  #loginScreen { width: 100%; max-width: 400px; padding: 20px; }
   #loginScreen h1 { text-align: center; color: #fff; font-size: 22px; margin-bottom: 5px; }
   #loginScreen .subtitle { text-align: center; color: rgba(255,255,255,0.7); font-size: 14px; margin-bottom: 25px; }
   .login-card {
@@ -39,7 +30,7 @@
     border-radius: 20px;
     padding: 25px 20px;
   }
-  .login-card label { display: block; color: rgba(255,255,255,0.85); font-size: 14px; margin-bottom: 8px; text-align: right; }
+  .login-card label { display: block; color: rgba(255,255,255,0.85); font-size: 14px; margin-bottom: 8px; }
   .login-card input {
     width: 100%; padding: 14px; border-radius: 12px;
     border: 1px solid rgba(255,255,255,0.4);
@@ -78,6 +69,7 @@
   button.secondary { background: rgba(198,40,40,0.35); }
   button.export-btn { background: rgba(33,150,243,0.5); }
   button.camera-btn { background: rgba(255,152,0,0.5); }
+  button.edit-btn { background: rgba(255,152,0,0.5); width: auto; padding: 5px 10px; font-size: 12px; margin: 0; }
   label { font-size: 13px; color: rgba(255,255,255,0.85); margin-bottom: 5px; display: block; }
   input, textarea {
     width: 100%; padding: 12px; border-radius: 10px;
@@ -101,15 +93,11 @@
   }
   .stat .num { font-size: 20px; font-weight: bold; display: block; }
   .row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.2); color: #fff; }
-  .worker-row { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.15); font-size: 13px; color: #fff; }
+  .worker-row { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.15); font-size: 13px; color: #fff; flex-wrap: wrap; }
   .worker-row .name { flex: 1; }
   .worker-row img { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.4); }
   .badge { padding: 3px 8px; border-radius: 15px; color: white; font-size: 11px; }
-  .del-btn {
-    width: auto; padding: 5px 8px;
-    background: rgba(198,40,40,0.35); color: #ffcdd2;
-    border: 1px solid rgba(255,120,120,0.5); margin: 0; font-size: 12px;
-  }
+  .del-btn { width: auto; padding: 5px 8px; background: rgba(198,40,40,0.35); color: #ffcdd2; border: 1px solid rgba(255,120,120,0.5); margin: 0; font-size: 12px; }
   .shift-selector { display: flex; gap: 8px; margin-bottom: 12px; }
   .shift-btn {
     flex: 1; padding: 12px; border-radius: 10px;
@@ -127,55 +115,31 @@
   .role-worker { background: rgba(76,175,80,0.5); color: #fff; }
   .view-only-badge { background: rgba(255,193,7,0.5); color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 10px; }
   .deduction-badge { background: rgba(244,67,54,0.6); color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 10px; }
-  .date-display {
-    text-align: center; color: #ffc107; font-size: 14px; font-weight: bold;
-    margin-bottom: 12px; padding: 8px; background: rgba(0,0,0,0.2); border-radius: 8px;
-  }
-  .photo-preview {
-    width: 100%; max-height: 150px; object-fit: cover;
-    border-radius: 10px; margin-bottom: 10px; display: none;
-    border: 2px solid rgba(255,255,255,0.4);
-  }
-  .camera-container {
-    text-align: center; margin-bottom: 15px;
-  }
-  .user-card {
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.25);
-    border-radius: 10px; padding: 10px; margin-bottom: 8px;
-  }
-  .perm-tag {
-    display: inline-block; padding: 2px 6px; border-radius: 6px;
-    font-size: 9px; margin: 2px; background: rgba(76,175,80,0.4); color: #fff;
-  }
-  .permission-box {
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 8px; padding: 10px; margin-bottom: 10px;
-  }
+  .date-display { text-align: center; color: #ffc107; font-size: 14px; font-weight: bold; margin-bottom: 12px; padding: 8px; background: rgba(0,0,0,0.2); border-radius: 8px; }
+  .photo-preview { width: 100%; max-height: 150px; object-fit: cover; border-radius: 10px; margin-bottom: 10px; display: none; border: 2px solid rgba(255,255,255,0.4); }
+  .camera-container { text-align: center; margin-bottom: 15px; }
+  .user-card { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.25); border-radius: 10px; padding: 10px; margin-bottom: 8px; }
+  .perm-tag { display: inline-block; padding: 2px 6px; border-radius: 6px; font-size: 9px; margin: 2px; background: rgba(76,175,80,0.4); color: #fff; }
+  .permission-box { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 10px; margin-bottom: 10px; }
   .permission-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
   .permission-item:last-child { border-bottom: none; }
   .permission-item label { flex: 1; margin: 0; font-size: 12px; }
   .permission-item input[type="checkbox"] { width: 16px; height: 16px; margin: 0; accent-color: #4caf50; }
+  .edit-form { display: none; width: 100%; background: rgba(0,0,0,0.3); border-radius: 10px; padding: 12px; margin-top: 8px; }
+  .info-tag { font-size: 10px; background: rgba(255,255,255,0.15); padding: 2px 6px; border-radius: 6px; display: inline-block; margin: 2px; }
 </style>
 </head>
 <body>
 
 <!-- شاشة تسجيل الدخول -->
 <div id="loginScreen">
-  <div class="logo">
-    <img src="logo.png" alt="شعار" onerror="this.style.display='none'">
-  </div>
   <h1>🔐 نظام حضور سرت</h1>
   <p class="subtitle">أدخل اسمك والرقم السري</p>
-  
   <div class="login-card">
     <label>👤 الاسم</label>
     <input id="loginName" placeholder="اكتب اسمك">
-    
     <label>🔢 الرقم السري</label>
     <input id="loginPin" type="password" class="pin-input" placeholder="••••" maxlength="6" inputmode="numeric">
-    
     <button onclick="login()">🔓 دخول</button>
     <div id="loginMsg"></div>
   </div>
@@ -264,15 +228,15 @@
       <div class="card">
         <h2>➕ إضافة عامل</h2>
         
-        <label>📸 صورة العامل</label>
+        <label>📸 صورة</label>
         <div class="camera-container">
-          <img id="workerPhotoPreview" class="photo-preview" alt="معاينة الصورة">
+          <img id="workerPhotoPreview" class="photo-preview">
           <input type="file" id="workerPhotoInput" accept="image/*" capture="user" style="display:none;">
-          <button class="camera-btn" onclick="document.getElementById('workerPhotoInput').click()">📷 التقط صورة</button>
+          <button class="camera-btn" onclick="document.getElementById('workerPhotoInput').click()">📷 صورة</button>
         </div>
         
-        <label>👤 اسم العامل</label>
-        <input id="newWorkerName" placeholder="اكتب الاسم">
+        <label>👤 الاسم</label>
+        <input id="newWorkerName" placeholder="اسم العامل">
         
         <label>🏢 الفريق</label>
         <select id="newWorkerTeam"></select>
@@ -284,8 +248,35 @@
           <option value="both">🔄 كلاهما</option>
         </select>
         
-        <button onclick="addWorker()">✅ تسجيل العامل</button>
+        <label>🏦 رقم الحساب (للسائقين)</label>
+        <input id="newWorkerAccount" placeholder="رقم الحساب البنكي">
+        
+        <label>🏛️ اسم المصرف</label>
+        <select id="newWorkerBank">
+          <option value="">— اختر —</option>
+          <option value="الجمهورية">مصرف الجمهورية</option>
+          <option value="التجاري">المصرف التجاري</option>
+          <option value="الوحدة">مصرف الوحدة</option>
+          <option value="الصحاري">مصرف الصحاري</option>
+          <option value="التجاري الوطني">المصرف التجاري الوطني</option>
+          <option value="الادخار">مصرف الادخار</option>
+          <option value="أخرى">أخرى</option>
+        </select>
+        
+        <label>🚗 درجة الرخصة</label>
+        <select id="newWorkerLicense">
+          <option value="">— اختر —</option>
+          <option value="خاصة">رخصة خاصة</option>
+          <option value="عامة">رخصة عامة</option>
+          <option value="درجة أولى">درجة أولى</option>
+          <option value="درجة ثانية">درجة ثانية</option>
+          <option value="درجة ثالثة">درجة ثالثة</option>
+          <option value="معدات ثقيلة">معدات ثقيلة</option>
+        </select>
+        
+        <button onclick="addWorker()">✅ تسجيل</button>
       </div>
+      
       <div class="card">
         <h2>👷 العمال</h2>
         <button class="export-btn" onclick="exportWorkersExcel()">📊 Excel</button>
@@ -341,12 +332,10 @@
           <option value="maintenance">🔧 صيانة</option>
           <option value="broken">❌ معطلة</option>
         </select>
-        
-        <label>📸 صورة الآلية</label>
-        <img id="vehiclePhotoPreview" class="photo-preview" alt="معاينة">
+        <label>📸 صورة</label>
+        <img id="vehiclePhotoPreview" class="photo-preview">
         <input type="file" id="vehiclePhotoInput" accept="image/*" capture="environment" style="display:none;">
         <button class="camera-btn" onclick="document.getElementById('vehiclePhotoInput').click()">📷 صورة</button>
-        
         <button onclick="saveVehicle()">💾 حفظ</button>
       </div>
       <div class="card">
@@ -411,14 +400,15 @@ let vehiclePhotoBase64 = '';
 
 const TEAMS = [
   { id: 'dump_truck_drivers', label: 'سائقين دنبر' },
-  { id: 'container_drivers', label: 'سائقين كنتر' },
-  { id: 'large_compactor_drivers', label: 'كباسة كبيرة' },
-  { id: 'small_compactor_drivers', label: 'كباسة صغيرة' },
+  { id: 'container_drivers', label: 'سائقين صندوق كنتر' },
+  { id: 'small_box_drivers', label: 'سائقين صندوق صغير' },
+  { id: 'large_compactor_drivers', label: 'سائقين كباسة كبيرة' },
+  { id: 'small_compactor_drivers', label: 'سائقين كباسة صغيرة' },
   { id: 'guards', label: 'غفير' },
-  { id: 'gardens_workers', label: 'حدائق' },
-  { id: 'cleaning_workers', label: 'نظافة' },
+  { id: 'gardens_workers', label: 'عمال حدائق' },
+  { id: 'cleaning_workers', label: 'عمال نظافة' },
   { id: 'compactor_workers', label: 'عمال كباسات' },
-  { id: 'electricians', label: 'كهربائي' },
+  { id: 'electricians', label: 'عمال كهربائي' },
   { id: 'cleaning_supervisors', label: 'مشرف نظافة' },
   { id: '', label: 'أخرى' },
 ];
@@ -428,7 +418,6 @@ function getTodayDate() {
 }
 function getTodayISO() { return new Date().toISOString().slice(0, 10); }
 
-// ضغط الصورة
 function compressImage(file, maxWidth = 400, quality = 0.6) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -449,7 +438,6 @@ function compressImage(file, maxWidth = 400, quality = 0.6) {
   });
 }
 
-// صورة العامل
 document.getElementById('workerPhotoInput').addEventListener('change', async (e) => {
   const file = e.target.files[0];
   if (!file) return;
@@ -459,7 +447,6 @@ document.getElementById('workerPhotoInput').addEventListener('change', async (e)
   preview.style.display = 'block';
 });
 
-// صورة الآلية
 document.getElementById('vehiclePhotoInput').addEventListener('change', async (e) => {
   const file = e.target.files[0];
   if (!file) return;
@@ -474,12 +461,7 @@ async function login() {
   const name = document.getElementById('loginName').value.trim();
   const pin = document.getElementById('loginPin').value.trim();
   const msg = document.getElementById('loginMsg');
-
-  if (!name || !pin) {
-    msg.innerHTML = '<p style="color:#ffcdd2;">⚠️ أدخل اسمك والرقم السري</p>';
-    return;
-  }
-
+  if (!name || !pin) { msg.innerHTML = '<p style="color:#ffcdd2;">⚠️ أدخل البيانات</p>'; return; }
   if (name === OWNER_NAME && pin === OWNER_PIN) {
     currentUser = { name: OWNER_NAME, role: 'owner' };
     currentUserRole = 'owner';
@@ -487,30 +469,15 @@ async function login() {
     enterAdmin();
     return;
   }
-
   try {
-    const userSnapshot = await db.collection('systemUsers')
-      .where('name', '==', name).where('pin', '==', pin).get();
-    if (!userSnapshot.empty) {
-      userSnapshot.forEach(doc => { currentUser = { id: doc.id, ...doc.data() }; });
-      currentUserRole = currentUser.role || 'supervisor';
-      currentUserPermissions = currentUser.permissions || {};
-      enterAdmin();
-      return;
-    }
+    const us = await db.collection('systemUsers').where('name','==',name).where('pin','==',pin).get();
+    if (!us.empty) { us.forEach(d => { currentUser = { id: d.id, ...d.data() }; }); currentUserRole = currentUser.role || 'supervisor'; currentUserPermissions = currentUser.permissions || {}; enterAdmin(); return; }
   } catch (err) {}
-
   try {
-    const workerSnapshot = await db.collection('workers').where('name', '==', name).get();
-    if (!workerSnapshot.empty) {
-      workerSnapshot.forEach(doc => { currentUser = { id: doc.id, ...doc.data(), role: 'worker' }; });
-      currentUserRole = 'worker';
-      enterWorker();
-      return;
-    }
+    const ws = await db.collection('workers').where('name','==',name).get();
+    if (!ws.empty) { ws.forEach(d => { currentUser = { id: d.id, ...d.data(), role: 'worker' }; }); currentUserRole = 'worker'; enterWorker(); return; }
   } catch (err) {}
-
-  msg.innerHTML = '<p style="color:#ffcdd2;">❌ الاسم أو الرقم السري غير صحيح</p>';
+  msg.innerHTML = '<p style="color:#ffcdd2;">❌ غير صحيح</p>';
 }
 
 function enterWorker() {
@@ -528,10 +495,10 @@ function enterAdmin() {
   document.getElementById('mainApp').style.display = 'block';
   document.getElementById('workerView').style.display = 'none';
   document.getElementById('adminView').style.display = 'block';
-  const userInfo = document.getElementById('currentUserInfo');
-  if (currentUserRole === 'owner') userInfo.innerHTML = '<span class="role-badge role-owner">👑</span> ' + currentUser.name;
-  else if (currentUserRole === 'admin') userInfo.innerHTML = '<span class="role-badge role-admin">👤</span> ' + currentUser.name;
-  else userInfo.innerHTML = '<span class="role-badge role-supervisor">👤</span> ' + currentUser.name;
+  const ui = document.getElementById('currentUserInfo');
+  if (currentUserRole === 'owner') ui.innerHTML = '<span class="role-badge role-owner">👑</span> ' + currentUser.name;
+  else if (currentUserRole === 'admin') ui.innerHTML = '<span class="role-badge role-admin">👤</span> ' + currentUser.name;
+  else ui.innerHTML = '<span class="role-badge role-supervisor">👤</span> ' + currentUser.name;
   clearLogin();
   initializeAdmin();
 }
@@ -551,23 +518,15 @@ function logout() {
 }
 
 function togglePermissionsBox() {
-  document.getElementById('permissionsBox').style.display = 
-    document.getElementById('newUserRole').value === 'supervisor' ? 'block' : 'none';
+  document.getElementById('permissionsBox').style.display = document.getElementById('newUserRole').value === 'supervisor' ? 'block' : 'none';
 }
 
-function selectWorkerShift(shift) {
-  selectedShift = shift;
-  document.querySelectorAll('#workerView .shift-btn').forEach(btn => {
+function selectWorkerShift(s) { selectedShift = s; updateShiftButtons('#workerView', s); }
+function selectAdminShift(s) { adminSelectedShift = s; updateShiftButtons('#tab-daily', s); }
+function updateShiftButtons(container, s) {
+  document.querySelectorAll(container + ' .shift-btn').forEach(btn => {
     btn.classList.remove('active');
-    if ((shift === 'morning' && btn.classList.contains('morning')) || (shift === 'night' && btn.classList.contains('night'))) btn.classList.add('active');
-  });
-}
-
-function selectAdminShift(shift) {
-  adminSelectedShift = shift;
-  document.querySelectorAll('#tab-daily .shift-btn').forEach(btn => {
-    btn.classList.remove('active');
-    if ((shift === 'morning' && btn.classList.contains('morning')) || (shift === 'night' && btn.classList.contains('night'))) btn.classList.add('active');
+    if ((s === 'morning' && btn.classList.contains('morning')) || (s === 'night' && btn.classList.contains('night'))) btn.classList.add('active');
   });
 }
 
@@ -581,13 +540,11 @@ function initializeAdmin() {
   watchInventory();
   loadVehicles();
   if (currentUserRole === 'owner' || currentUserRole === 'admin') loadUsersList();
-  
   document.querySelectorAll('.tab').forEach(tab => {
     tab.onclick = () => {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
-      const tabs = ['overview','daily','workers','deductions','inventory','vehicles','permissions'];
-      tabs.forEach(t => {
+      ['overview','daily','workers','deductions','inventory','vehicles','permissions'].forEach(t => {
         const el = document.getElementById('tab-' + t);
         if (el) el.style.display = tab.dataset.tab === t ? 'block' : 'none';
       });
@@ -597,9 +554,9 @@ function initializeAdmin() {
 }
 
 function displayDates() {
-  const todayStr = getTodayDate();
-  document.getElementById('adminDateDisplay').textContent = '📅 ' + todayStr;
-  document.getElementById('dailyDateDisplay').textContent = '📅 ' + todayStr;
+  const ts = getTodayDate();
+  document.getElementById('adminDateDisplay').textContent = '📅 ' + ts;
+  document.getElementById('dailyDateDisplay').textContent = '📅 ' + ts;
 }
 
 function populateTeamSelect() {
@@ -608,109 +565,82 @@ function populateTeamSelect() {
 
 function populateDeductionMonthSelect() {
   const now = new Date();
-  let options = '';
+  let o = '';
   for (let i = 0; i < 6; i++) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    options += `<option value="${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}">${d.toLocaleDateString('ar-LY',{year:'numeric',month:'long'})}</option>`;
+    o += `<option value="${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}">${d.toLocaleDateString('ar-LY',{year:'numeric',month:'long'})}</option>`;
   }
-  document.getElementById('deductionMonthSelect').innerHTML = options;
+  document.getElementById('deductionMonthSelect').innerHTML = o;
 }
 
-// حضور العامل
+// حضور
 function checkIn() {
-  const statusDiv = document.getElementById('status');
-  statusDiv.textContent = '⏳ جاري...';
-  statusDiv.style.display = 'block';
-  statusDiv.style.background = 'rgba(255,167,38,0.35)';
-  
-  if (!navigator.geolocation) {
-    statusDiv.textContent = '❌ لا يوجد موقع';
-    statusDiv.style.background = 'rgba(239,83,80,0.35)';
-    return;
-  }
-  
-  navigator.geolocation.getCurrentPosition(async (position) => {
-    const now = new Date();
-    const cutoff = new Date(now); cutoff.setHours(8,0,0,0);
-    const status = now > cutoff ? 'late' : 'present';
+  const sd = document.getElementById('status');
+  sd.textContent = '⏳...'; sd.style.display = 'block'; sd.style.background = 'rgba(255,167,38,0.35)';
+  if (!navigator.geolocation) { sd.textContent = '❌'; return; }
+  navigator.geolocation.getCurrentPosition(async (pos) => {
+    const now = new Date(); const cut = new Date(now); cut.setHours(8,0,0,0);
+    const status = now > cut ? 'late' : 'present';
     await db.collection('attendance').add({
       workerId: currentUser.id, workerName: currentUser.name,
       timestamp: firebase.firestore.FieldValue.serverTimestamp(),
       date: getTodayISO(), status, shift: selectedShift, hasDeduction: false
     });
-    statusDiv.textContent = '✅ تم التسجيل';
-    statusDiv.style.background = 'rgba(76,175,80,0.35)';
+    sd.textContent = '✅ تم'; sd.style.background = 'rgba(76,175,80,0.35)';
   });
 }
 
 async function markAbsent() {
-  await db.collection('attendance').add({
-    workerId: currentUser.id, workerName: currentUser.name,
-    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-    date: getTodayISO(), status: 'absent', shift: selectedShift, hasDeduction: true
-  });
-  const d = document.getElementById('status');
-  d.textContent = '✗ غائب (خصم)'; d.style.display = 'block'; d.style.background = 'rgba(239,83,80,0.35)';
+  await db.collection('attendance').add({ workerId: currentUser.id, workerName: currentUser.name, timestamp: firebase.firestore.FieldValue.serverTimestamp(), date: getTodayISO(), status: 'absent', shift: selectedShift, hasDeduction: true });
+  const d = document.getElementById('status'); d.textContent = '✗ غائب'; d.style.display = 'block'; d.style.background = 'rgba(239,83,80,0.35)';
 }
-
 async function markLeave() {
-  await db.collection('attendance').add({
-    workerId: currentUser.id, workerName: currentUser.name,
-    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-    date: getTodayISO(), status: 'leave', shift: selectedShift, hasDeduction: false
-  });
-  const d = document.getElementById('status');
-  d.textContent = '📝 إذن (لا خصم)'; d.style.display = 'block'; d.style.background = 'rgba(103,58,183,0.35)';
+  await db.collection('attendance').add({ workerId: currentUser.id, workerName: currentUser.name, timestamp: firebase.firestore.FieldValue.serverTimestamp(), date: getTodayISO(), status: 'leave', shift: selectedShift, hasDeduction: false });
+  const d = document.getElementById('status'); d.textContent = '📝 إذن'; d.style.display = 'block'; d.style.background = 'rgba(103,58,183,0.35)';
 }
-
 async function markSick() {
-  await db.collection('attendance').add({
-    workerId: currentUser.id, workerName: currentUser.name,
-    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-    date: getTodayISO(), status: 'sick', shift: selectedShift, hasDeduction: false
-  });
-  const d = document.getElementById('status');
-  d.textContent = '🤒 مريض (لا خصم)'; d.style.display = 'block'; d.style.background = 'rgba(173,20,87,0.35)';
+  await db.collection('attendance').add({ workerId: currentUser.id, workerName: currentUser.name, timestamp: firebase.firestore.FieldValue.serverTimestamp(), date: getTodayISO(), status: 'sick', shift: selectedShift, hasDeduction: false });
+  const d = document.getElementById('status'); d.textContent = '🤒 مريض'; d.style.display = 'block'; d.style.background = 'rgba(173,20,87,0.35)';
 }
 
-// مراقبة
 function watchAttendance() {
-  db.collection('attendance').where('date', '==', getTodayISO()).orderBy('timestamp', 'desc')
-    .onSnapshot(snapshot => {
-      const records = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-      latestAttendanceRecords = records;
-      document.getElementById('presentCount').textContent = records.filter(r => r.status === 'present' || r.status === 'late').length;
-      document.getElementById('leaveCount').textContent = records.filter(r => r.status === 'leave').length;
-      document.getElementById('sickCount').textContent = records.filter(r => r.status === 'sick').length;
-      document.getElementById('absentCount').textContent = records.filter(r => r.status === 'absent').length;
-      
-      const listDiv = document.getElementById('attendanceList');
-      if (!records.length) { listDiv.innerHTML = '<p style="text-align:center;color:#888;">لا يوجد</p>'; return; }
-      const meta = { present:{c:'#2e7d32',l:'حاضر'}, late:{c:'#ef6c00',l:'متأخر'}, leave:{c:'#673ab7',l:'إذن'}, sick:{c:'#ad1457',l:'مريض'}, absent:{c:'#c62828',l:'غائب'} };
-      listDiv.innerHTML = records.map(r => {
-        const time = r.timestamp ? new Date(r.timestamp.seconds*1000).toLocaleTimeString('ar-LY') : '--';
-        const m = meta[r.status] || {c:'#607d8b',l:r.status};
-        return `<div class="row"><div><div>${r.workerName}</div><div style="font-size:11px;">${time} ${r.shift==='morning'?'🌅':'🌙'}</div></div><span class="badge" style="background:${m.c};margin-right:auto;">${m.l}</span></div>`;
-      }).join('');
-    });
+  db.collection('attendance').where('date','==',getTodayISO()).orderBy('timestamp','desc').onSnapshot(sn => {
+    const recs = sn.docs.map(d => ({ id: d.id, ...d.data() }));
+    latestAttendanceRecords = recs;
+    document.getElementById('presentCount').textContent = recs.filter(r => r.status === 'present' || r.status === 'late').length;
+    document.getElementById('leaveCount').textContent = recs.filter(r => r.status === 'leave').length;
+    document.getElementById('sickCount').textContent = recs.filter(r => r.status === 'sick').length;
+    document.getElementById('absentCount').textContent = recs.filter(r => r.status === 'absent').length;
+    const ld = document.getElementById('attendanceList');
+    if (!recs.length) { ld.innerHTML = '<p style="text-align:center;color:#888;">لا يوجد</p>'; return; }
+    const meta = { present:{c:'#2e7d32',l:'حاضر'}, late:{c:'#ef6c00',l:'متأخر'}, leave:{c:'#673ab7',l:'إذن'}, sick:{c:'#ad1457',l:'مريض'}, absent:{c:'#c62828',l:'غائب'} };
+    ld.innerHTML = recs.map(r => {
+      const time = r.timestamp ? new Date(r.timestamp.seconds*1000).toLocaleTimeString('ar-LY') : '--';
+      const m = meta[r.status] || {c:'#607d8b',l:r.status};
+      return `<div class="row"><div><div>${r.workerName}</div><div style="font-size:11px;">${time} ${r.shift==='morning'?'🌅':'🌙'}</div></div><span class="badge" style="background:${m.c};margin-right:auto;">${m.l}</span></div>`;
+    }).join('');
+  });
 }
 
 function watchWorkers() {
-  db.collection('workers').orderBy('name').onSnapshot(snapshot => {
-    allWorkers = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+  db.collection('workers').orderBy('name').onSnapshot(sn => {
+    allWorkers = sn.docs.map(d => ({ id: d.id, ...d.data() }));
     const c1 = document.getElementById('workersList');
     c1.innerHTML = allWorkers.length ? allWorkers.map(w => `
       <div class="worker-row">
-        <img src="${w.photo || ''}" onerror="this.style.visibility='hidden'">
+        <img src="${w.photo||''}" onerror="this.style.visibility='hidden'">
         <span class="name">${w.name}</span>
+        <span style="font-size:10px;">${teamLabel(w.team)}</span>
+        <button class="edit-btn" onclick="toggleEditForm('${w.id}')">✏️ تعديل</button>
         <button class="del-btn" onclick="deleteWorker('${w.id}','${w.name}')">حذف</button>
+        <div id="editForm-${w.id}" class="edit-form"></div>
       </div>
     `).join('') : '<p style="text-align:center;">لا يوجد</p>';
     
     const c2 = document.getElementById('dailyMarkList');
     c2.innerHTML = allWorkers.length ? allWorkers.map(w => `
       <div class="worker-row">
-        <img src="${w.photo || ''}" onerror="this.style.visibility='hidden'">
+        <img src="${w.photo||''}" onerror="this.style.visibility='hidden'">
         <span class="name">${w.name}</span>
         <button onclick="manualMark('${w.id}','${w.name}','present')" style="width:auto;padding:5px;margin:0;background:rgba(46,125,50,0.4);">✅</button>
         <button onclick="manualMark('${w.id}','${w.name}','absent')" style="width:auto;padding:5px;margin:0;background:rgba(198,40,40,0.4);">✗</button>
@@ -721,89 +651,105 @@ function watchWorkers() {
   });
 }
 
-async function manualMark(workerId, workerName, status) {
-  await db.collection('attendance').add({
-    workerId, workerName,
-    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-    date: getTodayISO(), status, shift: adminSelectedShift,
-    hasDeduction: status === 'absent'
-  });
+function teamLabel(id) {
+  const t = TEAMS.find(t => t.id === id);
+  return t ? t.label : '';
 }
 
-// إضافة عامل
+function toggleEditForm(workerId) {
+  const form = document.getElementById('editForm-' + workerId);
+  if (form.style.display === 'block') { form.style.display = 'none'; form.innerHTML = ''; return; }
+  const w = allWorkers.find(x => x.id === workerId);
+  form.innerHTML = `
+    <input id="editName-${workerId}" value="${w.name}" placeholder="الاسم">
+    <select id="editTeam-${workerId}">
+      ${TEAMS.map(t => `<option value="${t.id}" ${t.id === w.team ? 'selected' : ''}>${t.label}</option>`).join('')}
+    </select>
+    <select id="editShift-${workerId}">
+      <option value="morning" ${w.shift === 'morning' ? 'selected' : ''}>🌅 صباح</option>
+      <option value="night" ${w.shift === 'night' ? 'selected' : ''}>🌙 ليل</option>
+      <option value="both" ${w.shift === 'both' ? 'selected' : ''}>🔄 كلاهما</option>
+    </select>
+    <input id="editAccount-${workerId}" value="${w.accountNumber || ''}" placeholder="رقم الحساب">
+    <input id="editBank-${workerId}" value="${w.bankName || ''}" placeholder="اسم المصرف">
+    <input id="editLicense-${workerId}" value="${w.licenseGrade || ''}" placeholder="درجة الرخصة">
+    <button onclick="saveEdit('${workerId}')">💾 حفظ</button>
+  `;
+  form.style.display = 'block';
+}
+
+async function saveEdit(workerId) {
+  const name = document.getElementById(`editName-${workerId}`).value;
+  const team = document.getElementById(`editTeam-${workerId}`).value;
+  const shift = document.getElementById(`editShift-${workerId}`).value;
+  const accountNumber = document.getElementById(`editAccount-${workerId}`).value;
+  const bankName = document.getElementById(`editBank-${workerId}`).value;
+  const licenseGrade = document.getElementById(`editLicense-${workerId}`).value;
+  
+  await db.collection('workers').doc(workerId).update({ name, team, shift, accountNumber, bankName, licenseGrade });
+  document.getElementById('editForm-' + workerId).style.display = 'none';
+}
+
+async function manualMark(workerId, workerName, status) {
+  await db.collection('attendance').add({ workerId, workerName, timestamp: firebase.firestore.FieldValue.serverTimestamp(), date: getTodayISO(), status, shift: adminSelectedShift, hasDeduction: status === 'absent' });
+}
+
 async function addWorker() {
   const name = document.getElementById('newWorkerName').value.trim();
   const team = document.getElementById('newWorkerTeam').value;
   const shift = document.getElementById('newWorkerShift').value;
-  if (!name) { alert('اكتب اسم العامل'); return; }
+  const accountNumber = document.getElementById('newWorkerAccount').value.trim();
+  const bankName = document.getElementById('newWorkerBank').value;
+  const licenseGrade = document.getElementById('newWorkerLicense').value;
+  
+  if (!name) { alert('اكتب الاسم'); return; }
   
   await db.collection('workers').add({
-    name, team, shift,
-    photo: workerPhotoBase64,
-    pin: '0000',
+    name, team, shift, accountNumber, bankName, licenseGrade,
+    photo: workerPhotoBase64, pin: '0000',
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   });
   
   document.getElementById('newWorkerName').value = '';
+  document.getElementById('newWorkerAccount').value = '';
+  document.getElementById('newWorkerBank').value = '';
+  document.getElementById('newWorkerLicense').value = '';
   workerPhotoBase64 = '';
   document.getElementById('workerPhotoPreview').style.display = 'none';
   document.getElementById('workerPhotoInput').value = '';
-  alert('✅ تمت الإضافة');
+  alert('✅ تم');
 }
 
-function deleteWorker(id, name) {
-  if (!confirm(`حذف ${name}؟`)) return;
-  db.collection('workers').doc(id).delete();
-}
+function deleteWorker(id, name) { if (confirm(`حذف ${name}؟`)) db.collection('workers').doc(id).delete(); }
 
 // خصومات
 async function loadDeductionSettings() {
-  try {
-    const doc = await db.collection('settings').doc('deductions').get();
-    if (doc.exists) { deductionAmountValue = doc.data().amount || 50; document.getElementById('deductionAmount').value = deductionAmountValue; }
-  } catch (err) {}
+  try { const d = await db.collection('settings').doc('deductions').get(); if (d.exists) { deductionAmountValue = d.data().amount || 50; document.getElementById('deductionAmount').value = deductionAmountValue; } } catch (err) {}
 }
-
 async function saveDeductionSettings() {
   deductionAmountValue = Number(document.getElementById('deductionAmount').value) || 0;
   await db.collection('settings').doc('deductions').set({ amount: deductionAmountValue });
-  alert('✅ تم الحفظ');
+  alert('✅');
 }
-
 async function loadDeductions() {
-  const [year, month] = document.getElementById('deductionMonthSelect').value.split('-').map(Number);
-  const from = new Date(year, month-1, 1), to = new Date(year, month, 1);
-  const snapshot = await db.collection('attendance').where('timestamp','>=',from).where('timestamp','<',to).get();
-  const deductions = {};
-  snapshot.forEach(doc => {
-    const r = doc.data();
-    if (r.status === 'absent') {
-      const key = r.workerName || r.workerId;
-      if (!deductions[key]) deductions[key] = 0;
-      deductions[key]++;
-    }
-  });
+  const [y, m] = document.getElementById('deductionMonthSelect').value.split('-').map(Number);
+  const from = new Date(y, m-1, 1), to = new Date(y, m, 1);
+  const sn = await db.collection('attendance').where('timestamp','>=',from).where('timestamp','<',to).get();
+  const ded = {};
+  sn.forEach(doc => { const r = doc.data(); if (r.status === 'absent') { const k = r.workerName || r.workerId; if (!ded[k]) ded[k] = 0; ded[k]++; } });
   const c = document.getElementById('deductionsList');
-  if (!Object.keys(deductions).length) { c.innerHTML = '<p style="text-align:center;">✅ لا يوجد</p>'; return; }
+  if (!Object.keys(ded).length) { c.innerHTML = '<p style="text-align:center;">✅ لا يوجد</p>'; return; }
   let total = 0;
-  c.innerHTML = Object.keys(deductions).map(name => {
-    const days = deductions[name], amount = days * deductionAmountValue;
-    total += amount;
-    return `<div class="worker-row"><span class="name">${name}</span><span class="deduction-badge">${days} يوم</span><span class="deduction-badge" style="background:rgba(255,152,0,0.6);">-${amount}</span></div>`;
-  }).join('') + `<div style="margin-top:10px;text-align:center;font-weight:bold;">الإجمالي: ${total} دينار</div>`;
+  c.innerHTML = Object.keys(ded).map(name => { const days = ded[name], amt = days * deductionAmountValue; total += amt; return `<div class="worker-row"><span class="name">${name}</span><span class="deduction-badge">${days} يوم</span><span class="deduction-badge" style="background:rgba(255,152,0,0.6);">-${amt}</span></div>`; }).join('') + `<div style="margin-top:10px;text-align:center;font-weight:bold;">الإجمالي: ${total}</div>`;
 }
 
 // مخزن
 function watchInventory() {
-  db.collection('inventory').orderBy('name').onSnapshot(snapshot => {
-    allInventory = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-    document.getElementById('inventoryList').innerHTML = allInventory.length ? allInventory.map(item => `
-      <div class="worker-row"><span class="name">${item.name}</span><span>${item.quantity} ${item.unit||''}</span>
-      <button class="del-btn" onclick="deleteItem('${item.id}','${item.name}')">حذف</button></div>
-    `).join('') : '<p style="text-align:center;">فارغ</p>';
+  db.collection('inventory').orderBy('name').onSnapshot(sn => {
+    allInventory = sn.docs.map(d => ({ id: d.id, ...d.data() }));
+    document.getElementById('inventoryList').innerHTML = allInventory.length ? allInventory.map(i => `<div class="worker-row"><span class="name">${i.name}</span><span>${i.quantity} ${i.unit||''}</span><button class="del-btn" onclick="deleteItem('${i.id}','${i.name}')">حذف</button></div>`).join('') : '<p style="text-align:center;">فارغ</p>';
   });
 }
-
 async function addItem() {
   const name = document.getElementById('newItemName').value.trim();
   const quantity = Number(document.getElementById('newItemQty').value) || 0;
@@ -814,25 +760,17 @@ async function addItem() {
   document.getElementById('newItemQty').value = '';
   document.getElementById('newItemUnit').value = '';
 }
-
 function deleteItem(id, name) { if (confirm(`حذف ${name}؟`)) db.collection('inventory').doc(id).delete(); }
 
 // آليات
 function loadVehicles() {
-  db.collection('vehicles').onSnapshot(snapshot => {
-    document.getElementById('vehiclesList').innerHTML = snapshot.empty ? '<p style="text-align:center;">لا يوجد</p>' :
-      snapshot.docs.map(doc => {
-        const v = doc.data();
-        return `<div class="worker-row">
-          ${v.photo ? `<img src="${v.photo}" style="width:35px;height:35px;border-radius:6px;object-fit:cover;">` : ''}
-          <span class="name">${v.typeLabel} - ${v.number}</span>
-          <span style="font-size:11px;">${v.statusLabel}</span>
-          <button class="del-btn" onclick="deleteVehicle('${doc.id}','${v.number}')">حذف</button>
-        </div>`;
-      }).join('');
+  db.collection('vehicles').onSnapshot(sn => {
+    document.getElementById('vehiclesList').innerHTML = sn.empty ? '<p style="text-align:center;">لا يوجد</p>' : sn.docs.map(doc => {
+      const v = doc.data();
+      return `<div class="worker-row">${v.photo ? `<img src="${v.photo}" style="width:35px;height:35px;border-radius:6px;">` : ''}<span class="name">${v.typeLabel} - ${v.number}</span><span style="font-size:11px;">${v.statusLabel}</span><button class="del-btn" onclick="deleteVehicle('${doc.id}','${v.number}')">حذف</button></div>`;
+    }).join('');
   });
 }
-
 async function saveVehicle() {
   const type = document.getElementById('vehicleType').value;
   const number = document.getElementById('vehicleNumber').value.trim();
@@ -846,7 +784,6 @@ async function saveVehicle() {
   document.getElementById('vehiclePhotoPreview').style.display = 'none';
   document.getElementById('vehiclePhotoInput').value = '';
 }
-
 function deleteVehicle(id, number) { if (confirm(`حذف ${number}؟`)) db.collection('vehicles').doc(id).delete(); }
 
 // مستخدمين
@@ -854,12 +791,10 @@ async function addUser() {
   const name = document.getElementById('newUserName').value.trim();
   const pin = document.getElementById('newUserPin').value.trim();
   const role = document.getElementById('newUserRole').value;
-  if (!name || !pin || pin.length < 4) { alert('اسم ورقم (4-6)'); return; }
-  
+  if (!name || !pin || pin.length < 4) { alert('اسم ورقم'); return; }
   let permissions = {}, viewOnly = false;
-  if (role === 'admin') {
-    permissions = { viewOverview:true, manageAttendance:true, manageWorkers:true, viewDeductions:true, manageInventory:true, manageVehicles:true };
-  } else {
+  if (role === 'admin') { permissions = { viewOverview:true, manageAttendance:true, manageWorkers:true, viewDeductions:true, manageInventory:true, manageVehicles:true }; }
+  else {
     permissions = {
       viewOverview: document.getElementById('perm-overview').checked,
       manageAttendance: document.getElementById('perm-attendance').checked,
@@ -870,27 +805,19 @@ async function addUser() {
     };
     viewOnly = document.getElementById('perm-viewonly').checked;
   }
-  
   await db.collection('systemUsers').add({ name, pin, role, permissions, viewOnly });
   document.getElementById('newUserName').value = '';
   document.getElementById('newUserPin').value = '';
   loadUsersList();
 }
-
 function loadUsersList() {
-  db.collection('systemUsers').onSnapshot(snapshot => {
-    document.getElementById('usersList').innerHTML = snapshot.empty ? '<p style="text-align:center;">لا يوجد</p>' :
-      snapshot.docs.map(doc => {
-        const u = doc.data();
-        return `<div class="user-card">
-          <strong>${u.name}</strong> <span style="font-size:11px;">🔢${u.pin}</span>
-          ${u.viewOnly ? '<span class="view-only-badge">👁️</span>' : ''}
-          <button class="del-btn" onclick="deleteUser('${doc.id}','${u.name}')">حذف</button>
-        </div>`;
-      }).join('');
+  db.collection('systemUsers').onSnapshot(sn => {
+    document.getElementById('usersList').innerHTML = sn.empty ? '<p style="text-align:center;">لا يوجد</p>' : sn.docs.map(doc => {
+      const u = doc.data();
+      return `<div class="user-card"><strong>${u.name}</strong> <span style="font-size:11px;">🔢${u.pin}</span> ${u.viewOnly ? '<span class="view-only-badge">👁️</span>' : ''}<button class="del-btn" onclick="deleteUser('${doc.id}','${u.name}')">حذف</button></div>`;
+    }).join('');
   });
 }
-
 function deleteUser(id, name) { if (confirm(`حذف ${name}؟`)) db.collection('systemUsers').doc(id).delete(); }
 
 // Excel
@@ -902,20 +829,14 @@ function exportAttendanceExcel() {
   const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'الحضور');
   XLSX.writeFile(wb, `حضور-${getTodayISO()}.xlsx`);
 }
-
 function exportWorkersExcel() {
   if (!allWorkers.length) { alert('لا يوجد'); return; }
-  const rows = allWorkers.map(w => [w.name, TEAMS.find(t=>t.id===w.team)?.label||'', w.shift==='both'?'كلاهما':w.shift==='night'?'ليل':'صباح']);
-  const ws = XLSX.utils.aoa_to_sheet([['الاسم','الفريق','الوردية'], ...rows]);
+  const rows = allWorkers.map(w => [w.name, teamLabel(w.team), w.shift==='both'?'كلاهما':w.shift==='night'?'ليل':'صباح', w.accountNumber||'', w.bankName||'', w.licenseGrade||'']);
+  const ws = XLSX.utils.aoa_to_sheet([['الاسم','الفريق','الوردية','رقم الحساب','المصرف','الرخصة'], ...rows]);
   const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'العمال');
   XLSX.writeFile(wb, 'عمال.xlsx');
 }
-
-function exportDeductionsExcel() {
-  loadDeductions();
-  alert('تم تحميل الخصومات - استخدم زر Excel في الأعلى');
-}
-
+function exportDeductionsExcel() { loadDeductions(); }
 function exportInventoryExcel() {
   if (!allInventory.length) { alert('فارغ'); return; }
   const rows = allInventory.map(i => [i.name, i.quantity, i.unit||'']);
@@ -923,7 +844,6 @@ function exportInventoryExcel() {
   const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'المخزن');
   XLSX.writeFile(wb, 'مخزن.xlsx');
 }
-
 function exportVehiclesExcel() {
   db.collection('vehicles').get().then(s => {
     if (s.empty) { alert('لا يوجد'); return; }

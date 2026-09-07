@@ -8,7 +8,6 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
   * { box-sizing: border-box; }
   body {
@@ -58,13 +57,6 @@
     background: rgba(198,40,40,0.35);
     color: #fff;
     border: 1px solid rgba(255,120,120,0.6);
-  }
-  #preview {
-    width: 100%;
-    border-radius: 14px;
-    margin-bottom: 12px;
-    display: none;
-    border: 1px solid rgba(255,255,255,0.4);
   }
   #status {
     text-align: center;
@@ -139,29 +131,6 @@
     border-radius: 8px;
     border: 1px solid rgba(255,255,255,0.3);
   }
-
-  .permission-toggle {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 8px;
-    margin-bottom: 8px;
-    border: 1px solid rgba(255,255,255,0.2);
-  }
-  .permission-toggle label {
-    flex: 1;
-    margin: 0;
-    cursor: pointer;
-  }
-  .permission-toggle input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
-    margin: 0;
-    cursor: pointer;
-    accent-color: #4caf50;
-  }
   .view-only-badge {
     display: inline-block;
     background: rgba(255,193,7,0.5);
@@ -179,14 +148,42 @@
     font-weight: bold;
     margin-right: 4px;
   }
+  .role-owner { background: rgba(255,215,0,0.6); color: #fff; }
   .role-admin { background: rgba(156,39,176,0.6); color: #fff; }
   .role-supervisor { background: rgba(33,150,243,0.6); color: #fff; }
-  .role-worker { background: rgba(76,175,80,0.5); color: #fff; }
   .pin-input {
     letter-spacing: 10px;
     font-size: 24px;
     text-align: center;
     font-weight: bold;
+  }
+  .permission-box {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 10px;
+  }
+  .permission-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .permission-item:last-child { border-bottom: none; }
+  .permission-item label {
+    flex: 1;
+    margin: 0;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .permission-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    cursor: pointer;
+    accent-color: #4caf50;
   }
 </style>
 </head>
@@ -197,15 +194,15 @@
   <h1 style="margin-bottom:4px;">نظام حضور سرت</h1>
   <p style="color:rgba(255,255,255,0.7); font-size:13px; margin:0 0 22px;">اختر الدخول المناسب لك</p>
   <button onclick="showWorker()" style="padding:16px; font-size:16px;">👷 تسجيل الحضور اليومي</button>
-  <button onclick="showAdminLogin()" style="background:rgba(103,58,183,0.5); padding:16px; font-size:16px;">🔐 دخول المشرفين</button>
+  <button onclick="showAdminLogin()" style="background:rgba(103,58,183,0.5); padding:16px; font-size:16px;">🔐 دخول المشرفين والإدارة</button>
 </div>
 
-<!-- صفحة تسجيل دخول المشرفين -->
+<!-- صفحة تسجيل الدخول -->
 <div id="adminLogin" style="display:none;">
   <button onclick="showLanding()" style="max-width:420px;margin:0 auto 12px;display:block;background:rgba(255,255,255,0.14);">⬅ رجوع للصفحة الرئيسية</button>
   <div class="card">
-    <h1>🔐 دخول المشرفين</h1>
-    <p style="text-align:center;color:rgba(255,255,255,0.7);font-size:13px;margin-bottom:20px;">أدخل اسمك والرقم السري الذي تم إعطاؤه لك</p>
+    <h1>🔐 تسجيل الدخول</h1>
+    <p style="text-align:center;color:rgba(255,255,255,0.7);font-size:13px;margin-bottom:20px;">أدخل الاسم والرقم السري الذي تم إعطاؤه لك من الإدارة</p>
     
     <label>👤 الاسم</label>
     <input id="loginName" placeholder="أدخل اسمك">
@@ -258,7 +255,7 @@
       <div class="tab" data-tab="inventory">📦 المخزن</div>
       <div class="tab" data-tab="reports">📋 تقارير العمل</div>
       <div class="tab" data-tab="vehicles">🚛 الآليات</div>
-      <div class="tab" data-tab="permissions">🔑 الصلاحيات</div>
+      <div class="tab" data-tab="permissions">🔑 إدارة المستخدمين</div>
     </div>
 
     <div id="tab-overview">
@@ -442,30 +439,67 @@
       </div>
     </div>
 
-    <!-- تبويب الصلاحيات -->
+    <!-- تبويب إدارة المستخدمين والصلاحيات -->
     <div id="tab-permissions" style="display:none;">
       <div class="card">
-        <h2>👥 إضافة مشرف جديد</h2>
+        <h2>👥 إضافة مستخدم جديد</h2>
+        <p style="font-size:12px;color:rgba(255,255,255,0.7);">أنت كمدير تقوم بإنشاء حساب لكل شخص وإعطائه الصلاحيات المناسبة</p>
         
-        <label>👤 اسم المشرف</label>
-        <input id="newSupervisorName" placeholder="اسم المشرف">
+        <label>👤 اسم المستخدم</label>
+        <input id="newUserName" placeholder="اسم الشخص">
         
         <label>🔢 الرقم السري (4-6 أرقام)</label>
-        <input id="newSupervisorPin" type="password" class="pin-input" placeholder="••••" maxlength="6" inputmode="numeric" pattern="[0-9]*">
+        <input id="newUserPin" type="password" class="pin-input" placeholder="••••" maxlength="6" inputmode="numeric" pattern="[0-9]*">
         
-        <label>📊 نوع الصلاحية</label>
-        <select id="newSupervisorRole">
-          <option value="supervisor">مشرف (صلاحيات مخصصة)</option>
-          <option value="admin">مدير عام (كل الصلاحيات)</option>
+        <label>📊 نوع المستخدم</label>
+        <select id="newUserRole">
+          <option value="supervisor">مشرف - صلاحيات محددة</option>
+          <option value="admin">مدير - صلاحيات كاملة</option>
         </select>
         
-        <button id="addSupervisorBtn">➕ إضافة المشرف</button>
-        <div id="addSupervisorMsg"></div>
+        <div id="permissionsSelection" class="permission-box" style="display:none;">
+          <h3 style="margin-top:0;">حدد الصلاحيات:</h3>
+          <div class="permission-item">
+            <label>📊 عرض نظرة عامة</label>
+            <input type="checkbox" id="perm-overview" checked>
+          </div>
+          <div class="permission-item">
+            <label>✅ تسجيل الحضور اليومي</label>
+            <input type="checkbox" id="perm-attendance" checked>
+          </div>
+          <div class="permission-item">
+            <label>👷 إدارة العمال</label>
+            <input type="checkbox" id="perm-workers">
+          </div>
+          <div class="permission-item">
+            <label>📅 عرض التقرير الشهري</label>
+            <input type="checkbox" id="perm-monthly" checked>
+          </div>
+          <div class="permission-item">
+            <label>📦 إدارة المخزن</label>
+            <input type="checkbox" id="perm-inventory">
+          </div>
+          <div class="permission-item">
+            <label>📋 تقارير العمل</label>
+            <input type="checkbox" id="perm-reports">
+          </div>
+          <div class="permission-item">
+            <label>🚛 إدارة الآليات</label>
+            <input type="checkbox" id="perm-vehicles">
+          </div>
+          <div class="permission-item">
+            <label>👁️ مشاهدة فقط (لا يمكنه التعديل)</label>
+            <input type="checkbox" id="perm-viewonly">
+          </div>
+        </div>
+        
+        <button id="addUserBtn">➕ إضافة المستخدم</button>
+        <div id="addUserMsg"></div>
       </div>
 
       <div class="card">
-        <h2>📋 قائمة المشرفين</h2>
-        <div id="supervisorsList">جاري التحميل...</div>
+        <h2>📋 قائمة المستخدمين المسجلين</h2>
+        <div id="usersList">جاري التحميل...</div>
       </div>
     </div>
   </div>
@@ -481,6 +515,10 @@
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
+
+// ============ الثوابت ============
+const OWNER_NAME = 'المدير'; // اسمك أنت كصاحب النظام
+const OWNER_PIN = '1234'; // رقمك السري الخاص - غيّره لما تريد
 
 const TEAMS = [
   { id: 'dump_truck_drivers',      label: 'سائقين شاحنة دنبر' },
@@ -524,22 +562,11 @@ const VEHICLE_STATUS = {
   broken: { label: 'معطلة', color: 'status-broken', icon: '❌' }
 };
 
-// الصلاحيات الافتراضية
-const DEFAULT_PERMISSIONS = {
-  viewOverview: true,
-  manageAttendance: true,
-  manageWorkers: false,
-  viewMonthly: true,
-  manageInventory: false,
-  manageReports: false,
-  manageVehicles: false,
-  managePermissions: false
-};
-
 let currentUser = null;
-let currentUserPermissions = { ...DEFAULT_PERMISSIONS };
+let currentUserPermissions = {};
 let currentUserRole = '';
 
+// ============ دوال مساعدة ============
 function equipmentLabel(id) {
   const e = EQUIPMENT.find(e => e.id === id);
   return e ? `${e.icon} ${e.label}` : id;
@@ -565,8 +592,12 @@ function compressImageToBase64(file, maxWidth = 480, quality = 0.6) {
   });
 }
 
-// ============ نظام تسجيل الدخول بالاسم والرقم السري ============
+function teamLabel(id) {
+  const t = TEAMS.find(t => t.id === (id || ''));
+  return t ? t.label : 'أخرى / غير مصنّف';
+}
 
+// ============ نظام تسجيل الدخول ============
 function showAdminLogin() {
   document.getElementById('landing').style.display = 'none';
   document.getElementById('adminLogin').style.display = 'block';
@@ -574,7 +605,6 @@ function showAdminLogin() {
   document.getElementById('adminView').style.display = 'none';
 }
 
-// تسجيل الدخول
 document.getElementById('loginBtn').addEventListener('click', async () => {
   const name = document.getElementById('loginName').value.trim();
   const pin = document.getElementById('loginPin').value.trim();
@@ -585,44 +615,183 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
     return;
   }
 
-  try {
-    msg.innerHTML = '<p style="color:#fff;">جاري التحقق...</p>';
+  // التحقق من صاحب النظام أولاً
+  if (name === OWNER_NAME && pin === OWNER_PIN) {
+    currentUser = { name: OWNER_NAME, role: 'owner', viewOnly: false };
+    currentUserRole = 'owner';
+    currentUserPermissions = {
+      viewOverview: true,
+      manageAttendance: true,
+      manageWorkers: true,
+      viewMonthly: true,
+      manageInventory: true,
+      manageReports: true,
+      manageVehicles: true,
+      managePermissions: true
+    };
     
-    // البحث عن المشرف بالاسم
-    const snapshot = await db.collection('supervisors')
+    msg.innerHTML = '<p style="color:#c8f7d4;">✅ مرحباً بك يا صاحب النظام</p>';
+    enterAdminPanel();
+    return;
+  }
+
+  // البحث في المستخدمين المسجلين
+  try {
+    const snapshot = await db.collection('systemUsers')
       .where('name', '==', name)
+      .where('pin', '==', pin)
       .get();
     
     if (snapshot.empty) {
-      msg.innerHTML = '<p style="color:#ffcdd2;">❌ الاسم غير موجود</p>';
+      msg.innerHTML = '<p style="color:#ffcdd2;">❌ الاسم أو الرقم السري غير صحيح</p>';
       return;
     }
     
-    // التحقق من الرقم السري
     let foundUser = null;
-    let foundUserId = null;
-    
     snapshot.forEach(doc => {
-      const data = doc.data();
-      if (data.pin === pin) {
-        foundUser = data;
-        foundUserId = doc.id;
-      }
+      foundUser = { id: doc.id, ...doc.data() };
     });
     
-    if (!foundUser) {
-      msg.innerHTML = '<p style="color:#ffcdd2;">❌ الرقم السري غير صحيح</p>';
-      return;
+    currentUser = foundUser;
+    currentUserRole = foundUser.role || 'supervisor';
+    currentUserPermissions = foundUser.permissions || {};
+    
+    msg.innerHTML = `<p style="color:#c8f7d4;">✅ مرحباً ${foundUser.name}</p>`;
+    enterAdminPanel();
+    
+  } catch (err) {
+    console.error('خطأ:', err);
+    msg.innerHTML = '<p style="color:#ffcdd2;">خطأ: ' + err.message + '</p>';
+  }
+});
+
+function enterAdminPanel() {
+  // تنظيف الحقول
+  document.getElementById('loginName').value = '';
+  document.getElementById('loginPin').value = '';
+  document.getElementById('loginMsg').innerHTML = '';
+  
+  // إظهار لوحة التحكم
+  document.getElementById('adminLogin').style.display = 'none';
+  document.getElementById('adminView').style.display = 'block';
+  
+  updateUIForPermissions();
+  initializeAdmin();
+}
+
+function logoutAdmin() {
+  currentUser = null;
+  currentUserPermissions = {};
+  currentUserRole = '';
+  showLanding();
+}
+
+function updateUIForPermissions() {
+  const userInfo = document.getElementById('currentUserInfo');
+  
+  if (currentUserRole === 'owner') {
+    userInfo.innerHTML = '<span class="role-badge role-owner">👑 صاحب النظام</span> ' + currentUser.name;
+  } else if (currentUserRole === 'admin') {
+    userInfo.innerHTML = '<span class="role-badge role-admin">👤 مدير</span> ' + currentUser.name;
+  } else {
+    userInfo.innerHTML = '<span class="role-badge role-supervisor">👤 مشرف</span> ' + currentUser.name;
+  }
+  
+  if (currentUser.viewOnly) {
+    userInfo.innerHTML += ' <span class="view-only-badge">👁️ مشاهدة فقط</span>';
+  }
+  
+  // إظهار/إخفاء التبويبات
+  const tabs = document.querySelectorAll('#adminTabs .tab');
+  tabs.forEach(tab => {
+    const tabName = tab.dataset.tab;
+    let show = false;
+    
+    if (currentUserRole === 'owner') {
+      show = true; // صاحب النظام يرى كل شيء
+    } else {
+      switch(tabName) {
+        case 'overview': show = currentUserPermissions.viewOverview !== false; break;
+        case 'daily': show = currentUserPermissions.manageAttendance === true; break;
+        case 'workers': show = currentUserPermissions.manageWorkers === true; break;
+        case 'monthly': show = currentUserPermissions.viewMonthly !== false; break;
+        case 'inventory': show = currentUserPermissions.manageInventory === true; break;
+        case 'reports': show = currentUserPermissions.manageReports === true; break;
+        case 'vehicles': show = currentUserPermissions.manageVehicles === true; break;
+        case 'permissions': show = currentUserPermissions.managePermissions === true || currentUserRole === 'admin'; break;
+      }
     }
     
-    // تسجيل الدخول بنجاح
-    currentUser = { ...foundUser, id: foundUserId };
-    currentUserRole = foundUser.role || 'supervisor';
-    currentUserPermissions = foundUser.permissions || { ...DEFAULT_PERMISSIONS };
+    tab.style.display = show ? 'block' : 'none';
+  });
+  
+  applyViewOnlyMode();
+}
+
+function applyViewOnlyMode() {
+  const isViewOnly = currentUser.viewOnly === true;
+  
+  const editButtons = [
+    'addWorkerBtn', 'addItemBtn', 'issueBtn', 'saveReportBtn', 
+    'saveVehicleBtn', 'addUserBtn', 'clearTodayBtn'
+  ];
+  
+  editButtons.forEach(btnId => {
+    const btn = document.getElementById(btnId);
+    if (btn) {
+      if (isViewOnly) {
+        btn.disabled = true;
+        btn.style.opacity = '0.5';
+      } else {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+      }
+    }
+  });
+}
+
+// ============ إدارة المستخدمين ============
+document.getElementById('newUserRole').addEventListener('change', (e) => {
+  const permissionsDiv = document.getElementById('permissionsSelection');
+  if (e.target.value === 'supervisor') {
+    permissionsDiv.style.display = 'block';
+  } else {
+    permissionsDiv.style.display = 'none';
+  }
+});
+
+document.getElementById('addUserBtn').addEventListener('click', async () => {
+  const name = document.getElementById('newUserName').value.trim();
+  const pin = document.getElementById('newUserPin').value.trim();
+  const role = document.getElementById('newUserRole').value;
+  const msg = document.getElementById('addUserMsg');
+
+  if (!name || !pin) {
+    msg.innerHTML = '<p style="color:#ffcdd2;">أدخل اسم المستخدم والرقم السري</p>';
+    return;
+  }
+
+  if (pin.length < 4 || pin.length > 6 || !/^\d+$/.test(pin)) {
+    msg.innerHTML = '<p style="color:#ffcdd2;">الرقم السري يجب أن يكون 4-6 أرقام</p>';
+    return;
+  }
+
+  try {
+    // التحقق من عدم وجود نفس الاسم
+    const existingCheck = await db.collection('systemUsers')
+      .where('name', '==', name)
+      .get();
     
-    // إذا كان مدير عام، يعطى كل الصلاحيات
-    if (currentUserRole === 'admin') {
-      currentUserPermissions = {
+    if (!existingCheck.empty) {
+      msg.innerHTML = '<p style="color:#ffcdd2;">يوجد مستخدم بنفس الاسم بالفعل</p>';
+      return;
+    }
+
+    let permissions = {};
+    let viewOnly = false;
+
+    if (role === 'admin') {
+      permissions = {
         viewOverview: true,
         manageAttendance: true,
         manageWorkers: true,
@@ -632,244 +801,87 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
         manageVehicles: true,
         managePermissions: true
       };
-    }
-    
-    msg.innerHTML = '<p style="color:#c8f7d4;">✅ تم تسجيل الدخول بنجاح</p>';
-    
-    // تنظيف الحقول
-    document.getElementById('loginName').value = '';
-    document.getElementById('loginPin').value = '';
-    
-    // إظهار لوحة التحكم
-    document.getElementById('adminLogin').style.display = 'none';
-    document.getElementById('adminView').style.display = 'block';
-    
-    // تحديث واجهة المستخدم
-    updateUIForPermissions();
-    initializeAdmin();
-    
-  } catch (err) {
-    console.error('خطأ في تسجيل الدخول:', err);
-    msg.innerHTML = '<p style="color:#ffcdd2;">خطأ: ' + err.message + '</p>';
-  }
-});
-
-function logoutAdmin() {
-  currentUser = null;
-  currentUserPermissions = { ...DEFAULT_PERMISSIONS };
-  currentUserRole = '';
-  showLanding();
-}
-
-function updateUIForPermissions() {
-  // تحديث معلومات المستخدم
-  const userInfo = document.getElementById('currentUserInfo');
-  if (currentUser) {
-    const roleLabel = currentUserRole === 'admin' ? '👑 مدير عام' : '👤 مشرف';
-    const roleClass = currentUserRole === 'admin' ? 'role-admin' : 'role-supervisor';
-    const viewOnlyBadge = currentUser.viewOnly ? ' <span class="view-only-badge">👁️ مشاهدة فقط</span>' : '';
-    userInfo.innerHTML = `<span class="role-badge ${roleClass}">${roleLabel}</span> ${currentUser.name || 'مشرف'}${viewOnlyBadge}`;
-  }
-  
-  // إظهار/إخفاء التبويبات حسب الصلاحيات
-  const tabs = document.querySelectorAll('#adminTabs .tab');
-  tabs.forEach(tab => {
-    const tabName = tab.dataset.tab;
-    let show = true;
-    
-    switch(tabName) {
-      case 'overview':
-        show = currentUserPermissions.viewOverview;
-        break;
-      case 'daily':
-        show = currentUserPermissions.manageAttendance;
-        break;
-      case 'workers':
-        show = currentUserPermissions.manageWorkers;
-        break;
-      case 'monthly':
-        show = currentUserPermissions.viewMonthly;
-        break;
-      case 'inventory':
-        show = currentUserPermissions.manageInventory;
-        break;
-      case 'reports':
-        show = currentUserPermissions.manageReports;
-        break;
-      case 'vehicles':
-        show = currentUserPermissions.manageVehicles;
-        break;
-      case 'permissions':
-        show = currentUserPermissions.managePermissions;
-        break;
-    }
-    
-    tab.style.display = show ? 'block' : 'none';
-  });
-  
-  // تطبيق وضع المشاهدة فقط
-  applyViewOnlyMode();
-}
-
-function applyViewOnlyMode() {
-  const isViewOnly = currentUser.viewOnly || false;
-  
-  // تعطيل أزرار التعديل
-  const editButtons = [
-    'addWorkerBtn', 'addItemBtn', 'issueBtn', 'saveReportBtn', 
-    'saveVehicleBtn', 'addSupervisorBtn', 'clearTodayBtn'
-  ];
-  
-  editButtons.forEach(btnId => {
-    const btn = document.getElementById(btnId);
-    if (btn) {
-      if (isViewOnly) {
-        btn.disabled = true;
-        btn.style.opacity = '0.5';
-        btn.title = 'وضع المشاهدة فقط - لا يمكنك التعديل';
-      } else {
-        btn.disabled = false;
-        btn.style.opacity = '1';
-        btn.title = '';
-      }
-    }
-  });
-  
-  // تعطيل حقول الإدخال في وضع المشاهدة
-  const inputs = document.querySelectorAll('#adminView input, #adminView textarea, #adminView select');
-  inputs.forEach(input => {
-    if (isViewOnly) {
-      input.disabled = true;
-      input.style.opacity = '0.6';
     } else {
-      input.disabled = false;
-      input.style.opacity = '1';
-    }
-  });
-}
-
-// ============ إدارة المشرفين ============
-
-document.getElementById('addSupervisorBtn').addEventListener('click', async () => {
-  if (currentUser.viewOnly) {
-    alert('أنت في وضع المشاهدة فقط');
-    return;
-  }
-
-  const name = document.getElementById('newSupervisorName').value.trim();
-  const pin = document.getElementById('newSupervisorPin').value.trim();
-  const role = document.getElementById('newSupervisorRole').value;
-  const msg = document.getElementById('addSupervisorMsg');
-
-  if (!name || !pin) {
-    msg.innerHTML = '<p style="color:#ffcdd2;">أدخل اسم المشرف والرقم السري</p>';
-    return;
-  }
-
-  if (pin.length < 4 || pin.length > 6) {
-    msg.innerHTML = '<p style="color:#ffcdd2;">الرقم السري يجب أن يكون 4-6 أرقام</p>';
-    return;
-  }
-
-  if (!/^\d+$/.test(pin)) {
-    msg.innerHTML = '<p style="color:#ffcdd2;">الرقم السري يجب أن يكون أرقام فقط</p>';
-    return;
-  }
-
-  try {
-    // التحقق من عدم وجود نفس الاسم
-    const existingCheck = await db.collection('supervisors')
-      .where('name', '==', name)
-      .get();
-    
-    if (!existingCheck.empty) {
-      msg.innerHTML = '<p style="color:#ffcdd2;">يوجد مشرف بنفس الاسم بالفعل</p>';
-      return;
+      permissions = {
+        viewOverview: document.getElementById('perm-overview').checked,
+        manageAttendance: document.getElementById('perm-attendance').checked,
+        manageWorkers: document.getElementById('perm-workers').checked,
+        viewMonthly: document.getElementById('perm-monthly').checked,
+        manageInventory: document.getElementById('perm-inventory').checked,
+        manageReports: document.getElementById('perm-reports').checked,
+        manageVehicles: document.getElementById('perm-vehicles').checked,
+        managePermissions: false
+      };
+      viewOnly = document.getElementById('perm-viewonly').checked;
     }
 
-    // حفظ بيانات المشرف
-    await db.collection('supervisors').add({
+    await db.collection('systemUsers').add({
       name: name,
       pin: pin,
       role: role,
-      permissions: role === 'admin' ? {
-        viewOverview: true,
-        manageAttendance: true,
-        manageWorkers: true,
-        viewMonthly: true,
-        manageInventory: true,
-        manageReports: true,
-        manageVehicles: true,
-        managePermissions: true
-      } : { ...DEFAULT_PERMISSIONS },
-      viewOnly: false,
+      permissions: permissions,
+      viewOnly: viewOnly,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
     
-    msg.innerHTML = `<p style="color:#c8f7d4;">✅ تم إضافة المشرف ${name} بنجاح</p>`;
+    msg.innerHTML = `<p style="color:#c8f7d4;">✅ تم إضافة ${name} بنجاح - الرقم السري: ${pin}</p>`;
     
-    // تنظيف الحقول
-    document.getElementById('newSupervisorName').value = '';
-    document.getElementById('newSupervisorPin').value = '';
+    document.getElementById('newUserName').value = '';
+    document.getElementById('newUserPin').value = '';
+    document.getElementById('newUserRole').value = 'supervisor';
+    document.getElementById('permissionsSelection').style.display = 'block';
     
-    loadSupervisors();
+    loadUsersList();
   } catch (err) {
-    console.error('خطأ في إضافة المشرف:', err);
     msg.innerHTML = '<p style="color:#ffcdd2;">خطأ: ' + err.message + '</p>';
   }
 });
 
-function loadSupervisors() {
-  db.collection('supervisors').onSnapshot(snapshot => {
-    const container = document.getElementById('supervisorsList');
+function loadUsersList() {
+  db.collection('systemUsers').onSnapshot(snapshot => {
+    const container = document.getElementById('usersList');
     
     if (snapshot.empty) {
-      container.innerHTML = '<p style="text-align:center;color:rgba(255,255,255,0.7);">لا يوجد مشرفين مسجلين</p>';
+      container.innerHTML = '<p style="text-align:center;color:rgba(255,255,255,0.7);">لا يوجد مستخدمين مسجلين بعد</p>';
       return;
     }
     
     container.innerHTML = snapshot.docs.map(doc => {
-      const s = doc.data();
-      const roleLabel = s.role === 'admin' ? '👑 مدير عام' : '👤 مشرف';
-      const roleClass = s.role === 'admin' ? 'role-admin' : 'role-supervisor';
-      const isViewOnly = s.viewOnly;
+      const u = doc.data();
+      const roleLabel = u.role === 'admin' ? '👤 مدير' : '👤 مشرف';
+      const roleClass = u.role === 'admin' ? 'role-admin' : 'role-supervisor';
+      
+      // عرض الصلاحيات
+      const permLabels = [];
+      if (u.permissions?.manageWorkers) permLabels.push('👷 عمال');
+      if (u.permissions?.manageInventory) permLabels.push('📦 مخزن');
+      if (u.permissions?.manageVehicles) permLabels.push('🚛 آليات');
+      if (u.permissions?.manageReports) permLabels.push('📋 تقارير');
+      if (u.permissions?.manageAttendance) permLabels.push('✅ حضور');
       
       return `
         <div class="vehicle-card">
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
             <div>
-              <strong>${s.name}</strong>
-              <div style="font-size:12px; color:rgba(255,255,255,0.7);">🔢 الرقم السري: ${s.pin}</div>
+              <strong>${u.name}</strong>
+              <div style="font-size:12px; color:rgba(255,255,255,0.7);">🔢 الرقم: ${u.pin}</div>
             </div>
             <span class="role-badge ${roleClass}">${roleLabel}</span>
           </div>
           
-          ${isViewOnly ? '<span class="view-only-badge">👁️ مشاهدة فقط</span>' : ''}
+          ${u.viewOnly ? '<span class="view-only-badge">👁️ مشاهدة فقط</span>' : ''}
           
-          <div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;">
-            ${currentUserRole === 'admin' || currentUserPermissions.managePermissions ? `
-              <button onclick="togglePermission('${doc.id}', 'manageWorkers')" style="width:auto;padding:6px 10px;font-size:12px;margin:0;background:${s.permissions?.manageWorkers ? 'rgba(76,175,80,0.5)' : 'rgba(255,255,255,0.2)'}">
-                👷 عمال
-              </button>
-              <button onclick="togglePermission('${doc.id}', 'manageInventory')" style="width:auto;padding:6px 10px;font-size:12px;margin:0;background:${s.permissions?.manageInventory ? 'rgba(76,175,80,0.5)' : 'rgba(255,255,255,0.2)'}">
-                📦 مخزن
-              </button>
-              <button onclick="togglePermission('${doc.id}', 'manageVehicles')" style="width:auto;padding:6px 10px;font-size:12px;margin:0;background:${s.permissions?.manageVehicles ? 'rgba(76,175,80,0.5)' : 'rgba(255,255,255,0.2)'}">
-                🚛 آليات
-              </button>
-              <button onclick="togglePermission('${doc.id}', 'manageReports')" style="width:auto;padding:6px 10px;font-size:12px;margin:0;background:${s.permissions?.manageReports ? 'rgba(76,175,80,0.5)' : 'rgba(255,255,255,0.2)'}">
-                📋 تقارير
-              </button>
-              <button onclick="togglePermission('${doc.id}', 'manageAttendance')" style="width:auto;padding:6px 10px;font-size:12px;margin:0;background:${s.permissions?.manageAttendance ? 'rgba(76,175,80,0.5)' : 'rgba(255,255,255,0.2)'}">
-                ✅ حضور
-              </button>
-              <button onclick="toggleViewOnly('${doc.id}')" style="width:auto;padding:6px 10px;font-size:12px;margin:0;background:${isViewOnly ? 'rgba(255,193,7,0.5)' : 'rgba(255,255,255,0.2)'}">
-                ${isViewOnly ? '👁️ إلغاء المشاهدة' : '👁️ مشاهدة فقط'}
-              </button>
-              ${s.role !== 'admin' ? `
-                <button onclick="deleteSupervisor('${doc.id}', '${s.name}')" class="del-btn" style="width:auto;padding:6px 10px;font-size:12px;margin:0;">حذف</button>
-              ` : ''}
-            ` : ''}
+          ${permLabels.length > 0 ? `
+            <div style="margin-top:8px;font-size:12px;color:rgba(255,255,255,0.8);">
+              الصلاحيات: ${permLabels.join('، ')}
+            </div>
+          ` : ''}
+          
+          <div style="display:flex; gap:8px; margin-top:10px;">
+            <button onclick="toggleViewOnly('${doc.id}')" style="width:auto;padding:6px 10px;font-size:12px;margin:0;background:${u.viewOnly ? 'rgba(255,193,7,0.5)' : 'rgba(255,255,255,0.2)'}">
+              ${u.viewOnly ? '👁️ إلغاء المشاهدة' : '👁️ مشاهدة فقط'}
+            </button>
+            <button onclick="deleteUser('${doc.id}', '${u.name}')" class="del-btn" style="width:auto;padding:6px 10px;font-size:12px;margin:0;">حذف</button>
           </div>
         </div>
       `;
@@ -877,46 +889,27 @@ function loadSupervisors() {
   });
 }
 
-async function togglePermission(supervisorId, permission) {
+async function toggleViewOnly(userId) {
   try {
-    const docRef = db.collection('supervisors').doc(supervisorId);
+    const docRef = db.collection('systemUsers').doc(userId);
     const doc = await docRef.get();
     const data = doc.data();
-    const permissions = data.permissions || { ...DEFAULT_PERMISSIONS };
-    
-    permissions[permission] = !permissions[permission];
-    
-    await docRef.update({ permissions: permissions });
-  } catch (err) {
-    alert('خطأ: ' + err.message);
-  }
-}
-
-async function toggleViewOnly(supervisorId) {
-  try {
-    const docRef = db.collection('supervisors').doc(supervisorId);
-    const doc = await docRef.get();
-    const data = doc.data();
-    
     await docRef.update({ viewOnly: !data.viewOnly });
   } catch (err) {
     alert('خطأ: ' + err.message);
   }
 }
 
-async function deleteSupervisor(supervisorId, name) {
-  if (!confirm(`حذف المشرف ${name}؟`)) return;
-  
+async function deleteUser(userId, name) {
+  if (!confirm(`حذف المستخدم ${name}؟`)) return;
   try {
-    await db.collection('supervisors').doc(supervisorId).delete();
-    alert('تم حذف المشرف بنجاح');
+    await db.collection('systemUsers').doc(userId).delete();
   } catch (err) {
     alert('خطأ: ' + err.message);
   }
 }
 
 // ============ باقي الدوال ============
-
 const workerSelect = document.getElementById('workerSelect');
 const checkInBtn = document.getElementById('checkInBtn');
 const absentBtn = document.getElementById('absentBtn');
@@ -1086,20 +1079,26 @@ leaveBtn.addEventListener('click', async () => {
   }
 });
 
-function teamLabel(id) {
-  const t = TEAMS.find(t => t.id === (id || ''));
-  return t ? t.label : 'أخرى / غير مصنّف';
+// ============ تهيئة لوحة التحكم ============
+function initializeAdmin() {
+  populateTeamSelect();
+  populateEquipmentCheckboxes();
+  populateMonthSelect();
+  displayTodayDate();
+  setDefaultReportDate();
+  watchAttendance();
+  watchWorkers();
+  watchInventory();
+  
+  if (currentUserRole === 'owner' || currentUserPermissions.managePermissions) {
+    loadUsersList();
+  }
+  
+  const firstVisibleTab = document.querySelector('#adminTabs .tab:not([style*="display: none"])');
+  if (firstVisibleTab) {
+    firstVisibleTab.click();
+  }
 }
-
-let newWorkerPhotoBase64 = '';
-document.getElementById('newWorkerPhoto').addEventListener('change', async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  newWorkerPhotoBase64 = await compressImageToBase64(file);
-  const preview = document.getElementById('newWorkerPreview');
-  preview.src = newWorkerPhotoBase64;
-  preview.style.display = 'block';
-});
 
 const dashboard = document.getElementById('dashboard');
 
@@ -1118,32 +1117,9 @@ document.querySelectorAll('.tab').forEach(tab => {
     if (tab.dataset.tab === 'daily') renderDailyMarkList();
     if (tab.dataset.tab === 'reports') loadSavedReports();
     if (tab.dataset.tab === 'vehicles') loadVehicles();
-    if (tab.dataset.tab === 'permissions') loadSupervisors();
+    if (tab.dataset.tab === 'permissions') loadUsersList();
   });
 });
-
-function initializeAdmin() {
-  dashboard.style.display = 'block';
-  populateTeamSelect();
-  populateEquipmentCheckboxes();
-  populateMonthSelect();
-  displayTodayDate();
-  setDefaultReportDate();
-  populateReportWorkerSelect();
-  watchAttendance();
-  watchWorkers();
-  watchInventory();
-  
-  if (currentUserPermissions.managePermissions) {
-    loadSupervisors();
-  }
-  
-  // تفعيل أول تبويب مرئي
-  const firstVisibleTab = document.querySelector('#adminTabs .tab:not([style*="display: none"])');
-  if (firstVisibleTab) {
-    firstVisibleTab.click();
-  }
-}
 
 function displayTodayDate() {
   const todayStr = new Date().toLocaleDateString('ar-LY', {
@@ -1189,130 +1165,35 @@ function populateMonthSelect() {
   select.addEventListener('change', loadMonthlyReport);
 }
 
+function populateTeamSelect() {
+  const select = document.getElementById('newWorkerTeam');
+  select.innerHTML = TEAMS.map(t => `<option value="${t.id}">${t.label}</option>`).join('');
+}
+
+// ============ المتغيرات العامة ============
 let monthlyData = null;
 let allInventory = [];
 let allWorkersRaw = [];
 let allWorkers = [];
 let latestRecords = [];
 let latestInfoMap = {};
+let newWorkerPhotoBase64 = '';
+let reportPhotosArray = [];
+let vehiclePhotoBase64 = '';
 
-async function loadMonthlyReport() {
-  const gridDiv = document.getElementById('monthlyGrid');
-  gridDiv.innerHTML = 'جاري التحميل...';
-
-  const [year, month] = document.getElementById('monthSelect').value.split('-').map(Number);
-  const from = new Date(year, month - 1, 1);
-  const to = new Date(year, month, 1);
-  const daysInMonth = new Date(year, month, 0).getDate();
-
-  const snapshot = await db.collection('attendance')
-    .where('timestamp', '>=', from)
-    .where('timestamp', '<', to)
-    .get();
-
-  const perWorkerDay = {};
-  snapshot.forEach(doc => {
-    const r = doc.data();
-    if (!r.timestamp) return;
-    const d = r.timestamp.toDate();
-    const day = d.getDate();
-    if (!perWorkerDay[r.workerId]) perWorkerDay[r.workerId] = {};
-    const priority = { present: 5, late: 4, leave: 3, sick: 2, absent: 1, rejected: 0 };
-    const existing = perWorkerDay[r.workerId][day];
-    if (!existing || (priority[r.status] || 0) > (priority[existing] || 0)) {
-      perWorkerDay[r.workerId][day] = r.status;
-    }
-  });
-
-  monthlyData = { year, month, daysInMonth, perWorkerDay, workers: allWorkers };
-  renderMonthlyTable();
-}
-
-function symbolFor(status) {
-  if (status === 'present') return '✅';
-  if (status === 'late') return '⏰';
-  if (status === 'leave') return '📝';
-  if (status === 'sick') return '🤒';
-  return '✗';
-}
-
-function renderMonthlyTable() {
-  const gridDiv = document.getElementById('monthlyGrid');
-  if (!monthlyData) return;
-  const { daysInMonth, perWorkerDay } = monthlyData;
-
-  if (!allWorkers.length) {
-    gridDiv.innerHTML = '<p style="color:rgba(255,255,255,0.7);">لا يوجد عمال مسجلين بعد</p>';
-    return;
-  }
-
-  const searchTerm = (document.getElementById('monthlySearch').value || '').trim();
-  const filteredWorkers = searchTerm
-    ? allWorkers.filter(w => w.name.includes(searchTerm))
-    : allWorkers;
-
-  if (filteredWorkers.length === 0) {
-    gridDiv.innerHTML = '<p style="color:rgba(255,255,255,0.7);">لا يوجد عامل بهذا الاسم</p>';
-    return;
-  }
-
-  let html = '<table style="border-collapse:collapse; font-size:11px; color:#fff;">';
-  html += '<tr><th style="padding:4px 8px; text-align:right; position:sticky; right:0; background:#134e4a;">الاسم</th>';
-  for (let d = 1; d <= daysInMonth; d++) {
-    html += `<th style="padding:2px 4px;">${d}</th>`;
-  }
-  html += '</tr>';
-
-  filteredWorkers.forEach(w => {
-    html += `<tr><td style="padding:4px 8px; white-space:nowrap; position:sticky; right:0; background:#134e4a;">
-      <div style="display:flex; align-items:center; gap:6px;">
-        <img src="${w.photo}" style="width:22px;height:22px;border-radius:50%;object-fit:cover;background:rgba(255,255,255,0.2);" onerror="this.style.visibility='hidden'">
-        <span>${w.name}</span>
-      </div>
-    </td>`;
-    for (let d = 1; d <= daysInMonth; d++) {
-      const status = (perWorkerDay[w.id] || {})[d];
-      html += `<td style="padding:2px 4px; text-align:center;">${symbolFor(status)}</td>`;
-    }
-    html += '</tr>';
-  });
-  html += '</table>';
-
-  gridDiv.innerHTML = html;
-}
-
-document.getElementById('monthlySearch').addEventListener('input', renderMonthlyTable);
-
-document.getElementById('exportMonthlyBtn').addEventListener('click', () => {
-  if (!monthlyData || !monthlyData.workers.length) {
-    alert('لا يوجد بيانات لتصديرها بعد');
-    return;
-  }
-  const { daysInMonth, perWorkerDay, workers, year, month } = monthlyData;
-  const statusLabels = { present: 'حاضر', late: 'متأخر', leave: 'إذن', sick: 'مريض', absent: 'غائب', rejected: 'مرفوض' };
-  const headers = ['الاسم', 'الفريق', ...Array.from({ length: daysInMonth }, (_, i) => String(i + 1))];
-  const rows = workers.map(w => {
-    const days = Array.from({ length: daysInMonth }, (_, i) => {
-      const status = (perWorkerDay[w.id] || {})[i + 1];
-      return status ? statusLabels[status] || status : 'غائب';
-    });
-    return [w.name, teamLabel(w.team), ...days];
-  });
-
-  const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'التقرير الشهري');
-  XLSX.writeFile(workbook, `تقرير-شهري-${year}-${String(month).padStart(2, '0')}.xlsx`);
+// ============ دوال العمال ============
+document.getElementById('newWorkerPhoto').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  newWorkerPhotoBase64 = await compressImageToBase64(file);
+  const preview = document.getElementById('newWorkerPreview');
+  preview.src = newWorkerPhotoBase64;
+  preview.style.display = 'block';
 });
-
-function populateTeamSelect() {
-  const select = document.getElementById('newWorkerTeam');
-  select.innerHTML = TEAMS.map(t => `<option value="${t.id}">${t.label}</option>`).join('');
-}
 
 document.getElementById('addWorkerBtn').addEventListener('click', async () => {
   if (currentUser.viewOnly) {
-    alert('أنت في وضع المشاهدة فقط - لا يمكنك التعديل');
+    alert('أنت في وضع المشاهدة فقط');
     return;
   }
 
@@ -1344,143 +1225,6 @@ document.getElementById('addWorkerBtn').addEventListener('click', async () => {
     document.querySelectorAll('#newWorkerEquipment input:checked').forEach(cb => cb.checked = false);
     newWorkerPhotoBase64 = '';
     msg.innerHTML = `<p style="color:#c8f7d4;">✅ تمت إضافة ${name}</p>`;
-  } catch (err) {
-    msg.innerHTML = '<p style="color:#ffcdd2;">خطأ: ' + err.message + '</p>';
-  }
-});
-
-document.getElementById('exportInventoryBtn').addEventListener('click', () => {
-  if (!allInventory.length) {
-    alert('المخزن فارغ، لا يوجد شيء لتصديره');
-    return;
-  }
-  const headers = ['اسم الصنف', 'الكمية', 'الوحدة'];
-  const rows = allInventory.map(item => [item.name, item.quantity, item.unit || '']);
-
-  const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-  worksheet['!cols'] = [{ wch: 24 }, { wch: 12 }, { wch: 16 }];
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'المخزن');
-
-  const dateStr = new Date().toISOString().slice(0, 10);
-  XLSX.writeFile(workbook, `مخزن-سرت-${dateStr}.xlsx`);
-});
-
-function watchInventory() {
-  db.collection('inventory').orderBy('name').onSnapshot(snapshot => {
-    allInventory = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderInventoryList();
-    populateIssueItemSelect();
-  });
-}
-
-function renderInventoryList() {
-  const container = document.getElementById('inventoryList');
-  if (!allInventory.length) {
-    container.innerHTML = '<p style="text-align:center;color:rgba(255,255,255,0.7);">المخزن فارغ حالياً</p>';
-    return;
-  }
-  container.innerHTML = allInventory.map(item => `
-    <div class="worker-row">
-      <span class="name">${item.name}</span>
-      <span style="background:rgba(255,255,255,0.2); padding:4px 10px; border-radius:20px; font-size:13px;">${item.quantity} ${item.unit || ''}</span>
-      <button onclick="adjustQuantity('${item.id}', 1)" style="width:auto;padding:5px 10px;margin:0;font-size:14px;background:rgba(46,125,50,0.4);border:1px solid rgba(255,255,255,0.3);">+1</button>
-      <button onclick="adjustQuantity('${item.id}', -1)" style="width:auto;padding:5px 10px;margin:0;font-size:14px;background:rgba(198,40,40,0.4);border:1px solid rgba(255,255,255,0.3);">-1</button>
-      <button class="del-btn" onclick="deleteItem('${item.id}','${item.name.replace(/'/g,"\\'")}')">حذف</button>
-    </div>
-  `).join('');
-}
-
-document.getElementById('addItemBtn').addEventListener('click', async () => {
-  if (currentUser.viewOnly) {
-    alert('أنت في وضع المشاهدة فقط');
-    return;
-  }
-
-  const name = document.getElementById('newItemName').value.trim();
-  const qty = Number(document.getElementById('newItemQty').value) || 0;
-  const unit = document.getElementById('newItemUnit').value.trim();
-  const msg = document.getElementById('addItemMsg');
-
-  if (!name) {
-    msg.innerHTML = '<p style="color:#ffcdd2;">اكتب اسم الصنف</p>';
-    return;
-  }
-
-  try {
-    await db.collection('inventory').add({ name, quantity: qty, unit });
-    document.getElementById('newItemName').value = '';
-    document.getElementById('newItemQty').value = '';
-    document.getElementById('newItemUnit').value = '';
-    msg.innerHTML = `<p style="color:#c8f7d4;">✅ تمت إضافة ${name}</p>`;
-  } catch (err) {
-    msg.innerHTML = '<p style="color:#ffcdd2;">خطأ: ' + err.message + '</p>';
-  }
-});
-
-async function adjustQuantity(itemId, delta) {
-  if (currentUser.viewOnly) return;
-  const item = allInventory.find(i => i.id === itemId);
-  if (!item) return;
-  const newQty = Math.max(0, (item.quantity || 0) + delta);
-  await db.collection('inventory').doc(itemId).update({ quantity: newQty });
-}
-
-function deleteItem(itemId, name) {
-  if (currentUser.viewOnly) return;
-  if (!confirm('حذف ' + name + ' نهائياً من المخزن؟')) return;
-  db.collection('inventory').doc(itemId).delete();
-}
-
-function populateIssueItemSelect() {
-  const select = document.getElementById('issueItemSelect');
-  const current = select.value;
-  select.innerHTML = allInventory.map(i => `<option value="${i.id}">${i.name} (متوفر: ${i.quantity} ${i.unit || ''})</option>`).join('')
-    || '<option value="">لا يوجد أصناف بعد</option>';
-  if (current) select.value = current;
-}
-
-function populateIssueWorkerSelect() {
-  const select = document.getElementById('issueWorkerSelect');
-  const current = select.value;
-  select.innerHTML = allWorkers.map(w => `<option value="${w.id}">${w.name}</option>`).join('')
-    || '<option value="">لا يوجد عمال بعد</option>';
-  if (current) select.value = current;
-}
-
-document.getElementById('issueBtn').addEventListener('click', async () => {
-  if (currentUser.viewOnly) {
-    alert('أنت في وضع المشاهدة فقط');
-    return;
-  }
-
-  const itemId = document.getElementById('issueItemSelect').value;
-  const workerId = document.getElementById('issueWorkerSelect').value;
-  const qty = Number(document.getElementById('issueQty').value) || 1;
-  const msg = document.getElementById('issueMsg');
-
-  const item = allInventory.find(i => i.id === itemId);
-  const worker = allWorkers.find(w => w.id === workerId);
-
-  if (!item || !worker) {
-    msg.innerHTML = '<p style="color:#ffcdd2;">اختر الصنف والعامل أولاً</p>';
-    return;
-  }
-  if (item.quantity < qty) {
-    msg.innerHTML = '<p style="color:#ffcdd2;">الكمية المتوفرة غير كافية</p>';
-    return;
-  }
-
-  try {
-    await db.collection('inventory').doc(itemId).update({ quantity: item.quantity - qty });
-    await db.collection('inventoryLog').add({
-      itemName: item.name,
-      workerId: workerId,
-      workerName: worker.name,
-      quantity: qty,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    msg.innerHTML = `<p style="color:#c8f7d4;">✅ تم صرف ${qty} ${item.unit || ''} من ${item.name} إلى ${worker.name}</p>`;
   } catch (err) {
     msg.innerHTML = '<p style="color:#ffcdd2;">خطأ: ' + err.message + '</p>';
   }
@@ -1672,56 +1416,7 @@ async function manualMark(workerId, status) {
   }
 }
 
-function exportToExcel() {
-  if (!latestRecords.length) {
-    alert('لا يوجد بيانات لتصديرها بعد');
-    return;
-  }
-  const statusLabels = { present: 'حاضر', late: 'متأخر', leave: 'إذن', sick: 'مريض', absent: 'غائب', rejected: 'مرفوض' };
-  const headers = ['الاسم', 'الفريق', 'الحالة', 'الوقت', 'دقة الموقع (م)'];
-  const rows = latestRecords.map(r => {
-    const info = latestInfoMap[r.workerId] || { name: r.workerId, team: '' };
-    const time = r.timestamp ? new Date(r.timestamp.seconds * 1000).toLocaleString('ar-LY') : '';
-    return [
-      info.name,
-      teamLabel(info.team),
-      statusLabels[r.status] || r.status,
-      time,
-      r.accuracy || ''
-    ];
-  });
-
-  const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-  worksheet['!cols'] = [{ wch: 20 }, { wch: 22 }, { wch: 12 }, { wch: 20 }, { wch: 14 }];
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'الحضور');
-
-  const dateStr = new Date().toISOString().slice(0, 10);
-  XLSX.writeFile(workbook, `حضور-سرت-${dateStr}.xlsx`);
-}
-
-document.getElementById('exportBtn').addEventListener('click', exportToExcel);
-
-document.getElementById('clearTodayBtn').addEventListener('click', async () => {
-  if (currentUser.viewOnly) return;
-  if (!latestRecords.length) {
-    alert('لا يوجد سجل اليوم لمسحه');
-    return;
-  }
-  if (!confirm(`هل أنت متأكد من مسح ${latestRecords.length} سجل حضور لليوم؟ هذا الإجراء لا يمكن التراجع عنه.`)) return;
-
-  try {
-    const batch = db.batch();
-    latestRecords.forEach(r => {
-      batch.delete(db.collection('attendance').doc(r.id));
-    });
-    await batch.commit();
-    alert('تم مسح سجل اليوم بنجاح');
-  } catch (err) {
-    alert('خطأ: ' + err.message);
-  }
-});
-
+// ============ دوال الحضور ============
 function watchAttendance() {
   const startOfDay = new Date();
   startOfDay.setHours(0, 0, 0, 0);
@@ -1789,9 +1484,282 @@ function watchAttendance() {
     });
 }
 
-// ============ تقارير العمل ============
-let reportPhotosArray = [];
+function exportToExcel() {
+  if (!latestRecords.length) {
+    alert('لا يوجد بيانات لتصديرها بعد');
+    return;
+  }
+  const statusLabels = { present: 'حاضر', late: 'متأخر', leave: 'إذن', sick: 'مريض', absent: 'غائب', rejected: 'مرفوض' };
+  const headers = ['الاسم', 'الفريق', 'الحالة', 'الوقت', 'دقة الموقع (م)'];
+  const rows = latestRecords.map(r => {
+    const info = latestInfoMap[r.workerId] || { name: r.workerId, team: '' };
+    const time = r.timestamp ? new Date(r.timestamp.seconds * 1000).toLocaleString('ar-LY') : '';
+    return [
+      info.name,
+      teamLabel(info.team),
+      statusLabels[r.status] || r.status,
+      time,
+      r.accuracy || ''
+    ];
+  });
 
+  const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+  worksheet['!cols'] = [{ wch: 20 }, { wch: 22 }, { wch: 12 }, { wch: 20 }, { wch: 14 }];
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'الحضور');
+
+  const dateStr = new Date().toISOString().slice(0, 10);
+  XLSX.writeFile(workbook, `حضور-سرت-${dateStr}.xlsx`);
+}
+
+document.getElementById('exportBtn').addEventListener('click', exportToExcel);
+
+document.getElementById('clearTodayBtn').addEventListener('click', async () => {
+  if (currentUser.viewOnly) return;
+  if (!latestRecords.length) {
+    alert('لا يوجد سجل اليوم لمسحه');
+    return;
+  }
+  if (!confirm(`هل أنت متأكد من مسح ${latestRecords.length} سجل حضور لليوم؟`)) return;
+
+  try {
+    const batch = db.batch();
+    latestRecords.forEach(r => {
+      batch.delete(db.collection('attendance').doc(r.id));
+    });
+    await batch.commit();
+    alert('تم مسح سجل اليوم بنجاح');
+  } catch (err) {
+    alert('خطأ: ' + err.message);
+  }
+});
+
+// ============ دوال المخزن ============
+function watchInventory() {
+  db.collection('inventory').orderBy('name').onSnapshot(snapshot => {
+    allInventory = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderInventoryList();
+    populateIssueItemSelect();
+  });
+}
+
+function renderInventoryList() {
+  const container = document.getElementById('inventoryList');
+  if (!allInventory.length) {
+    container.innerHTML = '<p style="text-align:center;color:rgba(255,255,255,0.7);">المخزن فارغ حالياً</p>';
+    return;
+  }
+  container.innerHTML = allInventory.map(item => `
+    <div class="worker-row">
+      <span class="name">${item.name}</span>
+      <span style="background:rgba(255,255,255,0.2); padding:4px 10px; border-radius:20px; font-size:13px;">${item.quantity} ${item.unit || ''}</span>
+      <button onclick="adjustQuantity('${item.id}', 1)" style="width:auto;padding:5px 10px;margin:0;font-size:14px;background:rgba(46,125,50,0.4);border:1px solid rgba(255,255,255,0.3);">+1</button>
+      <button onclick="adjustQuantity('${item.id}', -1)" style="width:auto;padding:5px 10px;margin:0;font-size:14px;background:rgba(198,40,40,0.4);border:1px solid rgba(255,255,255,0.3);">-1</button>
+      <button class="del-btn" onclick="deleteItem('${item.id}','${item.name.replace(/'/g,"\\'")}')">حذف</button>
+    </div>
+  `).join('');
+}
+
+document.getElementById('addItemBtn').addEventListener('click', async () => {
+  if (currentUser.viewOnly) return;
+  const name = document.getElementById('newItemName').value.trim();
+  const qty = Number(document.getElementById('newItemQty').value) || 0;
+  const unit = document.getElementById('newItemUnit').value.trim();
+  const msg = document.getElementById('addItemMsg');
+
+  if (!name) {
+    msg.innerHTML = '<p style="color:#ffcdd2;">اكتب اسم الصنف</p>';
+    return;
+  }
+
+  try {
+    await db.collection('inventory').add({ name, quantity: qty, unit });
+    document.getElementById('newItemName').value = '';
+    document.getElementById('newItemQty').value = '';
+    document.getElementById('newItemUnit').value = '';
+    msg.innerHTML = `<p style="color:#c8f7d4;">✅ تمت إضافة ${name}</p>`;
+  } catch (err) {
+    msg.innerHTML = '<p style="color:#ffcdd2;">خطأ: ' + err.message + '</p>';
+  }
+});
+
+async function adjustQuantity(itemId, delta) {
+  if (currentUser.viewOnly) return;
+  const item = allInventory.find(i => i.id === itemId);
+  if (!item) return;
+  const newQty = Math.max(0, (item.quantity || 0) + delta);
+  await db.collection('inventory').doc(itemId).update({ quantity: newQty });
+}
+
+function deleteItem(itemId, name) {
+  if (currentUser.viewOnly) return;
+  if (!confirm('حذف ' + name + ' نهائياً من المخزن؟')) return;
+  db.collection('inventory').doc(itemId).delete();
+}
+
+function populateIssueItemSelect() {
+  const select = document.getElementById('issueItemSelect');
+  const current = select.value;
+  select.innerHTML = allInventory.map(i => `<option value="${i.id}">${i.name} (متوفر: ${i.quantity} ${i.unit || ''})</option>`).join('')
+    || '<option value="">لا يوجد أصناف بعد</option>';
+  if (current) select.value = current;
+}
+
+function populateIssueWorkerSelect() {
+  const select = document.getElementById('issueWorkerSelect');
+  const current = select.value;
+  select.innerHTML = allWorkers.map(w => `<option value="${w.id}">${w.name}</option>`).join('')
+    || '<option value="">لا يوجد عمال بعد</option>';
+  if (current) select.value = current;
+}
+
+document.getElementById('issueBtn').addEventListener('click', async () => {
+  if (currentUser.viewOnly) return;
+  const itemId = document.getElementById('issueItemSelect').value;
+  const workerId = document.getElementById('issueWorkerSelect').value;
+  const qty = Number(document.getElementById('issueQty').value) || 1;
+  const msg = document.getElementById('issueMsg');
+
+  const item = allInventory.find(i => i.id === itemId);
+  const worker = allWorkers.find(w => w.id === workerId);
+
+  if (!item || !worker) {
+    msg.innerHTML = '<p style="color:#ffcdd2;">اختر الصنف والعامل أولاً</p>';
+    return;
+  }
+  if (item.quantity < qty) {
+    msg.innerHTML = '<p style="color:#ffcdd2;">الكمية المتوفرة غير كافية</p>';
+    return;
+  }
+
+  try {
+    await db.collection('inventory').doc(itemId).update({ quantity: item.quantity - qty });
+    await db.collection('inventoryLog').add({
+      itemName: item.name,
+      workerId: workerId,
+      workerName: worker.name,
+      quantity: qty,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    msg.innerHTML = `<p style="color:#c8f7d4;">✅ تم صرف ${qty} ${item.unit || ''} من ${item.name} إلى ${worker.name}</p>`;
+  } catch (err) {
+    msg.innerHTML = '<p style="color:#ffcdd2;">خطأ: ' + err.message + '</p>';
+  }
+});
+
+document.getElementById('exportInventoryBtn').addEventListener('click', () => {
+  if (!allInventory.length) {
+    alert('المخزن فارغ');
+    return;
+  }
+  const headers = ['اسم الصنف', 'الكمية', 'الوحدة'];
+  const rows = allInventory.map(item => [item.name, item.quantity, item.unit || '']);
+  const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'المخزن');
+  XLSX.writeFile(workbook, `مخزن-سرت-${new Date().toISOString().slice(0, 10)}.xlsx`);
+});
+
+// ============ دوال التقرير الشهري ============
+async function loadMonthlyReport() {
+  const gridDiv = document.getElementById('monthlyGrid');
+  gridDiv.innerHTML = 'جاري التحميل...';
+
+  const [year, month] = document.getElementById('monthSelect').value.split('-').map(Number);
+  const from = new Date(year, month - 1, 1);
+  const to = new Date(year, month, 1);
+  const daysInMonth = new Date(year, month, 0).getDate();
+
+  const snapshot = await db.collection('attendance')
+    .where('timestamp', '>=', from)
+    .where('timestamp', '<', to)
+    .get();
+
+  const perWorkerDay = {};
+  snapshot.forEach(doc => {
+    const r = doc.data();
+    if (!r.timestamp) return;
+    const d = r.timestamp.toDate();
+    const day = d.getDate();
+    if (!perWorkerDay[r.workerId]) perWorkerDay[r.workerId] = {};
+    const priority = { present: 5, late: 4, leave: 3, sick: 2, absent: 1, rejected: 0 };
+    const existing = perWorkerDay[r.workerId][day];
+    if (!existing || (priority[r.status] || 0) > (priority[existing] || 0)) {
+      perWorkerDay[r.workerId][day] = r.status;
+    }
+  });
+
+  monthlyData = { year, month, daysInMonth, perWorkerDay, workers: allWorkers };
+  renderMonthlyTable();
+}
+
+function symbolFor(status) {
+  if (status === 'present') return '✅';
+  if (status === 'late') return '⏰';
+  if (status === 'leave') return '📝';
+  if (status === 'sick') return '🤒';
+  return '✗';
+}
+
+function renderMonthlyTable() {
+  const gridDiv = document.getElementById('monthlyGrid');
+  if (!monthlyData) return;
+  const { daysInMonth, perWorkerDay } = monthlyData;
+
+  if (!allWorkers.length) {
+    gridDiv.innerHTML = '<p style="color:rgba(255,255,255,0.7);">لا يوجد عمال مسجلين بعد</p>';
+    return;
+  }
+
+  const searchTerm = (document.getElementById('monthlySearch').value || '').trim();
+  const filteredWorkers = searchTerm ? allWorkers.filter(w => w.name.includes(searchTerm)) : allWorkers;
+
+  let html = '<table style="border-collapse:collapse; font-size:11px; color:#fff;">';
+  html += '<tr><th style="padding:4px 8px; text-align:right; position:sticky; right:0; background:#134e4a;">الاسم</th>';
+  for (let d = 1; d <= daysInMonth; d++) html += `<th style="padding:2px 4px;">${d}</th>`;
+  html += '</tr>';
+
+  filteredWorkers.forEach(w => {
+    html += `<tr><td style="padding:4px 8px; white-space:nowrap; position:sticky; right:0; background:#134e4a;">
+      <div style="display:flex; align-items:center; gap:6px;">
+        <img src="${w.photo}" style="width:22px;height:22px;border-radius:50%;object-fit:cover;background:rgba(255,255,255,0.2);" onerror="this.style.visibility='hidden'">
+        <span>${w.name}</span>
+      </div>
+    </td>`;
+    for (let d = 1; d <= daysInMonth; d++) {
+      const status = (perWorkerDay[w.id] || {})[d];
+      html += `<td style="padding:2px 4px; text-align:center;">${symbolFor(status)}</td>`;
+    }
+    html += '</tr>';
+  });
+  html += '</table>';
+  gridDiv.innerHTML = html;
+}
+
+document.getElementById('monthlySearch').addEventListener('input', renderMonthlyTable);
+
+document.getElementById('exportMonthlyBtn').addEventListener('click', () => {
+  if (!monthlyData || !monthlyData.workers.length) {
+    alert('لا يوجد بيانات');
+    return;
+  }
+  const { daysInMonth, perWorkerDay, workers, year, month } = monthlyData;
+  const statusLabels = { present: 'حاضر', late: 'متأخر', leave: 'إذن', sick: 'مريض', absent: 'غائب' };
+  const headers = ['الاسم', 'الفريق', ...Array.from({ length: daysInMonth }, (_, i) => String(i + 1))];
+  const rows = workers.map(w => {
+    const days = Array.from({ length: daysInMonth }, (_, i) => {
+      const status = (perWorkerDay[w.id] || {})[i + 1];
+      return status ? statusLabels[status] || status : 'غائب';
+    });
+    return [w.name, teamLabel(w.team), ...days];
+  });
+  const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'التقرير الشهري');
+  XLSX.writeFile(workbook, `تقرير-شهري-${year}-${String(month).padStart(2, '0')}.xlsx`);
+});
+
+// ============ دوال تقارير العمل ============
 document.getElementById('reportPhotos').addEventListener('change', async (e) => {
   const files = e.target.files;
   reportPhotosArray = [];
@@ -1808,11 +1776,7 @@ document.getElementById('reportPhotos').addEventListener('change', async (e) => 
 });
 
 document.getElementById('saveReportBtn').addEventListener('click', async () => {
-  if (currentUser.viewOnly) {
-    alert('أنت في وضع المشاهدة فقط');
-    return;
-  }
-
+  if (currentUser.viewOnly) return;
   const date = document.getElementById('reportDate').value;
   const workerId = document.getElementById('reportWorkerSelect').value;
   const location = document.getElementById('reportLocation').value.trim();
@@ -1829,26 +1793,20 @@ document.getElementById('saveReportBtn').addEventListener('click', async () => {
 
   try {
     await db.collection('workReports').add({
-      date: date,
-      workerId: workerId,
+      date, workerId,
       workerName: worker?.name || 'غير معروف',
       workerTeam: worker?.team || '',
-      location: location,
-      description: description,
-      notes: notes,
+      location, description, notes,
       photos: reportPhotosArray,
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
     });
-
     msg.innerHTML = '<p style="color:#c8f7d4;">✅ تم حفظ التقرير بنجاح</p>';
-    
     document.getElementById('reportLocation').value = '';
     document.getElementById('reportDescription').value = '';
     document.getElementById('reportNotes').value = '';
     document.getElementById('reportPhotos').value = '';
     document.getElementById('reportPhotosPreview').innerHTML = '';
     reportPhotosArray = [];
-    
     loadSavedReports();
   } catch (err) {
     msg.innerHTML = '<p style="color:#ffcdd2;">خطأ: ' + err.message + '</p>';
@@ -1856,100 +1814,67 @@ document.getElementById('saveReportBtn').addEventListener('click', async () => {
 });
 
 function loadSavedReports() {
-  db.collection('workReports')
-    .orderBy('timestamp', 'desc')
-    .limit(50)
-    .onSnapshot(snapshot => {
-      const container = document.getElementById('savedReports');
-      if (snapshot.empty) {
-        container.innerHTML = '<p style="text-align:center;color:rgba(255,255,255,0.7);">لا توجد تقارير محفوظة بعد</p>';
-        return;
-      }
-
-      container.innerHTML = snapshot.docs.map(doc => {
-        const r = doc.data();
-        const photos = (r.photos || []).slice(0, 3).map(p => 
-          `<img src="${p}" style="width:60px;height:60px;object-fit:cover;border-radius:6px;margin:2px;">`
-        ).join('');
-        return `
-          <div class="vehicle-card">
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
-              <strong>${r.workerName}</strong>
-              <span style="font-size:12px;">${r.date}</span>
-            </div>
-            <div style="font-size:13px; color:rgba(255,255,255,0.8); margin-top:4px;">
-              📍 ${r.location}
-            </div>
-            <div style="font-size:13px; color:rgba(255,255,255,0.8); margin-top:4px;">
-              📝 ${r.description}
-            </div>
-            ${r.notes ? `<div style="font-size:12px; color:rgba(255,200,200,0.8); margin-top:4px;">⚠️ ${r.notes}</div>` : ''}
-            ${photos ? `<div style="display:flex; gap:4px; margin-top:8px;">${photos}${(r.photos || []).length > 3 ? `<span style="font-size:12px;">+${(r.photos || []).length - 3} صور</span>` : ''}</div>` : ''}
-            <div style="display:flex; gap:8px; margin-top:8px;">
-              <button onclick="exportReportPdf('${doc.id}')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;background:rgba(33,150,243,0.5);">📄 PDF</button>
-              <button onclick="deleteReport('${doc.id}')" class="del-btn" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">حذف</button>
-            </div>
+  db.collection('workReports').orderBy('timestamp', 'desc').limit(50).onSnapshot(snapshot => {
+    const container = document.getElementById('savedReports');
+    if (snapshot.empty) {
+      container.innerHTML = '<p style="text-align:center;color:rgba(255,255,255,0.7);">لا توجد تقارير محفوظة بعد</p>';
+      return;
+    }
+    container.innerHTML = snapshot.docs.map(doc => {
+      const r = doc.data();
+      const photos = (r.photos || []).slice(0, 3).map(p => 
+        `<img src="${p}" style="width:60px;height:60px;object-fit:cover;border-radius:6px;margin:2px;">`
+      ).join('');
+      return `
+        <div class="vehicle-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+            <strong>${r.workerName}</strong>
+            <span style="font-size:12px;">${r.date}</span>
           </div>
-        `;
-      }).join('');
-    });
+          <div style="font-size:13px; color:rgba(255,255,255,0.8); margin-top:4px;">📍 ${r.location}</div>
+          <div style="font-size:13px; color:rgba(255,255,255,0.8); margin-top:4px;">📝 ${r.description}</div>
+          ${r.notes ? `<div style="font-size:12px; color:rgba(255,200,200,0.8); margin-top:4px;">⚠️ ${r.notes}</div>` : ''}
+          ${photos ? `<div style="display:flex; gap:4px; margin-top:8px;">${photos}</div>` : ''}
+          <div style="display:flex; gap:8px; margin-top:8px;">
+            <button onclick="exportReportPdf('${doc.id}')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;background:rgba(33,150,243,0.5);">📄 PDF</button>
+            <button onclick="deleteReport('${doc.id}')" class="del-btn" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">حذف</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  });
 }
 
 async function exportReportPdf(reportId) {
   try {
     const doc = await db.collection('workReports').doc(reportId).get();
     const r = doc.data();
-    
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF('p', 'mm', 'a4');
-    
-    pdf.setFont('helvetica', 'normal');
     pdf.setR2L(true);
-    
     pdf.setFontSize(18);
     pdf.text('تقرير عمل يومي', 105, 20, { align: 'center' });
-    
     pdf.setFontSize(12);
     pdf.text(`التاريخ: ${r.date}`, 20, 35, { align: 'right' });
     pdf.text(`اسم العامل: ${r.workerName}`, 20, 42, { align: 'right' });
-    pdf.text(`الفريق: ${teamLabel(r.workerTeam)}`, 20, 49, { align: 'right' });
-    pdf.text(`موقع العمل: ${r.location}`, 20, 56, { align: 'right' });
-    
-    pdf.text('وصف العمل:', 20, 63, { align: 'right' });
-    const descriptionLines = pdf.splitTextToSize(r.description, 170);
-    pdf.text(descriptionLines, 20, 70, { align: 'right' });
-    
-    let yPos = 70 + (descriptionLines.length * 7);
-    
-    if (r.notes) {
-      yPos += 10;
-      pdf.text('ملاحظات:', 20, yPos, { align: 'right' });
-      const notesLines = pdf.splitTextToSize(r.notes, 170);
-      pdf.text(notesLines, 20, yPos + 7, { align: 'right' });
-      yPos += 7 + (notesLines.length * 7);
-    }
-    
+    pdf.text(`موقع العمل: ${r.location}`, 20, 49, { align: 'right' });
+    pdf.text('وصف العمل:', 20, 56, { align: 'right' });
+    const descLines = pdf.splitTextToSize(r.description, 170);
+    pdf.text(descLines, 20, 63, { align: 'right' });
+    let yPos = 63 + (descLines.length * 7);
     if (r.photos && r.photos.length > 0) {
       for (let i = 0; i < r.photos.length; i++) {
-        if (yPos > 250) {
-          pdf.addPage();
-          yPos = 20;
-        }
+        if (yPos > 250) { pdf.addPage(); yPos = 20; }
         yPos += 10;
-        pdf.text(`صورة ${i + 1}:`, 20, yPos, { align: 'right' });
-        yPos += 5;
         try {
           pdf.addImage(r.photos[i], 'JPEG', 40, yPos, 130, 97);
           yPos += 105;
-        } catch (e) {
-          console.log('خطأ في إضافة الصورة:', e);
-        }
+        } catch (e) {}
       }
     }
-    
     pdf.save(`تقرير-عمل-${r.date}-${r.workerName}.pdf`);
   } catch (err) {
-    alert('خطأ في تصدير PDF: ' + err.message);
+    alert('خطأ: ' + err.message);
   }
 }
 
@@ -1959,9 +1884,7 @@ async function deleteReport(reportId) {
   await db.collection('workReports').doc(reportId).delete();
 }
 
-// ============ الآليات ============
-let vehiclePhotoBase64 = '';
-
+// ============ دوال الآليات ============
 document.getElementById('vehiclePhoto').addEventListener('change', async (e) => {
   const file = e.target.files[0];
   if (!file) return;
@@ -1972,11 +1895,7 @@ document.getElementById('vehiclePhoto').addEventListener('change', async (e) => 
 });
 
 document.getElementById('saveVehicleBtn').addEventListener('click', async () => {
-  if (currentUser.viewOnly) {
-    alert('أنت في وضع المشاهدة فقط');
-    return;
-  }
-
+  if (currentUser.viewOnly) return;
   const type = document.getElementById('vehicleType').value;
   const number = document.getElementById('vehicleNumber').value.trim();
   const status = document.getElementById('vehicleStatus').value;
@@ -1990,24 +1909,17 @@ document.getElementById('saveVehicleBtn').addEventListener('click', async () => 
 
   try {
     await db.collection('vehicles').add({
-      type: type,
-      typeLabel: VEHICLE_TYPES[type],
-      number: number,
-      status: status,
-      statusLabel: VEHICLE_STATUS[status].label,
-      notes: notes,
+      type, typeLabel: VEHICLE_TYPES[type], number, status,
+      statusLabel: VEHICLE_STATUS[status].label, notes,
       photo: vehiclePhotoBase64,
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
     });
-
     msg.innerHTML = '<p style="color:#c8f7d4;">✅ تم حفظ الآلية بنجاح</p>';
-    
     document.getElementById('vehicleNumber').value = '';
     document.getElementById('vehicleNotes').value = '';
     document.getElementById('vehiclePhoto').value = '';
     document.getElementById('vehiclePhotoPreview').style.display = 'none';
     vehiclePhotoBase64 = '';
-    
     loadVehicles();
   } catch (err) {
     msg.innerHTML = '<p style="color:#ffcdd2;">خطأ: ' + err.message + '</p>';
@@ -2015,51 +1927,42 @@ document.getElementById('saveVehicleBtn').addEventListener('click', async () => 
 });
 
 function loadVehicles() {
-  db.collection('vehicles')
-    .orderBy('timestamp', 'desc')
-    .onSnapshot(snapshot => {
-      const container = document.getElementById('vehiclesList');
-      if (snapshot.empty) {
-        container.innerHTML = '<p style="text-align:center;color:rgba(255,255,255,0.7);">لا توجد آليات مسجلة بعد</p>';
-        return;
-      }
-
-      const grouped = {};
-      snapshot.docs.forEach(doc => {
-        const v = { id: doc.id, ...doc.data() };
-        if (!grouped[v.type]) grouped[v.type] = [];
-        grouped[v.type].push(v);
-      });
-
-      let html = '';
-      Object.keys(grouped).forEach(type => {
-        const vehicles = grouped[type];
-        html += `<div class="team-group">
-          <div class="team-title">${VEHICLE_TYPES[type]} (${vehicles.length})</div>`;
-        
-        vehicles.forEach(v => {
-          const statusInfo = VEHICLE_STATUS[v.status] || VEHICLE_STATUS.working;
-          html += `
-            <div class="vehicle-card">
-              <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
-                <strong>🚛 ${v.number}</strong>
-                <span class="status-badge ${statusInfo.color}">${statusInfo.icon} ${statusInfo.label}</span>
-              </div>
-              ${v.photo ? `<img src="${v.photo}" alt="صورة الآلية">` : ''}
-              ${v.notes ? `<div style="font-size:12px; color:rgba(255,255,255,0.7); margin-top:4px;">📝 ${v.notes}</div>` : ''}
-              <div style="display:flex; gap:8px; margin-top:8px;">
-                <button onclick="editVehicle('${v.id}', '${v.status}')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;background:rgba(255,152,0,0.5);">🔄 تغيير الحالة</button>
-                <button onclick="deleteVehicle('${v.id}', '${v.number}')" class="del-btn" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">حذف</button>
-              </div>
-            </div>
-          `;
-        });
-        
-        html += '</div>';
-      });
-
-      container.innerHTML = html;
+  db.collection('vehicles').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
+    const container = document.getElementById('vehiclesList');
+    if (snapshot.empty) {
+      container.innerHTML = '<p style="text-align:center;color:rgba(255,255,255,0.7);">لا توجد آليات مسجلة بعد</p>';
+      return;
+    }
+    const grouped = {};
+    snapshot.docs.forEach(doc => {
+      const v = { id: doc.id, ...doc.data() };
+      if (!grouped[v.type]) grouped[v.type] = [];
+      grouped[v.type].push(v);
     });
+    let html = '';
+    Object.keys(grouped).forEach(type => {
+      const vehicles = grouped[type];
+      html += `<div class="team-group"><div class="team-title">${VEHICLE_TYPES[type]} (${vehicles.length})</div>`;
+      vehicles.forEach(v => {
+        const statusInfo = VEHICLE_STATUS[v.status] || VEHICLE_STATUS.working;
+        html += `
+          <div class="vehicle-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+              <strong>🚛 ${v.number}</strong>
+              <span class="status-badge ${statusInfo.color}">${statusInfo.icon} ${statusInfo.label}</span>
+            </div>
+            ${v.photo ? `<img src="${v.photo}" alt="صورة الآلية">` : ''}
+            ${v.notes ? `<div style="font-size:12px; color:rgba(255,255,255,0.7); margin-top:4px;">📝 ${v.notes}</div>` : ''}
+            <div style="display:flex; gap:8px; margin-top:8px;">
+              <button onclick="editVehicle('${v.id}', '${v.status}')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;background:rgba(255,152,0,0.5);">🔄 تغيير الحالة</button>
+              <button onclick="deleteVehicle('${v.id}', '${v.number}')" class="del-btn" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">حذف</button>
+            </div>
+          </div>`;
+      });
+      html += '</div>';
+    });
+    container.innerHTML = html;
+  });
 }
 
 async function editVehicle(vehicleId, currentStatus) {
@@ -2067,7 +1970,6 @@ async function editVehicle(vehicleId, currentStatus) {
   const statuses = ['working', 'maintenance', 'broken'];
   const currentIndex = statuses.indexOf(currentStatus);
   const nextStatus = statuses[(currentIndex + 1) % statuses.length];
-  
   await db.collection('vehicles').doc(vehicleId).update({
     status: nextStatus,
     statusLabel: VEHICLE_STATUS[nextStatus].label
@@ -2083,86 +1985,48 @@ async function deleteVehicle(vehicleId, number) {
 document.getElementById('exportVehiclesPdfBtn').addEventListener('click', async () => {
   try {
     const snapshot = await db.collection('vehicles').orderBy('type').get();
-    
-    if (snapshot.empty) {
-      alert('لا توجد آليات لتصديرها');
-      return;
-    }
-
+    if (snapshot.empty) { alert('لا توجد آليات'); return; }
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF('p', 'mm', 'a4');
     pdf.setR2L(true);
-    
     pdf.setFontSize(18);
     pdf.text('تقرير الآليات - شركة سرت', 105, 20, { align: 'center' });
-    
-    const dateStr = new Date().toLocaleDateString('ar-LY', {
-      year: 'numeric', month: 'long', day: 'numeric'
-    });
-    pdf.setFontSize(10);
-    pdf.text(`تاريخ التقرير: ${dateStr}`, 105, 28, { align: 'center' });
-    
-    let yPos = 40;
-    
+    let yPos = 35;
     const grouped = {};
     snapshot.docs.forEach(doc => {
       const v = doc.data();
       if (!grouped[v.type]) grouped[v.type] = [];
       grouped[v.type].push(v);
     });
-
     Object.keys(grouped).forEach(type => {
       const vehicles = grouped[type];
-      
-      if (yPos > 250) {
-        pdf.addPage();
-        yPos = 20;
-      }
-      
+      if (yPos > 250) { pdf.addPage(); yPos = 20; }
       pdf.setFontSize(14);
-      pdf.text(VEHICLE_TYPES[type] + ` (${vehicles.length})`, 20, yPos, { align: 'right' });
+      pdf.text(`${VEHICLE_TYPES[type]} (${vehicles.length})`, 20, yPos, { align: 'right' });
       yPos += 8;
-      
       vehicles.forEach(v => {
         const statusInfo = VEHICLE_STATUS[v.status] || VEHICLE_STATUS.working;
-        
         pdf.setFontSize(11);
-        pdf.text(`الرقم: ${v.number}`, 20, yPos, { align: 'right' });
-        pdf.text(`الحالة: ${statusInfo.label}`, 190, yPos, { align: 'left' });
+        pdf.text(`الرقم: ${v.number} - الحالة: ${statusInfo.label}`, 20, yPos, { align: 'right' });
         yPos += 7;
-        
-        if (v.notes) {
-          pdf.setFontSize(10);
-          const notesLines = pdf.splitTextToSize('ملاحظات: ' + v.notes, 170);
-          pdf.text(notesLines, 20, yPos, { align: 'right' });
-          yPos += (notesLines.length * 6);
-        }
-        
         if (v.photo) {
           try {
-            if (yPos > 240) {
-              pdf.addPage();
-              yPos = 20;
-            }
+            if (yPos > 240) { pdf.addPage(); yPos = 20; }
             pdf.addImage(v.photo, 'JPEG', 60, yPos, 90, 67);
             yPos += 75;
-          } catch (e) {
-            console.log('خطأ في إضافة صورة الآلية:', e);
-          }
+          } catch (e) {}
         }
-        
         yPos += 5;
       });
-      
       yPos += 10;
     });
-
     pdf.save(`الآليات-سرت-${new Date().toISOString().slice(0,10)}.pdf`);
   } catch (err) {
-    alert('خطأ في تصدير PDF: ' + err.message);
+    alert('خطأ: ' + err.message);
   }
 });
 
+// ============ دوال العرض ============
 function showLanding() {
   document.getElementById('landing').style.display = 'block';
   document.getElementById('adminLogin').style.display = 'none';
@@ -2178,7 +2042,7 @@ function showWorker() {
   loadWorkerSelect();
 }
 
-// تحميل قائمة العمال عند فتح الصفحة
+// تحميل أولي
 document.addEventListener('DOMContentLoaded', () => {
   loadWorkerSelect();
 });

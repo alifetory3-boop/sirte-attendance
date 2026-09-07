@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>تسجيل الحضور اليومي - سرت</title>
+<title>نظام حضور سرت</title>
 <link rel="manifest" href="manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -65,113 +65,105 @@
     margin-top: 12px;
     font-weight: bold;
     display: none;
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
   }
-  .ok { background: rgba(76,175,80,0.35); color: #ffffff; border: 1px solid rgba(76,175,80,0.6); }
-  .warn { background: rgba(255,167,38,0.35); color: #ffffff; border: 1px solid rgba(255,167,38,0.6); }
-  .err { background: rgba(239,83,80,0.35); color: #ffffff; border: 1px solid rgba(239,83,80,0.6); }
+  .ok { background: rgba(76,175,80,0.35); color: #fff; border: 1px solid rgba(76,175,80,0.6); }
+  .warn { background: rgba(255,167,38,0.35); color: #fff; border: 1px solid rgba(255,167,38,0.6); }
+  .err { background: rgba(239,83,80,0.35); color: #fff; border: 1px solid rgba(239,83,80,0.6); }
   label { font-size: 14px; color: rgba(255,255,255,0.85); margin-bottom: 6px; display: block; }
   .divider { text-align: center; color: rgba(255,255,255,0.6); font-size: 13px; margin: 6px 0 14px; }
-  h2 { font-size: 16px; color: #ffffff; }
-  h3 { font-size: 14px; color: #ffffff; margin: 18px 0 8px; }
-  input, textarea { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.4); font-size: 15px; margin-bottom: 10px; background: rgba(255,255,255,0.2); color: #ffffff; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+  h2 { font-size: 16px; color: #fff; }
+  input, textarea { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.4); font-size: 15px; margin-bottom: 10px; background: rgba(255,255,255,0.2); color: #fff; }
   input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.6); }
   .tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
-  .tab { flex: 1; text-align: center; padding: 10px; border-radius: 10px; background: rgba(255,255,255,0.14); color: rgba(255,255,255,0.85); font-weight: bold; cursor: pointer; border: 1px solid rgba(255,255,255,0.35); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); font-size: 12px; min-width: 70px; }
+  .tab { flex: 1; text-align: center; padding: 10px; border-radius: 10px; background: rgba(255,255,255,0.14); color: rgba(255,255,255,0.85); font-weight: bold; cursor: pointer; border: 1px solid rgba(255,255,255,0.35); font-size: 12px; min-width: 70px; }
   .tab.active { background: rgba(0,150,136,0.6); color: white; border-color: rgba(255,255,255,0.5); }
   .stats { display: flex; flex-wrap: wrap; gap: 10px; }
   .stat { flex: 1; min-width: 100px; padding: 14px; border-radius: 12px; text-align: center; background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.3); color: #fff; }
   .stat .num { font-size: 22px; font-weight: bold; display: block; }
   .row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.2); color: #fff; }
-  .row img { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; background:rgba(255,255,255,0.2); }
-  .row .info { flex: 1; font-size: 14px; }
-  .badge { padding: 4px 10px; border-radius: 20px; color: white; font-size: 12px; white-space: nowrap; }
+  .badge { padding: 4px 10px; border-radius: 20px; color: white; font-size: 12px; }
   .team-group { margin-bottom: 18px; }
-  .team-title { background: rgba(255,255,255,0.2); color: #ffffff; padding: 8px 12px; border-radius: 10px; font-weight: bold; font-size: 14px; margin-bottom: 6px; border: 1px solid rgba(255,255,255,0.3); }
+  .team-title { background: rgba(255,255,255,0.2); color: #fff; padding: 8px 12px; border-radius: 10px; font-weight: bold; font-size: 14px; margin-bottom: 6px; }
   .worker-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.15); font-size: 14px; color: #fff; }
   .worker-row .name { flex: 1; }
   .del-btn { width: auto; padding: 6px 10px; background: rgba(198,40,40,0.35); color: #ffcdd2; border: 1px solid rgba(255,120,120,0.5); margin: 0; font-size: 13px; }
-  .vehicle-card { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.25); border-radius: 12px; padding: 12px; margin-bottom: 10px; }
-  .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
-  .status-working { background: rgba(76,175,80,0.5); }
-  .status-maintenance { background: rgba(255,152,0,0.5); }
-  .status-broken { background: rgba(239,83,80,0.5); }
-  .image-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px; margin-top: 8px; }
-  .image-grid img { width: 100%; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(255,255,255,0.3); }
-  .view-only-badge { display: inline-block; background: rgba(255,193,7,0.5); color: #fff; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
-  .role-badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; margin-right: 4px; }
-  .role-owner { background: rgba(255,215,0,0.6); color: #fff; }
-  .role-admin { background: rgba(156,39,176,0.6); color: #fff; }
-  .role-supervisor { background: rgba(33,150,243,0.6); color: #fff; }
   .pin-input { letter-spacing: 10px; font-size: 24px; text-align: center; font-weight: bold; }
-  .permission-box { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; padding: 12px; margin-bottom: 10px; }
-  .permission-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
-  .permission-item:last-child { border-bottom: none; }
-  .permission-item label { flex: 1; margin: 0; font-size: 13px; cursor: pointer; }
-  .permission-item input[type="checkbox"] { width: 18px; height: 18px; margin: 0; cursor: pointer; accent-color: #4caf50; }
   .shift-selector { display: flex; gap: 10px; margin-bottom: 15px; }
-  .shift-btn { flex: 1; padding: 14px; border-radius: 12px; border: 2px solid rgba(255,255,255,0.4); font-size: 16px; font-weight: bold; cursor: pointer; text-align: center; transition: all 0.3s; }
+  .shift-btn { flex: 1; padding: 14px; border-radius: 12px; border: 2px solid rgba(255,255,255,0.4); font-size: 16px; font-weight: bold; cursor: pointer; text-align: center; }
   .shift-btn.morning { background: rgba(255,193,7,0.3); color: #fff; }
   .shift-btn.morning.active { background: rgba(255,193,7,0.7); border-color: #ffc107; }
   .shift-btn.night { background: rgba(63,81,181,0.3); color: #fff; }
   .shift-btn.night.active { background: rgba(63,81,181,0.7); border-color: #3f51b5; }
-  .deduction-badge { background: rgba(244,67,54,0.6); color: #fff; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
-  .no-deduction-badge { background: rgba(76,175,80,0.5); color: #fff; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
+  .deduction-badge { background: rgba(244,67,54,0.6); color: #fff; padding: 2px 8px; border-radius: 12px; font-size: 11px; }
+  .role-badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
+  .role-owner { background: rgba(255,215,0,0.6); color: #fff; }
+  .role-admin { background: rgba(156,39,176,0.6); color: #fff; }
+  .role-supervisor { background: rgba(33,150,243,0.6); color: #fff; }
+  .role-worker { background: rgba(76,175,80,0.5); color: #fff; }
+  .view-only-badge { background: rgba(255,193,7,0.5); color: #fff; padding: 2px 8px; border-radius: 12px; font-size: 11px; }
+  .permission-box { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; padding: 12px; margin-bottom: 10px; }
+  .permission-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .permission-item label { flex: 1; margin: 0; font-size: 13px; }
+  .permission-item input[type="checkbox"] { width: 18px; height: 18px; margin: 0; accent-color: #4caf50; }
+  .vehicle-card { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.25); border-radius: 12px; padding: 12px; margin-bottom: 10px; }
+  .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; }
+  .status-working { background: rgba(76,175,80,0.5); }
+  .status-maintenance { background: rgba(255,152,0,0.5); }
+  .status-broken { background: rgba(239,83,80,0.5); }
+  .image-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px; margin-top: 8px; }
+  .image-grid img { width: 100%; height: 80px; object-fit: cover; border-radius: 8px; }
 </style>
 </head>
 <body>
 
-<div id="landing" class="card" style="max-width:420px; text-align:center;">
-  <img src="logo.png" alt="شعار الشركة" style="width:100%; max-width:200px; display:block; margin:0 auto 16px; border-radius:16px; box-shadow:0 6px 20px rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.4);">
-  <h1 style="margin-bottom:4px;">نظام حضور سرت</h1>
-  <p style="color:rgba(255,255,255,0.7); font-size:13px; margin:0 0 22px;">اختر الدخول المناسب لك</p>
-  <button onclick="showWorker()" style="padding:16px; font-size:16px;">👷 تسجيل الحضور اليومي</button>
-  <button onclick="showAdminLogin()" style="background:rgba(103,58,183,0.5); padding:16px; font-size:16px;">🔐 دخول المشرفين والإدارة</button>
-</div>
-
-<!-- صفحة تسجيل الدخول -->
-<div id="adminLogin" style="display:none;">
-  <button onclick="showLanding()" style="max-width:420px;margin:0 auto 12px;display:block;background:rgba(255,255,255,0.14);">⬅ رجوع للصفحة الرئيسية</button>
-  <div class="card">
-    <h1>🔐 تسجيل الدخول</h1>
-    <p style="text-align:center;color:rgba(255,255,255,0.7);font-size:13px;margin-bottom:20px;">أدخل الاسم والرقم السري</p>
-    <label>👤 الاسم</label>
-    <input id="loginName" placeholder="أدخل اسمك">
-    <label>🔢 الرقم السري</label>
-    <input id="loginPin" type="password" class="pin-input" placeholder="••••" maxlength="6" inputmode="numeric" pattern="[0-9]*">
-    <button id="loginBtn">🔓 دخول</button>
-    <div id="loginMsg"></div>
-  </div>
+<!-- صفحة تسجيل الدخول الرئيسية -->
+<div id="loginPage" class="card" style="max-width:420px; text-align:center;">
+  <img src="logo.png" alt="شعار الشركة" style="width:100%; max-width:150px; display:block; margin:0 auto 16px; border-radius:16px; border:1px solid rgba(255,255,255,0.4);">
+  <h1 style="margin-bottom:4px;">🔐 تسجيل الدخول</h1>
+  <p style="color:rgba(255,255,255,0.7); font-size:13px; margin:0 0 20px;">أدخل اسمك والرقم السري</p>
+  
+  <label style="text-align:right;">👤 الاسم</label>
+  <input id="loginName" placeholder="أدخل اسمك">
+  
+  <label style="text-align:right;">🔢 الرقم السري</label>
+  <input id="loginPin" type="password" class="pin-input" placeholder="••••" maxlength="6" inputmode="numeric" pattern="[0-9]*">
+  
+  <button id="loginBtn" style="padding:16px; font-size:16px; margin-top:10px;">🔓 دخول</button>
+  <div id="loginMsg"></div>
 </div>
 
 <!-- صفحة العامل -->
 <div id="workerView" style="display:none;">
-  <button onclick="showLanding()" style="max-width:420px;margin:0 auto 12px;display:block;background:rgba(255,255,255,0.14);">⬅ رجوع</button>
+  <div style="max-width:420px;margin:0 auto 12px;display:flex;gap:8px;">
+    <div style="flex:1;text-align:center;color:#fff;padding:10px;background:rgba(255,255,255,0.1);border-radius:10px;">
+      <span id="workerInfo"></span>
+    </div>
+    <button onclick="logoutWorker()" style="width:auto;background:rgba(198,40,40,0.5);">🚪 خروج</button>
+  </div>
   <div class="card">
     <h1>📍 تسجيل الحضور اليومي</h1>
+    
     <label>اختر الوردية</label>
     <div class="shift-selector">
       <div class="shift-btn morning active" onclick="selectWorkerShift('morning')">🌅 صباح</div>
       <div class="shift-btn night" onclick="selectWorkerShift('night')">🌙 ليل</div>
     </div>
-    <label>اختر فريقك ثم اسمك</label>
-    <select id="workerSelect">
-      <option value="">جاري تحميل قائمة العمال...</option>
-    </select>
-    <button id="checkInBtn" disabled>✅ تسجيل الحضور الآن</button>
+    
+    <button id="checkInBtn">✅ تسجيل الحضور الآن</button>
+    
     <div class="divider">— أو —</div>
-    <button id="absentBtn" class="secondary" disabled>✗ غائب اليوم (يوجد خصم)</button>
-    <button id="leaveBtn" class="secondary" disabled>📝 أخذت إذن اليوم (لا يوجد خصم)</button>
-    <button id="sickBtn" class="secondary" disabled>🤒 مريض اليوم (لا يوجد خصم)</button>
+    
+    <button id="absentBtn" class="secondary">✗ غائب اليوم (يوجد خصم)</button>
+    <button id="leaveBtn" class="secondary">📝 أخذت إذن اليوم (لا يوجد خصم)</button>
+    <button id="sickBtn" class="secondary">🤒 مريض اليوم (لا يوجد خصم)</button>
+    
     <div id="status"></div>
   </div>
 </div>
 
-<!-- لوحة التحكم -->
+<!-- لوحة المشرف -->
 <div id="adminView" style="display:none;">
   <div style="max-width:100%;margin:0 auto 12px;display:flex;gap:8px;flex-wrap:wrap;">
-    <button onclick="showLanding()" style="width:auto;background:rgba(255,255,255,0.14);">⬅ رجوع</button>
     <div style="flex:1;text-align:center;color:#fff;padding:10px;background:rgba(255,255,255,0.1);border-radius:10px;">
       <span id="currentUserInfo"></span>
     </div>
@@ -195,139 +187,120 @@
     <!-- نظرة عامة -->
     <div id="tab-overview">
       <div class="card">
-        <h1>حضور اليوم - الوردية الحالية</h1>
-        <p id="todayDateDisplay" style="text-align:center; color:rgba(255,255,255,0.75); font-size:13px; margin-top:-10px; margin-bottom:14px;"></p>
-        <p id="currentShiftDisplay" style="text-align:center; color:#ffc107; font-size:14px; font-weight:bold; margin-bottom:14px;"></p>
+        <h1>حضور اليوم</h1>
+        <p id="todayDateDisplay" style="text-align:center;color:rgba(255,255,255,0.75);font-size:13px;margin-bottom:14px;"></p>
         <div class="stats">
           <div class="stat" style="background:#e8f5e9;"><span class="num" id="presentCount">0</span>حاضر</div>
           <div class="stat" style="background:#fff3e0;"><span class="num" id="lateCount">0</span>متأخر</div>
           <div class="stat" style="background:#ede7f6;"><span class="num" id="leaveCount">0</span>إذن</div>
           <div class="stat" style="background:#fce4ec;"><span class="num" id="sickCount">0</span>مريض</div>
           <div class="stat" style="background:#ffebee;"><span class="num" id="absentCount">0</span>غائب</div>
-          <div class="stat" style="background:#eceff1;"><span class="num" id="totalCount">0</span>إجمالي</div>
         </div>
       </div>
       <div class="card">
-        <h2>⚠️ لم يسجلوا حضور الوردية الحالية</h2>
+        <h2>⚠️ لم يسجلوا اليوم</h2>
         <div id="absentList">جاري التحميل...</div>
       </div>
       <div class="card">
-        <h2>سجل الحضور اللحظي</h2>
-        <button id="exportBtn">📊 تصدير Excel</button>
-        <button id="clearTodayBtn" style="background:rgba(198,40,40,0.4);">🗑️ مسح سجل اليوم</button>
+        <h2>سجل الحضور</h2>
+        <button id="exportBtn">📊 Excel</button>
         <div id="list">جاري التحميل...</div>
       </div>
     </div>
 
-    <!-- تسجيل الحضور اليومي -->
+    <!-- تسجيل الحضور -->
     <div id="tab-daily" style="display:none;">
       <div class="card">
-        <h2>✅ سجّل حالة اليوم لكل عامل</h2>
-        <p id="dailyDateDisplay" style="text-align:center; color:rgba(255,255,255,0.75); font-size:13px; margin-top:-6px; margin-bottom:12px;"></p>
-        <label>اختر الوردية</label>
+        <h2>✅ سجّل حالة اليوم</h2>
         <div class="shift-selector">
           <div class="shift-btn morning active" onclick="selectAdminShift('morning')">🌅 صباح</div>
           <div class="shift-btn night" onclick="selectAdminShift('night')">🌙 ليل</div>
         </div>
-        <input id="dailySearch" placeholder="🔍 ابحث باسم العامل">
+        <input id="dailySearch" placeholder="🔍 ابحث">
         <div id="dailyMarkList">جاري التحميل...</div>
       </div>
     </div>
 
-    <!-- إدارة العمال -->
+    <!-- العمال -->
     <div id="tab-workers" style="display:none;">
       <div class="card">
-        <h2>➕ تسجيل عامل جديد</h2>
+        <h2>➕ تسجيل عامل</h2>
         <input type="file" id="newWorkerPhoto" accept="image/*" capture="user">
-        <img id="newWorkerPreview" style="width:100%;border-radius:10px;display:none;margin-bottom:10px;">
         <input id="newWorkerName" placeholder="اسم العامل">
         <select id="newWorkerTeam"></select>
-        <label>الوردية الأساسية</label>
         <select id="newWorkerShift">
           <option value="morning">🌅 صباح</option>
           <option value="night">🌙 ليل</option>
           <option value="both">🔄 كلاهما</option>
         </select>
-        <label>الراتب اليومي (للخصم)</label>
-        <input id="newWorkerSalary" type="number" placeholder="مثال: 50 دينار" min="0">
-        <div id="newWorkerEquipment" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;"></div>
-        <button id="addWorkerBtn">✅ تسجيل العامل</button>
-        <div id="addWorkerMsg"></div>
+        <input id="newWorkerSalary" type="number" placeholder="الراتب اليومي" min="0" value="50">
+        <button id="addWorkerBtn">✅ تسجيل</button>
       </div>
       <div class="card">
-        <h2>العمال حسب الفريق</h2>
-        <input id="workersSearch" placeholder="🔍 ابحث باسم العامل">
+        <h2>العمال</h2>
+        <input id="workersSearch" placeholder="🔍 ابحث">
         <div id="workersByTeam">جاري التحميل...</div>
       </div>
     </div>
 
-    <!-- التقرير الشهري -->
+    <!-- شهري -->
     <div id="tab-monthly" style="display:none;">
       <div class="card">
         <h2>📅 حضور الشهر</h2>
         <select id="monthSelect"></select>
-        <input id="monthlySearch" placeholder="🔍 ابحث باسم العامل">
-        <button id="exportMonthlyBtn">📊 تصدير Excel</button>
-        <div style="overflow-x:auto; margin-top:10px;">
-          <div id="monthlyGrid" style="min-width:600px;">جاري التحميل...</div>
-        </div>
+        <button id="exportMonthlyBtn">📊 Excel</button>
+        <div id="monthlyGrid" style="overflow-x:auto;min-width:600px;">جاري التحميل...</div>
       </div>
     </div>
 
-    <!-- الخصومات -->
+    <!-- خصومات -->
     <div id="tab-deductions" style="display:none;">
       <div class="card">
-        <h2>💰 تقرير الخصومات الشهري</h2>
+        <h2>💰 الخصومات</h2>
         <select id="deductionMonthSelect"></select>
-        <button id="exportDeductionsBtn">📊 تصدير Excel</button>
+        <button id="exportDeductionsBtn">📊 Excel</button>
         <div id="deductionsList">جاري التحميل...</div>
       </div>
       <div class="card">
-        <h2>⚙️ إعدادات الخصم</h2>
-        <label>قيمة الخصم عن كل يوم غياب (دينار)</label>
-        <input id="deductionAmount" type="number" value="50" min="0" placeholder="قيمة الخصم">
-        <button id="saveDeductionSettingsBtn">💾 حفظ الإعدادات</button>
+        <h2>⚙️ قيمة الخصم</h2>
+        <input id="deductionAmount" type="number" value="50" min="0">
+        <button id="saveDeductionSettingsBtn">💾 حفظ</button>
       </div>
     </div>
 
-    <!-- المخزن -->
+    <!-- مخزن -->
     <div id="tab-inventory" style="display:none;">
       <div class="card">
         <h2>➕ إضافة صنف</h2>
         <input id="newItemName" placeholder="اسم الصنف">
-        <input id="newItemQty" type="number" placeholder="الكمية" min="0">
+        <input id="newItemQty" type="number" placeholder="الكمية">
         <input id="newItemUnit" placeholder="الوحدة">
         <button id="addItemBtn">➕ إضافة</button>
-        <div id="addItemMsg"></div>
       </div>
       <div class="card">
-        <h2>📤 صرف صنف</h2>
+        <h2>📤 صرف</h2>
         <select id="issueItemSelect"></select>
         <select id="issueWorkerSelect"></select>
-        <input id="issueQty" type="number" placeholder="الكمية" min="1" value="1">
+        <input id="issueQty" type="number" value="1" min="1">
         <button id="issueBtn">📤 صرف</button>
-        <div id="issueMsg"></div>
       </div>
       <div class="card">
         <h2>📦 المخزن</h2>
-        <button id="exportInventoryBtn">📊 تصدير</button>
         <div id="inventoryList">جاري التحميل...</div>
       </div>
     </div>
 
-    <!-- تقارير العمل -->
+    <!-- تقارير -->
     <div id="tab-reports" style="display:none;">
       <div class="card">
-        <h2>📋 إنشاء تقرير</h2>
+        <h2>📋 تقرير</h2>
         <input type="date" id="reportDate">
         <select id="reportWorkerSelect"></select>
         <input id="reportLocation" placeholder="موقع العمل">
-        <textarea id="reportDescription" rows="4" placeholder="وصف العمل"></textarea>
-        <textarea id="reportNotes" rows="3" placeholder="ملاحظات"></textarea>
+        <textarea id="reportDescription" rows="3" placeholder="وصف العمل"></textarea>
         <input type="file" id="reportPhotos" accept="image/*" multiple>
         <div id="reportPhotosPreview" class="image-grid"></div>
         <button id="saveReportBtn">💾 حفظ</button>
-        <div id="reportMsg"></div>
       </div>
       <div class="card">
         <h2>📄 التقارير</h2>
@@ -335,37 +308,33 @@
       </div>
     </div>
 
-    <!-- الآليات -->
+    <!-- آليات -->
     <div id="tab-vehicles" style="display:none;">
       <div class="card">
-        <h2>➕ إضافة آلية</h2>
+        <h2>➕ آلية</h2>
         <select id="vehicleType">
           <option value="small_compactor">كبس صغير</option>
           <option value="large_compactor">كبس كبير</option>
-          <option value="small_garbage_truck">صندوق قمامة صغير</option>
-          <option value="large_garbage_truck">صندوق قمامة كبير</option>
+          <option value="small_garbage_truck">صندوق صغير</option>
+          <option value="large_garbage_truck">صندوق كبير</option>
           <option value="dump_truck">قلاب</option>
         </select>
-        <input id="vehicleNumber" placeholder="رقم الآلية">
+        <input id="vehicleNumber" placeholder="رقم">
         <select id="vehicleStatus">
           <option value="working">✅ تعمل</option>
           <option value="maintenance">🔧 صيانة</option>
           <option value="broken">❌ معطلة</option>
         </select>
-        <textarea id="vehicleNotes" rows="3" placeholder="ملاحظات"></textarea>
         <input type="file" id="vehiclePhoto" accept="image/*">
-        <img id="vehiclePhotoPreview" style="width:100%;border-radius:10px;display:none;margin-bottom:10px;">
         <button id="saveVehicleBtn">💾 حفظ</button>
-        <div id="vehicleMsg"></div>
       </div>
       <div class="card">
         <h2>🚛 الآليات</h2>
-        <button id="exportVehiclesPdfBtn">📄 PDF</button>
         <div id="vehiclesList">جاري التحميل...</div>
       </div>
     </div>
 
-    <!-- الورديات -->
+    <!-- ورديات -->
     <div id="tab-shifts" style="display:none;">
       <div class="card">
         <h2>🔄 الورديات</h2>
@@ -378,7 +347,7 @@
       </div>
     </div>
 
-    <!-- إدارة المستخدمين -->
+    <!-- مستخدمين -->
     <div id="tab-permissions" style="display:none;">
       <div class="card">
         <h2>👥 إضافة مستخدم</h2>
@@ -388,9 +357,8 @@
           <option value="supervisor">مشرف</option>
           <option value="admin">مدير</option>
         </select>
-        <div id="permissionsSelection" class="permission-box" style="display:none;">
-          <h3>الصلاحيات:</h3>
-          <div class="permission-item"><label>📊 نظرة عامة</label><input type="checkbox" id="perm-overview" checked></div>
+        <div id="permissionsSelection" style="display:none;">
+          <div class="permission-item"><label>📊 نظرة</label><input type="checkbox" id="perm-overview" checked></div>
           <div class="permission-item"><label>✅ حضور</label><input type="checkbox" id="perm-attendance" checked></div>
           <div class="permission-item"><label>👷 عمال</label><input type="checkbox" id="perm-workers"></div>
           <div class="permission-item"><label>📅 شهري</label><input type="checkbox" id="perm-monthly" checked></div>
@@ -402,7 +370,6 @@
           <div class="permission-item"><label>👁️ مشاهدة فقط</label><input type="checkbox" id="perm-viewonly"></div>
         </div>
         <button id="addUserBtn">➕ إضافة</button>
-        <div id="addUserMsg"></div>
       </div>
       <div class="card">
         <h2>📋 المستخدمين</h2>
@@ -420,33 +387,29 @@
 
 <script>
 firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
 const db = firebase.firestore();
 
 // ============ الإعدادات ============
 const OWNER_NAME = 'المدير';
 const OWNER_PIN = '1234';
-let deductionAmountValue = 50; // قيمة الخصم الافتراضية
-
-// ============ المتغيرات ============
+let deductionAmountValue = 50;
 let currentUser = null;
-let currentUserPermissions = {};
 let currentUserRole = '';
-let selectedShift = 'morning'; // الوردية المختارة
-let adminSelectedShift = 'morning'; // وردية المشرف
-let viewSelectedShift = 'morning'; // وردية العرض
+let currentUserPermissions = {};
+let selectedShift = 'morning';
+let adminSelectedShift = 'morning';
+let viewSelectedShift = 'morning';
 
-// ============ الثوابت ============
 const TEAMS = [
-  { id: 'dump_truck_drivers', label: 'سائقين شاحنة دنبر' },
-  { id: 'container_drivers', label: 'سائقين صندوق كنتر' },
-  { id: 'large_compactor_drivers', label: 'سائقين كباسة كبيرة' },
-  { id: 'small_compactor_drivers', label: 'سائقين كباسة صغيرة' },
+  { id: 'dump_truck_drivers', label: 'سائقين دنبر' },
+  { id: 'container_drivers', label: 'سائقين كنتر' },
+  { id: 'large_compactor_drivers', label: 'كباسة كبيرة' },
+  { id: 'small_compactor_drivers', label: 'كباسة صغيرة' },
   { id: 'guards', label: 'غفير' },
-  { id: 'gardens_workers', label: 'عمال حدائق' },
-  { id: 'cleaning_workers', label: 'عمال نظافة' },
+  { id: 'gardens_workers', label: 'حدائق' },
+  { id: 'cleaning_workers', label: 'نظافة' },
   { id: 'compactor_workers', label: 'عمال كباسات' },
-  { id: 'electricians', label: 'عمال كهربائي' },
+  { id: 'electricians', label: 'كهربائي' },
   { id: 'cleaning_supervisors', label: 'مشرف نظافة' },
   { id: '', label: 'أخرى' },
 ];
@@ -455,45 +418,138 @@ const EQUIPMENT = [
   { id: 'broom', label: 'مكنسة', icon: '🧹' },
   { id: 'axe', label: 'فأس', icon: '⛏️' },
   { id: 'shovel', label: 'بالة', icon: '🧰' },
-  { id: 'wheelbarrow', label: 'بروطة', icon: '🛒' },
   { id: 'gloves', label: 'قفاز', icon: '🧤' },
-  { id: 'helmet', label: 'طربوش عاكس', icon: '⛑️' },
+  { id: 'helmet', label: 'طربوش', icon: '⛑️' },
   { id: 'vest', label: 'سترة', icon: '🦺' },
-  { id: 'ladder', label: 'سلم', icon: '🪜' },
 ];
 
 const VEHICLE_TYPES = {
   small_compactor: 'كبس صغير',
   large_compactor: 'كبس كبير',
-  small_garbage_truck: 'صندوق قمامة صغير',
-  large_garbage_truck: 'صندوق قمامة كبير',
+  small_garbage_truck: 'صندوق صغير',
+  large_garbage_truck: 'صندوق كبير',
   dump_truck: 'قلاب'
-};
-
-const VEHICLE_STATUS = {
-  working: { label: 'تعمل', color: 'status-working', icon: '✅' },
-  maintenance: { label: 'صيانة', color: 'status-maintenance', icon: '🔧' },
-  broken: { label: 'معطلة', color: 'status-broken', icon: '❌' }
 };
 
 let allWorkers = [];
 let allInventory = [];
 let latestRecords = [];
-let latestInfoMap = {};
-let newWorkerPhotoBase64 = '';
-let reportPhotosArray = [];
-let vehiclePhotoBase64 = '';
 
-// ============ دوال مساعدة ============
-function getCurrentShift() {
-  const hour = new Date().getHours();
-  return hour >= 6 && hour < 18 ? 'morning' : 'night';
+// ============ تسجيل الدخول ============
+document.getElementById('loginBtn').addEventListener('click', async () => {
+  const name = document.getElementById('loginName').value.trim();
+  const pin = document.getElementById('loginPin').value.trim();
+  const msg = document.getElementById('loginMsg');
+
+  if (!name || !pin) {
+    msg.innerHTML = '<p style="color:#ffcdd2;">أدخل اسمك والرقم السري</p>';
+    return;
+  }
+
+  // 1. التحقق من صاحب النظام
+  if (name === OWNER_NAME && pin === OWNER_PIN) {
+    currentUser = { name: OWNER_NAME, role: 'owner' };
+    currentUserRole = 'owner';
+    currentUserPermissions = { all: true };
+    showAdminPanel();
+    return;
+  }
+
+  // 2. التحقق من المستخدمين (مشرفين/مدراء)
+  try {
+    const userSnapshot = await db.collection('systemUsers')
+      .where('name', '==', name)
+      .where('pin', '==', pin)
+      .get();
+    
+    if (!userSnapshot.empty) {
+      userSnapshot.forEach(doc => {
+        currentUser = { id: doc.id, ...doc.data() };
+      });
+      currentUserRole = currentUser.role || 'supervisor';
+      currentUserPermissions = currentUser.permissions || {};
+      showAdminPanel();
+      return;
+    }
+  } catch (err) {}
+
+  // 3. التحقق من العمال
+  try {
+    const workerSnapshot = await db.collection('workers')
+      .where('name', '==', name)
+      .get();
+    
+    if (!workerSnapshot.empty) {
+      let workerId = null;
+      let workerData = null;
+      workerSnapshot.forEach(doc => {
+        workerId = doc.id;
+        workerData = doc.data();
+      });
+      
+      // إذا كان العامل مسجل، نعطيه دخول مباشر (أو نتحقق من رقمه)
+      if (pin === workerData.pin || pin === '0000') {
+        currentUser = { id: workerId, ...workerData, role: 'worker' };
+        currentUserRole = 'worker';
+        showWorkerPanel();
+        return;
+      }
+    }
+  } catch (err) {}
+
+  msg.innerHTML = '<p style="color:#ffcdd2;">❌ الاسم أو الرقم السري غير صحيح</p>';
+});
+
+function showWorkerPanel() {
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('workerView').style.display = 'block';
+  document.getElementById('adminView').style.display = 'none';
+  
+  document.getElementById('workerInfo').innerHTML = 
+    '<span class="role-badge role-worker">👷 عامل</span> ' + currentUser.name;
+  
+  document.getElementById('loginName').value = '';
+  document.getElementById('loginPin').value = '';
+  document.getElementById('loginMsg').innerHTML = '';
 }
 
-function getShiftLabel(shift) {
-  return shift === 'morning' ? '🌅 صباح' : '🌙 ليل';
+function showAdminPanel() {
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('workerView').style.display = 'none';
+  document.getElementById('adminView').style.display = 'block';
+  
+  const userInfo = document.getElementById('currentUserInfo');
+  if (currentUserRole === 'owner') {
+    userInfo.innerHTML = '<span class="role-badge role-owner">👑 صاحب النظام</span> ' + currentUser.name;
+  } else if (currentUserRole === 'admin') {
+    userInfo.innerHTML = '<span class="role-badge role-admin">👤 مدير</span> ' + currentUser.name;
+  } else {
+    userInfo.innerHTML = '<span class="role-badge role-supervisor">👤 مشرف</span> ' + currentUser.name;
+  }
+  if (currentUser.viewOnly) {
+    userInfo.innerHTML += ' <span class="view-only-badge">👁️ مشاهدة</span>';
+  }
+  
+  document.getElementById('loginName').value = '';
+  document.getElementById('loginPin').value = '';
+  document.getElementById('loginMsg').innerHTML = '';
+  
+  initializeAdmin();
 }
 
+function logoutWorker() {
+  currentUser = null;
+  document.getElementById('workerView').style.display = 'none';
+  document.getElementById('loginPage').style.display = 'block';
+}
+
+function logoutAdmin() {
+  currentUser = null;
+  document.getElementById('adminView').style.display = 'none';
+  document.getElementById('loginPage').style.display = 'block';
+}
+
+// ============ اختيار الوردية ============
 function selectWorkerShift(shift) {
   selectedShift = shift;
   document.querySelectorAll('#workerView .shift-btn').forEach(btn => {
@@ -529,129 +585,51 @@ function selectShiftView(shift) {
   loadShiftWorkers();
 }
 
-// ============ نظام تسجيل الدخول ============
-function showAdminLogin() {
-  document.getElementById('landing').style.display = 'none';
-  document.getElementById('adminLogin').style.display = 'block';
-  document.getElementById('workerView').style.display = 'none';
-  document.getElementById('adminView').style.display = 'none';
-}
-
-document.getElementById('loginBtn').addEventListener('click', async () => {
-  const name = document.getElementById('loginName').value.trim();
-  const pin = document.getElementById('loginPin').value.trim();
-  const msg = document.getElementById('loginMsg');
-
-  if (!name || !pin) {
-    msg.innerHTML = '<p style="color:#ffcdd2;">أدخل اسمك والرقم السري</p>';
-    return;
-  }
-
-  if (name === OWNER_NAME && pin === OWNER_PIN) {
-    currentUser = { name: OWNER_NAME, role: 'owner', viewOnly: false };
-    currentUserRole = 'owner';
-    currentUserPermissions = { all: true };
-    enterAdminPanel();
-    return;
-  }
-
-  try {
-    const snapshot = await db.collection('systemUsers')
-      .where('name', '==', name)
-      .where('pin', '==', pin)
-      .get();
-    
-    if (snapshot.empty) {
-      msg.innerHTML = '<p style="color:#ffcdd2;">❌ الاسم أو الرقم السري غير صحيح</p>';
-      return;
-    }
-    
-    snapshot.forEach(doc => {
-      currentUser = { id: doc.id, ...doc.data() };
-    });
-    
-    currentUserRole = currentUser.role || 'supervisor';
-    currentUserPermissions = currentUser.permissions || {};
-    enterAdminPanel();
-  } catch (err) {
-    msg.innerHTML = '<p style="color:#ffcdd2;">خطأ: ' + err.message + '</p>';
-  }
-});
-
-function enterAdminPanel() {
-  document.getElementById('loginName').value = '';
-  document.getElementById('loginPin').value = '';
-  document.getElementById('loginMsg').innerHTML = '';
-  document.getElementById('adminLogin').style.display = 'none';
-  document.getElementById('adminView').style.display = 'block';
-  updateUIForPermissions();
-  initializeAdmin();
-}
-
-function logoutAdmin() {
-  currentUser = null;
-  currentUserPermissions = {};
-  currentUserRole = '';
-  showLanding();
-}
-
-function updateUIForPermissions() {
-  const userInfo = document.getElementById('currentUserInfo');
-  if (currentUserRole === 'owner') {
-    userInfo.innerHTML = '<span class="role-badge role-owner">👑 صاحب النظام</span> ' + currentUser.name;
-  } else if (currentUserRole === 'admin') {
-    userInfo.innerHTML = '<span class="role-badge role-admin">👤 مدير</span> ' + currentUser.name;
-  } else {
-    userInfo.innerHTML = '<span class="role-badge role-supervisor">👤 مشرف</span> ' + currentUser.name;
-  }
-  if (currentUser.viewOnly) {
-    userInfo.innerHTML += ' <span class="view-only-badge">👁️ مشاهدة فقط</span>';
-  }
-}
-
-// ============ تهيئة ============
+// ============ تهيئة المشرف ============
 function initializeAdmin() {
   populateTeamSelect();
-  populateEquipmentCheckboxes();
   populateMonthSelect();
   populateDeductionMonthSelect();
   displayTodayDate();
-  setDefaultReportDate();
-  setDefaultShiftDate();
+  setDefaultDates();
   loadDeductionSettings();
   watchAttendance();
   watchWorkers();
   watchInventory();
-  if (currentUserRole === 'owner' || currentUserPermissions.managePermissions) {
-    loadUsersList();
-  }
+  if (currentUserRole === 'owner') loadUsersList();
+  
+  // تفعيل التبويبات
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const tabs = ['overview','daily','workers','monthly','deductions','inventory','reports','vehicles','shifts','permissions'];
+      tabs.forEach(t => {
+        const el = document.getElementById('tab-' + t);
+        if (el) el.style.display = tab.dataset.tab === t ? 'block' : 'none';
+      });
+      if (tab.dataset.tab === 'monthly') loadMonthlyReport();
+      if (tab.dataset.tab === 'deductions') loadDeductions();
+      if (tab.dataset.tab === 'reports') loadSavedReports();
+      if (tab.dataset.tab === 'vehicles') loadVehicles();
+      if (tab.dataset.tab === 'shifts') loadShiftWorkers();
+    });
+  });
 }
 
 function displayTodayDate() {
   const todayStr = new Date().toLocaleDateString('ar-LY', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   document.getElementById('todayDateDisplay').textContent = '📅 ' + todayStr;
-  document.getElementById('dailyDateDisplay').textContent = '📅 ' + todayStr;
-  document.getElementById('currentShiftDisplay').textContent = 'الوردية الحالية: ' + getShiftLabel(getCurrentShift());
 }
 
-function setDefaultReportDate() {
-  document.getElementById('reportDate').value = new Date().toISOString().slice(0, 10);
-}
-
-function setDefaultShiftDate() {
-  document.getElementById('shiftDate').value = new Date().toISOString().slice(0, 10);
+function setDefaultDates() {
+  const today = new Date().toISOString().slice(0, 10);
+  document.getElementById('reportDate').value = today;
+  document.getElementById('shiftDate').value = today;
 }
 
 function populateTeamSelect() {
   document.getElementById('newWorkerTeam').innerHTML = TEAMS.map(t => `<option value="${t.id}">${t.label}</option>`).join('');
-}
-
-function populateEquipmentCheckboxes() {
-  document.getElementById('newWorkerEquipment').innerHTML = EQUIPMENT.map(e => `
-    <label style="display:flex;align-items:center;gap:4px;background:rgba(255,255,255,0.15);padding:6px 10px;border-radius:8px;font-size:13px;">
-      <input type="checkbox" value="${e.id}" style="width:auto;margin:0;"> ${e.icon} ${e.label}
-    </label>
-  `).join('');
 }
 
 function populateMonthSelect() {
@@ -660,8 +638,7 @@ function populateMonthSelect() {
   let options = '';
   for (let i = 0; i < 6; i++) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-    options += `<option value="${value}">${d.toLocaleDateString('ar-LY', { year: 'numeric', month: 'long' })}</option>`;
+    options += `<option value="${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}">${d.toLocaleDateString('ar-LY',{year:'numeric',month:'long'})}</option>`;
   }
   select.innerHTML = options;
 }
@@ -672,259 +649,95 @@ function populateDeductionMonthSelect() {
   let options = '';
   for (let i = 0; i < 6; i++) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-    options += `<option value="${value}">${d.toLocaleDateString('ar-LY', { year: 'numeric', month: 'long' })}</option>`;
+    options += `<option value="${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}">${d.toLocaleDateString('ar-LY',{year:'numeric',month:'long'})}</option>`;
   }
   select.innerHTML = options;
-  select.addEventListener('change', loadDeductions);
 }
-
-// ============ إعدادات الخصم ============
-async function loadDeductionSettings() {
-  try {
-    const doc = await db.collection('settings').doc('deductions').get();
-    if (doc.exists) {
-      deductionAmountValue = doc.data().amount || 50;
-      document.getElementById('deductionAmount').value = deductionAmountValue;
-    }
-  } catch (err) {}
-}
-
-document.getElementById('saveDeductionSettingsBtn').addEventListener('click', async () => {
-  const amount = Number(document.getElementById('deductionAmount').value) || 0;
-  try {
-    await db.collection('settings').doc('deductions').set({ amount });
-    deductionAmountValue = amount;
-    alert('✅ تم حفظ إعدادات الخصم');
-  } catch (err) {
-    alert('خطأ: ' + err.message);
-  }
-});
-
-// ============ تحميل الخصومات ============
-async function loadDeductions() {
-  const container = document.getElementById('deductionsList');
-  container.innerHTML = 'جاري التحميل...';
-  
-  const [year, month] = document.getElementById('deductionMonthSelect').value.split('-').map(Number);
-  const from = new Date(year, month - 1, 1);
-  const to = new Date(year, month, 1);
-  
-  const snapshot = await db.collection('attendance')
-    .where('timestamp', '>=', from)
-    .where('timestamp', '<', to)
-    .get();
-  
-  // حساب الغياب لكل عامل (فقط absent بدون إذن أو مرض)
-  const deductions = {};
-  snapshot.forEach(doc => {
-    const r = doc.data();
-    if (r.status === 'absent') {
-      if (!deductions[r.workerId]) deductions[r.workerId] = 0;
-      deductions[r.workerId]++;
-    }
-  });
-  
-  if (Object.keys(deductions).length === 0) {
-    container.innerHTML = '<p style="text-align:center;color:rgba(255,255,255,0.7);">لا يوجد خصومات هذا الشهر ✅</p>';
-    return;
-  }
-  
-  let html = '';
-  let totalDeductions = 0;
-  
-  for (const workerId of Object.keys(deductions)) {
-    const worker = allWorkers.find(w => w.id === workerId);
-    const days = deductions[workerId];
-    const amount = days * deductionAmountValue;
-    totalDeductions += amount;
-    
-    html += `
-      <div class="worker-row" style="flex-wrap:wrap;">
-        <img src="${worker?.photo || ''}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" onerror="this.style.visibility='hidden'">
-        <span class="name">${worker?.name || workerId}</span>
-        <span class="deduction-badge">${days} يوم غياب</span>
-        <span class="deduction-badge" style="background:rgba(255,152,0,0.6);">-${amount} دينار</span>
-      </div>
-    `;
-  }
-  
-  html += `
-    <div style="margin-top:15px;padding:15px;background:rgba(244,67,54,0.3);border-radius:10px;text-align:center;">
-      <strong>إجمالي الخصومات: ${totalDeductions} دينار</strong>
-    </div>
-  `;
-  
-  container.innerHTML = html;
-}
-
-document.getElementById('exportDeductionsBtn').addEventListener('click', async () => {
-  const [year, month] = document.getElementById('deductionMonthSelect').value.split('-').map(Number);
-  const from = new Date(year, month - 1, 1);
-  const to = new Date(year, month, 1);
-  
-  const snapshot = await db.collection('attendance')
-    .where('timestamp', '>=', from)
-    .where('timestamp', '<', to)
-    .get();
-  
-  const deductions = {};
-  snapshot.forEach(doc => {
-    const r = doc.data();
-    if (r.status === 'absent') {
-      if (!deductions[r.workerId]) deductions[r.workerId] = 0;
-      deductions[r.workerId]++;
-    }
-  });
-  
-  const headers = ['اسم العامل', 'الفريق', 'أيام الغياب', 'قيمة الخصم (دينار)'];
-  const rows = Object.keys(deductions).map(workerId => {
-    const worker = allWorkers.find(w => w.id === workerId);
-    const days = deductions[workerId];
-    return [worker?.name || workerId, teamLabel(worker?.team || ''), days, days * deductionAmountValue];
-  });
-  
-  if (rows.length === 0) {
-    alert('لا يوجد خصومات');
-    return;
-  }
-  
-  const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'الخصومات');
-  XLSX.writeFile(workbook, `خصومات-${year}-${String(month).padStart(2, '0')}.xlsx`);
-});
 
 // ============ تسجيل الحضور للعامل ============
-function loadWorkerSelect() {
-  db.collection('workers').orderBy('name').get().then(snapshot => {
-    if (snapshot.empty) {
-      document.getElementById('workerSelect').innerHTML = '<option value="">لا يوجد عمال</option>';
-      return;
-    }
-    const byTeam = {};
-    TEAMS.forEach(t => byTeam[t.id] = []);
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      const teamId = TEAMS.some(t => t.id === (data.team || '')) ? (data.team || '') : '';
-      byTeam[teamId].push({ id: doc.id, name: data.name || doc.id });
-    });
-    let html = '<option value="">-- اختر اسمك --</option>';
-    TEAMS.forEach(team => {
-      const members = byTeam[team.id];
-      if (!members.length) return;
-      html += `<optgroup label="${team.label}">`;
-      members.forEach(w => { html += `<option value="${w.id}">${w.name}</option>`; });
-      html += '</optgroup>';
-    });
-    document.getElementById('workerSelect').innerHTML = html;
-  });
-}
-
-document.getElementById('workerSelect').addEventListener('change', () => {
-  const hasValue = document.getElementById('workerSelect').value !== '';
-  document.getElementById('checkInBtn').disabled = !hasValue;
-  document.getElementById('absentBtn').disabled = !hasValue;
-  document.getElementById('leaveBtn').disabled = !hasValue;
-  document.getElementById('sickBtn').disabled = !hasValue;
-});
-
 document.getElementById('checkInBtn').addEventListener('click', async () => {
-  const btn = document.getElementById('checkInBtn');
-  btn.disabled = true;
   const statusDiv = document.getElementById('status');
   statusDiv.textContent = 'جاري تحديد موقعك...';
   statusDiv.className = 'warn';
   statusDiv.style.display = 'block';
   
   if (!navigator.geolocation) {
-    statusDiv.textContent = 'المتصفح لا يدعم تحديد الموقع';
+    statusDiv.textContent = 'المتصفح لا يدعم الموقع';
     statusDiv.className = 'err';
-    btn.disabled = false;
     return;
   }
   
   navigator.geolocation.getCurrentPosition(async (position) => {
     try {
-      const accuracy = Math.round(position.coords.accuracy || 0);
-      const workerId = document.getElementById('workerSelect').value;
       const now = new Date();
       const cutoff = new Date(now);
       cutoff.setHours(8, 0, 0, 0);
       const status = now > cutoff ? 'late' : 'present';
       
       await db.collection('attendance').add({
-        workerId,
+        workerId: currentUser.id,
+        workerName: currentUser.name,
         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
         lat: position.coords.latitude,
         lng: position.coords.longitude,
-        accuracy,
+        accuracy: Math.round(position.coords.accuracy || 0),
         status,
         shift: selectedShift,
-        hasDeduction: false // حاضر = لا خصم
+        hasDeduction: false
       });
       
-      statusDiv.textContent = `✅ تم تسجيل حضورك (${getShiftLabel(selectedShift)})`;
+      statusDiv.textContent = `✅ تم تسجيل حضورك (${selectedShift === 'morning' ? 'صباح' : 'ليل'})`;
       statusDiv.className = 'ok';
     } catch (err) {
       statusDiv.textContent = 'خطأ: ' + err.message;
       statusDiv.className = 'err';
-    } finally {
-      btn.disabled = false;
     }
-  }, (err) => {
-    statusDiv.textContent = 'تعذر تحديد الموقع';
-    statusDiv.className = 'err';
-    btn.disabled = false;
   });
 });
 
 document.getElementById('absentBtn').addEventListener('click', async () => {
-  const workerId = document.getElementById('workerSelect').value;
-  const statusDiv = document.getElementById('status');
   await db.collection('attendance').add({
-    workerId,
+    workerId: currentUser.id,
+    workerName: currentUser.name,
     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
     status: 'absent',
     shift: selectedShift,
-    hasDeduction: true // غائب = عليه خصم
+    hasDeduction: true
   });
-  statusDiv.textContent = '✗ تم تسجيل غيابك (سيتم الخصم)';
-  statusDiv.className = 'ok';
-  statusDiv.style.display = 'block';
+  document.getElementById('status').textContent = '✗ تم تسجيل غيابك (سيتم الخصم)';
+  document.getElementById('status').className = 'ok';
+  document.getElementById('status').style.display = 'block';
 });
 
 document.getElementById('leaveBtn').addEventListener('click', async () => {
-  const workerId = document.getElementById('workerSelect').value;
-  const statusDiv = document.getElementById('status');
   await db.collection('attendance').add({
-    workerId,
+    workerId: currentUser.id,
+    workerName: currentUser.name,
     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
     status: 'leave',
     shift: selectedShift,
-    hasDeduction: false // إذن = لا خصم
+    hasDeduction: false
   });
-  statusDiv.textContent = '📝 تم تسجيل إذنك (لا يوجد خصم)';
-  statusDiv.className = 'ok';
-  statusDiv.style.display = 'block';
+  document.getElementById('status').textContent = '📝 تم تسجيل إذنك (لا يوجد خصم)';
+  document.getElementById('status').className = 'ok';
+  document.getElementById('status').style.display = 'block';
 });
 
 document.getElementById('sickBtn').addEventListener('click', async () => {
-  const workerId = document.getElementById('workerSelect').value;
-  const statusDiv = document.getElementById('status');
   await db.collection('attendance').add({
-    workerId,
+    workerId: currentUser.id,
+    workerName: currentUser.name,
     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
     status: 'sick',
     shift: selectedShift,
-    hasDeduction: false // مريض = لا خصم
+    hasDeduction: false
   });
-  statusDiv.textContent = '🤒 تم تسجيل مرضك (لا يوجد خصم) - سلامتك';
-  statusDiv.className = 'ok';
-  statusDiv.style.display = 'block';
+  document.getElementById('status').textContent = '🤒 تم تسجيل مرضك (لا يوجد خصم)';
+  document.getElementById('status').className = 'ok';
+  document.getElementById('status').style.display = 'block';
 });
 
-// ============ دوال الحضور للمشرف ============
+// ============ مراقبة الحضور ============
 function watchAttendance() {
   const startOfDay = new Date();
   startOfDay.setHours(0, 0, 0, 0);
@@ -932,24 +745,16 @@ function watchAttendance() {
   db.collection('attendance')
     .where('timestamp', '>=', startOfDay)
     .orderBy('timestamp', 'desc')
-    .onSnapshot(async (snapshot) => {
+    .onSnapshot(snapshot => {
       const records = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
       latestRecords = records;
       
-      const present = records.filter(r => r.status === 'present').length;
-      const late = records.filter(r => r.status === 'late').length;
-      const leave = records.filter(r => r.status === 'leave').length;
-      const sick = records.filter(r => r.status === 'sick').length;
-      const absent = records.filter(r => r.status === 'absent').length;
+      document.getElementById('presentCount').textContent = records.filter(r => r.status === 'present').length;
+      document.getElementById('lateCount').textContent = records.filter(r => r.status === 'late').length;
+      document.getElementById('leaveCount').textContent = records.filter(r => r.status === 'leave').length;
+      document.getElementById('sickCount').textContent = records.filter(r => r.status === 'sick').length;
+      document.getElementById('absentCount').textContent = records.filter(r => r.status === 'absent').length;
       
-      document.getElementById('presentCount').textContent = present;
-      document.getElementById('lateCount').textContent = late;
-      document.getElementById('leaveCount').textContent = leave;
-      document.getElementById('sickCount').textContent = sick;
-      document.getElementById('absentCount').textContent = absent;
-      document.getElementById('totalCount').textContent = records.length;
-      
-      // عرض السجل
       const listDiv = document.getElementById('list');
       if (records.length === 0) {
         listDiv.innerHTML = '<p style="text-align:center;color:#888;">لا يوجد حضور اليوم</p>';
@@ -961,16 +766,14 @@ function watchAttendance() {
           sick: { color: '#ad1457', label: 'مريض' },
           absent: { color: '#c62828', label: 'غائب (خصم)' }
         };
-        
         listDiv.innerHTML = records.map(r => {
           const time = r.timestamp ? new Date(r.timestamp.seconds * 1000).toLocaleTimeString('ar-LY') : '--';
           const meta = statusMeta[r.status] || { color: '#607d8b', label: r.status };
-          const shiftLabel = r.shift ? getShiftLabel(r.shift) : '';
           return `
             <div class="row">
               <div class="info">
-                <div>${r.workerId}</div>
-                <div style="color:rgba(255,255,255,0.7);font-size:12px;">${time} ${shiftLabel}</div>
+                <div>${r.workerName || r.workerId}</div>
+                <div style="font-size:12px;color:rgba(255,255,255,0.7);">${time} ${r.shift === 'morning' ? '🌅' : '🌙'}</div>
               </div>
               <span class="badge" style="background:${meta.color}">${meta.label}</span>
             </div>
@@ -980,20 +783,10 @@ function watchAttendance() {
     });
 }
 
-// ============ باقي الدوال ============
-function teamLabel(id) {
-  const t = TEAMS.find(t => t.id === (id || ''));
-  return t ? t.label : 'أخرى';
-}
-
+// ============ مراقبة العمال ============
 function watchWorkers() {
   db.collection('workers').orderBy('name').onSnapshot(snapshot => {
-    const workersList = [];
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      workersList.push({ id: doc.id, ...data });
-    });
-    allWorkers = workersList;
+    allWorkers = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
     renderWorkersList();
     renderDailyMarkList();
     populateIssueWorkerSelect();
@@ -1015,23 +808,19 @@ function renderWorkersList() {
   
   let html = '';
   TEAMS.forEach(team => {
-    const members = byTeam[team.id];
-    if (!members.length) return;
-    html += `<div class="team-group"><div class="team-title">${team.label} (${members.length})</div>`;
-    members.forEach(w => {
-      const shiftLabel = w.shift === 'both' ? '🔄 كلاهما' : getShiftLabel(w.shift || 'morning');
+    if (!byTeam[team.id].length) return;
+    html += `<div class="team-group"><div class="team-title">${team.label} (${byTeam[team.id].length})</div>`;
+    byTeam[team.id].forEach(w => {
       html += `
-        <div class="worker-row" style="flex-wrap:wrap;">
-          <img src="${w.referencePhotoUrl || ''}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" onerror="this.style.visibility='hidden'">
+        <div class="worker-row">
           <span class="name">${w.name}</span>
-          <span style="font-size:11px;">${shiftLabel}</span>
           <button class="del-btn" onclick="deleteWorker('${w.id}','${w.name}')">حذف</button>
         </div>
       `;
     });
     html += '</div>';
   });
-  container.innerHTML = html || '<p style="text-align:center;color:#888;">لا يوجد عمال</p>';
+  container.innerHTML = html || '<p style="text-align:center;">لا يوجد عمال</p>';
 }
 
 function renderDailyMarkList() {
@@ -1040,38 +829,21 @@ function renderDailyMarkList() {
   const searchTerm = (document.getElementById('dailySearch')?.value || '').trim();
   const filtered = searchTerm ? allWorkers.filter(w => w.name.includes(searchTerm)) : allWorkers;
   
-  const byTeam = {};
-  TEAMS.forEach(t => byTeam[t.id] = []);
-  filtered.forEach(w => {
-    const teamId = TEAMS.some(t => t.id === w.team) ? w.team : '';
-    byTeam[teamId].push(w);
-  });
-  
-  let html = '';
-  TEAMS.forEach(team => {
-    const members = byTeam[team.id];
-    if (!members.length) return;
-    html += `<div class="team-group"><div class="team-title">${team.label} (${members.length})</div>`;
-    members.forEach(w => {
-      html += `
-        <div class="worker-row">
-          <img src="${w.referencePhotoUrl || ''}" style="width:32px;height:32px;border-radius:50%;" onerror="this.style.visibility='hidden'">
-          <span class="name">${w.name}</span>
-          <button onclick="manualMark('${w.id}','present')" style="width:auto;padding:6px;margin:0;font-size:14px;background:rgba(46,125,50,0.4);">✅</button>
-          <button onclick="manualMark('${w.id}','absent')" style="width:auto;padding:6px;margin:0;font-size:14px;background:rgba(198,40,40,0.4);">✗</button>
-          <button onclick="manualMark('${w.id}','leave')" style="width:auto;padding:6px;margin:0;font-size:14px;background:rgba(103,58,183,0.4);">📝</button>
-          <button onclick="manualMark('${w.id}','sick')" style="width:auto;padding:6px;margin:0;font-size:14px;background:rgba(173,20,87,0.4);">🤒</button>
-        </div>
-      `;
-    });
-    html += '</div>';
-  });
-  container.innerHTML = html || '<p style="text-align:center;color:#888;">لا يوجد عمال</p>';
+  container.innerHTML = filtered.map(w => `
+    <div class="worker-row">
+      <span class="name">${w.name}</span>
+      <button onclick="manualMark('${w.id}','${w.name}','present')" style="width:auto;padding:6px;margin:0;background:rgba(46,125,50,0.4);">✅</button>
+      <button onclick="manualMark('${w.id}','${w.name}','absent')" style="width:auto;padding:6px;margin:0;background:rgba(198,40,40,0.4);">✗</button>
+      <button onclick="manualMark('${w.id}','${w.name}','leave')" style="width:auto;padding:6px;margin:0;background:rgba(103,58,183,0.4);">📝</button>
+      <button onclick="manualMark('${w.id}','${w.name}','sick')" style="width:auto;padding:6px;margin:0;background:rgba(173,20,87,0.4);">🤒</button>
+    </div>
+  `).join('') || '<p style="text-align:center;">لا يوجد عمال</p>';
 }
 
-async function manualMark(workerId, status) {
+async function manualMark(workerId, workerName, status) {
   await db.collection('attendance').add({
     workerId,
+    workerName,
     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
     status,
     shift: adminSelectedShift,
@@ -1084,25 +856,7 @@ function deleteWorker(id, name) {
   db.collection('workers').doc(id).delete();
 }
 
-function populateIssueWorkerSelect() {
-  const select = document.getElementById('issueWorkerSelect');
-  select.innerHTML = allWorkers.map(w => `<option value="${w.id}">${w.name}</option>`).join('');
-}
-
-function populateReportWorkerSelect() {
-  const select = document.getElementById('reportWorkerSelect');
-  select.innerHTML = '<option value="">-- اختر --</option>' + allWorkers.map(w => `<option value="${w.id}">${w.name}</option>`).join('');
-}
-
 // ============ إضافة عامل ============
-document.getElementById('newWorkerPhoto').addEventListener('change', async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  newWorkerPhotoBase64 = await compressImageToBase64(file);
-  document.getElementById('newWorkerPreview').src = newWorkerPhotoBase64;
-  document.getElementById('newWorkerPreview').style.display = 'block';
-});
-
 document.getElementById('addWorkerBtn').addEventListener('click', async () => {
   const name = document.getElementById('newWorkerName').value.trim();
   const team = document.getElementById('newWorkerTeam').value;
@@ -1110,54 +864,100 @@ document.getElementById('addWorkerBtn').addEventListener('click', async () => {
   const salary = Number(document.getElementById('newWorkerSalary').value) || 50;
   
   if (!name) {
-    document.getElementById('addWorkerMsg').innerHTML = '<p style="color:#ffcdd2;">اكتب اسم العامل</p>';
+    alert('اكتب اسم العامل');
     return;
   }
   
-  try {
-    await db.collection('workers').add({
-      name,
-      team,
-      shift,
-      dailySalary: salary,
-      referencePhotoUrl: newWorkerPhotoBase64,
-      equipment: []
-    });
-    document.getElementById('newWorkerName').value = '';
-    document.getElementById('newWorkerSalary').value = '';
-    document.getElementById('newWorkerPhoto').value = '';
-    document.getElementById('newWorkerPreview').style.display = 'none';
-    newWorkerPhotoBase64 = '';
-    document.getElementById('addWorkerMsg').innerHTML = `<p style="color:#c8f7d4;">✅ تمت إضافة ${name}</p>`;
-  } catch (err) {
-    document.getElementById('addWorkerMsg').innerHTML = '<p style="color:#ffcdd2;">خطأ: ' + err.message + '</p>';
-  }
+  await db.collection('workers').add({
+    name,
+    team,
+    shift,
+    dailySalary: salary,
+    pin: '0000', // رقم افتراضي للعامل
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+  
+  document.getElementById('newWorkerName').value = '';
+  alert(`✅ تمت إضافة ${name}`);
 });
+
+// ============ الخصومات ============
+async function loadDeductionSettings() {
+  try {
+    const doc = await db.collection('settings').doc('deductions').get();
+    if (doc.exists) {
+      deductionAmountValue = doc.data().amount || 50;
+      document.getElementById('deductionAmount').value = deductionAmountValue;
+    }
+  } catch (err) {}
+}
+
+document.getElementById('saveDeductionSettingsBtn').addEventListener('click', async () => {
+  const amount = Number(document.getElementById('deductionAmount').value) || 0;
+  await db.collection('settings').doc('deductions').set({ amount });
+  deductionAmountValue = amount;
+  alert('✅ تم الحفظ');
+});
+
+async function loadDeductions() {
+  const container = document.getElementById('deductionsList');
+  const [year, month] = document.getElementById('deductionMonthSelect').value.split('-').map(Number);
+  const from = new Date(year, month - 1, 1);
+  const to = new Date(year, month, 1);
+  
+  const snapshot = await db.collection('attendance')
+    .where('timestamp', '>=', from)
+    .where('timestamp', '<', to)
+    .get();
+  
+  const deductions = {};
+  snapshot.forEach(doc => {
+    const r = doc.data();
+    if (r.status === 'absent') {
+      const key = r.workerName || r.workerId;
+      if (!deductions[key]) deductions[key] = 0;
+      deductions[key]++;
+    }
+  });
+  
+  if (Object.keys(deductions).length === 0) {
+    container.innerHTML = '<p style="text-align:center;">✅ لا يوجد خصومات</p>';
+    return;
+  }
+  
+  let total = 0;
+  container.innerHTML = Object.keys(deductions).map(name => {
+    const days = deductions[name];
+    const amount = days * deductionAmountValue;
+    total += amount;
+    return `
+      <div class="worker-row">
+        <span class="name">${name}</span>
+        <span class="deduction-badge">${days} يوم</span>
+        <span class="deduction-badge" style="background:rgba(255,152,0,0.6);">-${amount} دينار</span>
+      </div>
+    `;
+  }).join('') + `<div style="margin-top:15px;text-align:center;font-weight:bold;">الإجمالي: ${total} دينار</div>`;
+}
 
 // ============ المخزن ============
 function watchInventory() {
   db.collection('inventory').orderBy('name').onSnapshot(snapshot => {
     allInventory = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderInventoryList();
+    const container = document.getElementById('inventoryList');
+    if (!allInventory.length) {
+      container.innerHTML = '<p style="text-align:center;">المخزن فارغ</p>';
+      return;
+    }
+    container.innerHTML = allInventory.map(item => `
+      <div class="worker-row">
+        <span class="name">${item.name}</span>
+        <span>${item.quantity} ${item.unit || ''}</span>
+        <button class="del-btn" onclick="deleteItem('${item.id}','${item.name}')">حذف</button>
+      </div>
+    `).join('');
     populateIssueItemSelect();
   });
-}
-
-function renderInventoryList() {
-  const container = document.getElementById('inventoryList');
-  if (!allInventory.length) {
-    container.innerHTML = '<p style="text-align:center;">المخزن فارغ</p>';
-    return;
-  }
-  container.innerHTML = allInventory.map(item => `
-    <div class="worker-row">
-      <span class="name">${item.name}</span>
-      <span>${item.quantity} ${item.unit || ''}</span>
-      <button onclick="adjustQuantity('${item.id}',1)" style="width:auto;padding:5px;margin:0;">+</button>
-      <button onclick="adjustQuantity('${item.id}',-1)" style="width:auto;padding:5px;margin:0;">-</button>
-      <button class="del-btn" onclick="deleteItem('${item.id}','${item.name}')">حذف</button>
-    </div>
-  `).join('');
 }
 
 document.getElementById('addItemBtn').addEventListener('click', async () => {
@@ -1171,37 +971,32 @@ document.getElementById('addItemBtn').addEventListener('click', async () => {
   document.getElementById('newItemUnit').value = '';
 });
 
-async function adjustQuantity(itemId, delta) {
-  const item = allInventory.find(i => i.id === itemId);
-  if (!item) return;
-  const newQty = Math.max(0, (item.quantity || 0) + delta);
-  await db.collection('inventory').doc(itemId).update({ quantity: newQty });
-}
-
 function deleteItem(itemId, name) {
   if (!confirm(`حذف ${name}؟`)) return;
   db.collection('inventory').doc(itemId).delete();
 }
 
 function populateIssueItemSelect() {
-  const select = document.getElementById('issueItemSelect');
-  select.innerHTML = allInventory.map(i => `<option value="${i.id}">${i.name} (${i.quantity})</option>`).join('');
+  document.getElementById('issueItemSelect').innerHTML = 
+    allInventory.map(i => `<option value="${i.id}">${i.name} (${i.quantity})</option>`).join('');
+}
+
+function populateIssueWorkerSelect() {
+  document.getElementById('issueWorkerSelect').innerHTML = 
+    allWorkers.map(w => `<option value="${w.id}">${w.name}</option>`).join('');
+}
+
+function populateReportWorkerSelect() {
+  document.getElementById('reportWorkerSelect').innerHTML = 
+    '<option value="">-- اختر --</option>' + allWorkers.map(w => `<option value="${w.id}">${w.name}</option>`).join('');
 }
 
 document.getElementById('issueBtn').addEventListener('click', async () => {
-  const itemId = document.getElementById('issueItemSelect').value;
-  const workerId = document.getElementById('issueWorkerSelect').value;
+  const item = allInventory.find(i => i.id === document.getElementById('issueItemSelect').value);
+  const worker = allWorkers.find(w => w.id === document.getElementById('issueWorkerSelect').value);
   const qty = Number(document.getElementById('issueQty').value) || 1;
-  const item = allInventory.find(i => i.id === itemId);
-  const worker = allWorkers.find(w => w.id === workerId);
-  
-  if (!item || !worker) return;
-  if (item.quantity < qty) {
-    alert('الكمية غير كافية');
-    return;
-  }
-  
-  await db.collection('inventory').doc(itemId).update({ quantity: item.quantity - qty });
+  if (!item || !worker || item.quantity < qty) return;
+  await db.collection('inventory').doc(item.id).update({ quantity: item.quantity - qty });
   await db.collection('inventoryLog').add({
     itemName: item.name,
     workerName: worker.name,
@@ -1220,9 +1015,8 @@ document.getElementById('addUserBtn').addEventListener('click', async () => {
   const pin = document.getElementById('newUserPin').value.trim();
   const role = document.getElementById('newUserRole').value;
   
-  if (!name || !pin) return;
-  if (pin.length < 4 || pin.length > 6) {
-    alert('الرقم السري 4-6 أرقام');
+  if (!name || !pin || pin.length < 4) {
+    alert('أدخل اسم ورقم سري (4-6 أرقام)');
     return;
   }
   
@@ -1241,8 +1035,7 @@ document.getElementById('addUserBtn').addEventListener('click', async () => {
       manageInventory: document.getElementById('perm-inventory').checked,
       manageReports: document.getElementById('perm-reports').checked,
       manageVehicles: document.getElementById('perm-vehicles').checked,
-      manageShifts: document.getElementById('perm-shifts').checked,
-      managePermissions: false
+      manageShifts: document.getElementById('perm-shifts').checked
     };
     viewOnly = document.getElementById('perm-viewonly').checked;
   }
@@ -1267,10 +1060,9 @@ function loadUsersList() {
     container.innerHTML = snapshot.docs.map(doc => {
       const u = doc.data();
       return `
-        <div class="vehicle-card">
-          <strong>${u.name}</strong> - <span style="font-size:12px;">🔢 ${u.pin}</span>
-          <span class="role-badge ${u.role === 'admin' ? 'role-admin' : 'role-supervisor'}">${u.role === 'admin' ? 'مدير' : 'مشرف'}</span>
-          ${u.viewOnly ? '<span class="view-only-badge">👁️ مشاهدة</span>' : ''}
+        <div class="worker-row">
+          <span class="name">${u.name}</span>
+          <span style="font-size:12px;">🔢 ${u.pin}</span>
           <button class="del-btn" onclick="deleteUser('${doc.id}','${u.name}')">حذف</button>
         </div>
       `;
@@ -1286,64 +1078,51 @@ async function deleteUser(userId, name) {
 // ============ الورديات ============
 function loadShiftWorkers() {
   const container = document.getElementById('shiftWorkersList');
-  const date = document.getElementById('shiftDate').value;
   const shift = viewSelectedShift;
-  
-  // عرض العمال المسجلين في هذه الوردية
   const shiftWorkers = allWorkers.filter(w => w.shift === shift || w.shift === 'both');
-  
-  if (!shiftWorkers.length) {
-    container.innerHTML = '<p style="text-align:center;">لا يوجد عمال في هذه الوردية</p>';
-    return;
-  }
-  
-  container.innerHTML = shiftWorkers.map(w => `
-    <div class="worker-row">
-      <img src="${w.referencePhotoUrl || ''}" style="width:32px;height:32px;border-radius:50%;" onerror="this.style.visibility='hidden'">
-      <span class="name">${w.name}</span>
-      <span style="font-size:12px;">${teamLabel(w.team)}</span>
-    </div>
-  `).join('');
+  container.innerHTML = shiftWorkers.length ? 
+    shiftWorkers.map(w => `<div class="worker-row"><span class="name">${w.name}</span></div>`).join('') :
+    '<p style="text-align:center;">لا يوجد عمال</p>';
 }
 
-// ============ الضغط والتكبير ============
-function compressImageToBase64(file, maxWidth = 480, quality = 0.6) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    const reader = new FileReader();
-    reader.onload = (e) => { img.src = e.target.result; };
-    reader.onerror = reject;
-    img.onload = () => {
-      const scale = Math.min(1, maxWidth / img.width);
-      const canvas = document.createElement('canvas');
-      canvas.width = img.width * scale;
-      canvas.height = img.height * scale;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      resolve(canvas.toDataURL('image/jpeg', quality));
-    };
-    reader.readAsDataURL(file);
+// ============ التقرير الشهري ============
+async function loadMonthlyReport() {
+  const [year, month] = document.getElementById('monthSelect').value.split('-').map(Number);
+  const from = new Date(year, month - 1, 1);
+  const to = new Date(year, month, 1);
+  
+  const snapshot = await db.collection('attendance')
+    .where('timestamp', '>=', from)
+    .where('timestamp', '<', to)
+    .get();
+  
+  const perWorkerDay = {};
+  snapshot.forEach(doc => {
+    const r = doc.data();
+    const d = r.timestamp.toDate().getDate();
+    if (!perWorkerDay[r.workerId]) perWorkerDay[r.workerId] = {};
+    perWorkerDay[r.workerId][d] = r.status;
   });
+  
+  const daysInMonth = new Date(year, month, 0).getDate();
+  let html = '<table style="border-collapse:collapse;font-size:11px;color:#fff;"><tr><th>الاسم</th>';
+  for (let d = 1; d <= daysInMonth; d++) html += `<th>${d}</th>`;
+  html += '</tr>';
+  
+  allWorkers.forEach(w => {
+    html += `<tr><td>${w.name}</td>`;
+    for (let d = 1; d <= daysInMonth; d++) {
+      const status = (perWorkerDay[w.id] || {})[d];
+      html += `<td>${status === 'present' ? '✅' : status === 'late' ? '⏰' : status === 'leave' ? '📝' : status === 'sick' ? '🤒' : status === 'absent' ? '✗' : ''}</td>`;
+    }
+    html += '</tr>';
+  });
+  html += '</table>';
+  document.getElementById('monthlyGrid').innerHTML = html;
 }
 
-// ============ التنقل ============
-function showLanding() {
-  document.getElementById('landing').style.display = 'block';
-  document.getElementById('adminLogin').style.display = 'none';
-  document.getElementById('workerView').style.display = 'none';
-  document.getElementById('adminView').style.display = 'none';
-}
-
-function showWorker() {
-  document.getElementById('landing').style.display = 'none';
-  document.getElementById('adminLogin').style.display = 'none';
-  document.getElementById('workerView').style.display = 'block';
-  document.getElementById('adminView').style.display = 'none';
-  loadWorkerSelect();
-}
-
-// تحميل أولي
-showLanding();
+// ============ عرض الصفحة ============
+document.getElementById('loginPage').style.display = 'block';
 </script>
 </body>
 </html>

@@ -7,6 +7,8 @@
 <link rel="manifest" href="manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
   * { box-sizing: border-box; }
   body {
@@ -27,6 +29,7 @@
     border-radius: 20px;
     padding: 24px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    margin-bottom: 16px;
   }
   h1 { font-size: 20px; text-align: center; color: #ffffff; margin-bottom: 20px; text-shadow: 0 1px 4px rgba(0,0,0,0.3); }
   select, button {
@@ -80,10 +83,10 @@
 
   h2 { font-size: 16px; color: #ffffff; }
   h3 { font-size: 14px; color: #ffffff; margin: 18px 0 8px; }
-  input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.4); font-size: 15px; margin-bottom: 10px; background: rgba(255,255,255,0.2); color: #ffffff; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
-  input::placeholder { color: rgba(255,255,255,0.6); }
+  input, textarea { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.4); font-size: 15px; margin-bottom: 10px; background: rgba(255,255,255,0.2); color: #ffffff; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+  input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.6); }
   .tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
-  .tab { flex: 1; text-align: center; padding: 10px; border-radius: 10px; background: rgba(255,255,255,0.14); color: rgba(255,255,255,0.85); font-weight: bold; cursor: pointer; border: 1px solid rgba(255,255,255,0.35); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+  .tab { flex: 1; text-align: center; padding: 10px; border-radius: 10px; background: rgba(255,255,255,0.14); color: rgba(255,255,255,0.85); font-weight: bold; cursor: pointer; border: 1px solid rgba(255,255,255,0.35); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); font-size: 13px; min-width: 80px; }
   .tab.active { background: rgba(0,150,136,0.6); color: white; border-color: rgba(255,255,255,0.5); }
   .stats { display: flex; flex-wrap: wrap; gap: 10px; }
   .stat { flex: 1; min-width: 100px; padding: 14px; border-radius: 12px; text-align: center; background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.3); color: #fff; }
@@ -97,6 +100,44 @@
   .worker-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.15); font-size: 14px; color: #fff; }
   .worker-row .name { flex: 1; }
   .del-btn { width: auto; padding: 6px 10px; background: rgba(198,40,40,0.35); color: #ffcdd2; border: 1px solid rgba(255,120,120,0.5); margin: 0; font-size: 13px; }
+
+  .vehicle-card {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 10px;
+  }
+  .vehicle-card img {
+    width: 100%;
+    max-height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 8px;
+  }
+  .status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+  }
+  .status-working { background: rgba(76,175,80,0.5); }
+  .status-maintenance { background: rgba(255,152,0,0.5); }
+  .status-broken { background: rgba(239,83,80,0.5); }
+  .image-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .image-grid img {
+    width: 100%;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.3);
+  }
 </style>
 </head>
 <body>
@@ -136,10 +177,12 @@
 <div id="dashboard">
   <div class="tabs" style="flex-wrap:wrap;">
     <div class="tab active" data-tab="overview">📊 نظرة عامة</div>
-    <div class="tab" data-tab="daily">✅ تسجيل الحضور اليومي</div>
+    <div class="tab" data-tab="daily">✅ تسجيل الحضور</div>
     <div class="tab" data-tab="workers">👷 إدارة العمال</div>
     <div class="tab" data-tab="monthly">📅 التقرير الشهري</div>
     <div class="tab" data-tab="inventory">📦 المخزن</div>
+    <div class="tab" data-tab="reports">📋 تقارير العمل</div>
+    <div class="tab" data-tab="vehicles">🚛 الآليات</div>
   </div>
 
   <div id="tab-overview">
@@ -248,6 +291,82 @@
       </div>
     </div>
   </div>
+
+  <!-- تبويب تقارير العمل اليومي -->
+  <div id="tab-reports" style="display:none;">
+    <div class="card">
+      <h2>📋 إنشاء تقرير عمل يومي</h2>
+      
+      <label>📅 تاريخ العمل</label>
+      <input type="date" id="reportDate">
+      
+      <label>👷 اسم العامل / الفريق</label>
+      <select id="reportWorkerSelect"></select>
+      
+      <label>📍 موقع العمل</label>
+      <input id="reportLocation" placeholder="مثال: حي الأندلس، شارع الوحدة">
+      
+      <label>📝 وصف العمل المنجز</label>
+      <textarea id="reportDescription" rows="4" placeholder="اذكر تفاصيل العمل المنجز اليوم..."></textarea>
+      
+      <label>⚠️ ملاحظات / مشاكل (اختياري)</label>
+      <textarea id="reportNotes" rows="3" placeholder="أي ملاحظات أو مشاكل واجهتك"></textarea>
+      
+      <label>📸 صور العمل (يمكنك إضافة عدة صور)</label>
+      <input type="file" id="reportPhotos" accept="image/*" multiple capture="environment">
+      <div id="reportPhotosPreview" class="image-grid"></div>
+      
+      <button id="saveReportBtn">💾 حفظ التقرير</button>
+      <div id="reportMsg"></div>
+    </div>
+
+    <div class="card">
+      <h2>📄 التقارير المحفوظة</h2>
+      <div id="savedReports">جاري التحميل...</div>
+    </div>
+  </div>
+
+  <!-- تبويب الآليات -->
+  <div id="tab-vehicles" style="display:none;">
+    <div class="card">
+      <h2>➕ إضافة آلية</h2>
+      
+      <label>🚛 نوع الآلية</label>
+      <select id="vehicleType">
+        <option value="small_compactor">كبس صغير</option>
+        <option value="large_compactor">كبس كبير</option>
+        <option value="small_garbage_truck">سيارة صندوق قمامة صغيرة</option>
+        <option value="large_garbage_truck">سيارة صندوق قمامة كبيرة</option>
+        <option value="dump_truck">سيارة صندوق قلاب</option>
+      </select>
+      
+      <label>🔢 رقم الآلية / اللوحة</label>
+      <input id="vehicleNumber" placeholder="مثال: 45-123456">
+      
+      <label>📊 حالة الآلية</label>
+      <select id="vehicleStatus">
+        <option value="working">✅ تعمل</option>
+        <option value="maintenance">🔧 تحت الصيانة</option>
+        <option value="broken">❌ معطلة</option>
+      </select>
+      
+      <label>📝 ملاحظات (اختياري)</label>
+      <textarea id="vehicleNotes" rows="3" placeholder="أي ملاحظات عن حالة الآلية"></textarea>
+      
+      <label>📸 صورة الآلية</label>
+      <input type="file" id="vehiclePhoto" accept="image/*" capture="environment">
+      <img id="vehiclePhotoPreview" style="width:100%;border-radius:10px;display:none;margin-bottom:10px;">
+      
+      <button id="saveVehicleBtn">💾 حفظ الآلية</button>
+      <div id="vehicleMsg"></div>
+    </div>
+
+    <div class="card">
+      <h2>🚛 الآليات المسجلة</h2>
+      <button id="exportVehiclesPdfBtn">📄 تصدير PDF للآليات</button>
+      <div id="vehiclesList">جاري التحميل...</div>
+    </div>
+  </div>
 </div>
 </div>
 
@@ -289,6 +408,20 @@ const EQUIPMENT = [
   { id: 'helmet',     label: 'طربوش عاكس',   icon: '⛑️' },
   { id: 'ladder',     label: 'سلم',          icon: '🪜' },
 ];
+
+const VEHICLE_TYPES = {
+  small_compactor: 'كبس صغير',
+  large_compactor: 'كبس كبير',
+  small_garbage_truck: 'صندوق قمامة صغير',
+  large_garbage_truck: 'صندوق قمامة كبير',
+  dump_truck: 'صندوق قلاب'
+};
+
+const VEHICLE_STATUS = {
+  working: { label: 'تعمل', color: 'status-working', icon: '✅' },
+  maintenance: { label: 'تحت الصيانة', color: 'status-maintenance', icon: '🔧' },
+  broken: { label: 'معطلة', color: 'status-broken', icon: '❌' }
+};
 
 function equipmentLabel(id) {
   const e = EQUIPMENT.find(e => e.id === id);
@@ -520,8 +653,12 @@ document.querySelectorAll('.tab').forEach(tab => {
     document.getElementById('tab-workers').style.display = tab.dataset.tab === 'workers' ? 'block' : 'none';
     document.getElementById('tab-monthly').style.display = tab.dataset.tab === 'monthly' ? 'block' : 'none';
     document.getElementById('tab-inventory').style.display = tab.dataset.tab === 'inventory' ? 'block' : 'none';
+    document.getElementById('tab-reports').style.display = tab.dataset.tab === 'reports' ? 'block' : 'none';
+    document.getElementById('tab-vehicles').style.display = tab.dataset.tab === 'vehicles' ? 'block' : 'none';
     if (tab.dataset.tab === 'monthly') loadMonthlyReport();
     if (tab.dataset.tab === 'daily') renderDailyMarkList();
+    if (tab.dataset.tab === 'reports') loadSavedReports();
+    if (tab.dataset.tab === 'vehicles') loadVehicles();
   });
 });
 
@@ -533,6 +670,8 @@ auth.onAuthStateChanged(async (user) => {
   populateEquipmentCheckboxes();
   populateMonthSelect();
   displayTodayDate();
+  setDefaultReportDate();
+  populateReportWorkerSelect();
   watchAttendance();
   watchWorkers();
   watchInventory();
@@ -546,6 +685,17 @@ function displayTodayDate() {
   const el2 = document.getElementById('dailyDateDisplay');
   if (el1) el1.textContent = '📅 ' + todayStr;
   if (el2) el2.textContent = '📅 ' + todayStr;
+}
+
+function setDefaultReportDate() {
+  const today = new Date().toISOString().slice(0, 10);
+  document.getElementById('reportDate').value = today;
+}
+
+function populateReportWorkerSelect() {
+  const select = document.getElementById('reportWorkerSelect');
+  select.innerHTML = '<option value="">-- اختر العامل --</option>' + 
+    allWorkers.map(w => `<option value="${w.id}">${w.name} - ${teamLabel(w.team)}</option>`).join('');
 }
 
 function populateEquipmentCheckboxes() {
@@ -723,6 +873,9 @@ document.getElementById('addWorkerBtn').addEventListener('click', async () => {
 
 let allInventory = [];
 let allWorkersRaw = [];
+let allWorkers = [];
+let latestRecords = [];
+let latestInfoMap = {};
 
 document.getElementById('exportInventoryBtn').addEventListener('click', () => {
   if (!allInventory.length) {
@@ -867,6 +1020,7 @@ function watchWorkers() {
     renderWorkersList();
     renderDailyMarkList();
     populateIssueWorkerSelect();
+    populateReportWorkerSelect();
   });
 }
 
@@ -1030,10 +1184,6 @@ async function manualMark(workerId, status) {
   }
 }
 
-let allWorkers = [];
-let latestRecords = [];
-let latestInfoMap = {};
-
 function exportToExcel() {
   if (!latestRecords.length) {
     alert('لا يوجد بيانات لتصديرها بعد');
@@ -1149,6 +1299,378 @@ function watchAttendance() {
       }).join('');
     });
 }
+
+// ============ نظام تقارير العمل اليومي ============
+let reportPhotosArray = [];
+
+document.getElementById('reportPhotos').addEventListener('change', async (e) => {
+  const files = e.target.files;
+  reportPhotosArray = [];
+  const previewDiv = document.getElementById('reportPhotosPreview');
+  previewDiv.innerHTML = '';
+  
+  for (let i = 0; i < files.length; i++) {
+    const base64 = await compressImageToBase64(files[i], 800, 0.7);
+    reportPhotosArray.push(base64);
+    const img = document.createElement('img');
+    img.src = base64;
+    previewDiv.appendChild(img);
+  }
+});
+
+document.getElementById('saveReportBtn').addEventListener('click', async () => {
+  const date = document.getElementById('reportDate').value;
+  const workerId = document.getElementById('reportWorkerSelect').value;
+  const location = document.getElementById('reportLocation').value.trim();
+  const description = document.getElementById('reportDescription').value.trim();
+  const notes = document.getElementById('reportNotes').value.trim();
+  const msg = document.getElementById('reportMsg');
+
+  if (!date || !workerId || !location || !description) {
+    msg.innerHTML = '<p style="color:#ffcdd2;">يرجى ملء جميع الحقول المطلوبة</p>';
+    return;
+  }
+
+  const worker = allWorkers.find(w => w.id === workerId);
+
+  try {
+    await db.collection('workReports').add({
+      date: date,
+      workerId: workerId,
+      workerName: worker?.name || 'غير معروف',
+      workerTeam: worker?.team || '',
+      location: location,
+      description: description,
+      notes: notes,
+      photos: reportPhotosArray,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    msg.innerHTML = '<p style="color:#c8f7d4;">✅ تم حفظ التقرير بنجاح</p>';
+    
+    // تنظيف الحقول
+    document.getElementById('reportLocation').value = '';
+    document.getElementById('reportDescription').value = '';
+    document.getElementById('reportNotes').value = '';
+    document.getElementById('reportPhotos').value = '';
+    document.getElementById('reportPhotosPreview').innerHTML = '';
+    reportPhotosArray = [];
+    
+    loadSavedReports();
+  } catch (err) {
+    msg.innerHTML = '<p style="color:#ffcdd2;">خطأ: ' + err.message + '</p>';
+  }
+});
+
+function loadSavedReports() {
+  db.collection('workReports')
+    .orderBy('timestamp', 'desc')
+    .limit(50)
+    .onSnapshot(snapshot => {
+      const container = document.getElementById('savedReports');
+      if (snapshot.empty) {
+        container.innerHTML = '<p style="text-align:center;color:rgba(255,255,255,0.7);">لا توجد تقارير محفوظة بعد</p>';
+        return;
+      }
+
+      container.innerHTML = snapshot.docs.map(doc => {
+        const r = doc.data();
+        const photos = (r.photos || []).slice(0, 3).map(p => 
+          `<img src="${p}" style="width:60px;height:60px;object-fit:cover;border-radius:6px;margin:2px;">`
+        ).join('');
+        return `
+          <div class="vehicle-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+              <strong>${r.workerName}</strong>
+              <span style="font-size:12px;">${r.date}</span>
+            </div>
+            <div style="font-size:13px; color:rgba(255,255,255,0.8); margin-top:4px;">
+              📍 ${r.location}
+            </div>
+            <div style="font-size:13px; color:rgba(255,255,255,0.8); margin-top:4px;">
+              📝 ${r.description}
+            </div>
+            ${r.notes ? `<div style="font-size:12px; color:rgba(255,200,200,0.8); margin-top:4px;">⚠️ ${r.notes}</div>` : ''}
+            ${photos ? `<div style="display:flex; gap:4px; margin-top:8px;">${photos}${(r.photos || []).length > 3 ? `<span style="font-size:12px;">+${(r.photos || []).length - 3} صور</span>` : ''}</div>` : ''}
+            <div style="display:flex; gap:8px; margin-top:8px;">
+              <button onclick="exportReportPdf('${doc.id}')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;background:rgba(33,150,243,0.5);">📄 PDF</button>
+              <button onclick="deleteReport('${doc.id}')" class="del-btn" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">حذف</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    });
+}
+
+async function exportReportPdf(reportId) {
+  try {
+    const doc = await db.collection('workReports').doc(reportId).get();
+    const r = doc.data();
+    
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    
+    // إعداد الخط العربي
+    pdf.setFont('helvetica', 'normal');
+    pdf.setR2L(true);
+    
+    // العنوان
+    pdf.setFontSize(18);
+    pdf.text('تقرير عمل يومي', 105, 20, { align: 'center' });
+    
+    // البيانات
+    pdf.setFontSize(12);
+    pdf.text(`التاريخ: ${r.date}`, 20, 35, { align: 'right' });
+    pdf.text(`اسم العامل: ${r.workerName}`, 20, 42, { align: 'right' });
+    pdf.text(`الفريق: ${teamLabel(r.workerTeam)}`, 20, 49, { align: 'right' });
+    pdf.text(`موقع العمل: ${r.location}`, 20, 56, { align: 'right' });
+    
+    // وصف العمل
+    pdf.text('وصف العمل:', 20, 63, { align: 'right' });
+    const descriptionLines = pdf.splitTextToSize(r.description, 170);
+    pdf.text(descriptionLines, 20, 70, { align: 'right' });
+    
+    let yPos = 70 + (descriptionLines.length * 7);
+    
+    // ملاحظات
+    if (r.notes) {
+      yPos += 10;
+      pdf.text('ملاحظات:', 20, yPos, { align: 'right' });
+      const notesLines = pdf.splitTextToSize(r.notes, 170);
+      pdf.text(notesLines, 20, yPos + 7, { align: 'right' });
+      yPos += 7 + (notesLines.length * 7);
+    }
+    
+    // الصور
+    if (r.photos && r.photos.length > 0) {
+      for (let i = 0; i < r.photos.length; i++) {
+        if (yPos > 250) {
+          pdf.addPage();
+          yPos = 20;
+        }
+        yPos += 10;
+        pdf.text(`صورة ${i + 1}:`, 20, yPos, { align: 'right' });
+        yPos += 5;
+        try {
+          pdf.addImage(r.photos[i], 'JPEG', 40, yPos, 130, 97);
+          yPos += 105;
+        } catch (e) {
+          console.log('خطأ في إضافة الصورة:', e);
+        }
+      }
+    }
+    
+    pdf.save(`تقرير-عمل-${r.date}-${r.workerName}.pdf`);
+  } catch (err) {
+    alert('خطأ في تصدير PDF: ' + err.message);
+  }
+}
+
+async function deleteReport(reportId) {
+  if (!confirm('حذف هذا التقرير؟')) return;
+  await db.collection('workReports').doc(reportId).delete();
+}
+
+// ============ نظام الآليات ============
+let vehiclePhotoBase64 = '';
+
+document.getElementById('vehiclePhoto').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  vehiclePhotoBase64 = await compressImageToBase64(file, 600, 0.7);
+  const preview = document.getElementById('vehiclePhotoPreview');
+  preview.src = vehiclePhotoBase64;
+  preview.style.display = 'block';
+});
+
+document.getElementById('saveVehicleBtn').addEventListener('click', async () => {
+  const type = document.getElementById('vehicleType').value;
+  const number = document.getElementById('vehicleNumber').value.trim();
+  const status = document.getElementById('vehicleStatus').value;
+  const notes = document.getElementById('vehicleNotes').value.trim();
+  const msg = document.getElementById('vehicleMsg');
+
+  if (!number) {
+    msg.innerHTML = '<p style="color:#ffcdd2;">اكتب رقم الآلية</p>';
+    return;
+  }
+
+  try {
+    await db.collection('vehicles').add({
+      type: type,
+      typeLabel: VEHICLE_TYPES[type],
+      number: number,
+      status: status,
+      statusLabel: VEHICLE_STATUS[status].label,
+      notes: notes,
+      photo: vehiclePhotoBase64,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    msg.innerHTML = '<p style="color:#c8f7d4;">✅ تم حفظ الآلية بنجاح</p>';
+    
+    // تنظيف الحقول
+    document.getElementById('vehicleNumber').value = '';
+    document.getElementById('vehicleNotes').value = '';
+    document.getElementById('vehiclePhoto').value = '';
+    document.getElementById('vehiclePhotoPreview').style.display = 'none';
+    vehiclePhotoBase64 = '';
+    
+    loadVehicles();
+  } catch (err) {
+    msg.innerHTML = '<p style="color:#ffcdd2;">خطأ: ' + err.message + '</p>';
+  }
+});
+
+function loadVehicles() {
+  db.collection('vehicles')
+    .orderBy('timestamp', 'desc')
+    .onSnapshot(snapshot => {
+      const container = document.getElementById('vehiclesList');
+      if (snapshot.empty) {
+        container.innerHTML = '<p style="text-align:center;color:rgba(255,255,255,0.7);">لا توجد آليات مسجلة بعد</p>';
+        return;
+      }
+
+      // تجميع حسب النوع
+      const grouped = {};
+      snapshot.docs.forEach(doc => {
+        const v = { id: doc.id, ...doc.data() };
+        if (!grouped[v.type]) grouped[v.type] = [];
+        grouped[v.type].push(v);
+      });
+
+      let html = '';
+      Object.keys(grouped).forEach(type => {
+        const vehicles = grouped[type];
+        html += `<div class="team-group">
+          <div class="team-title">${VEHICLE_TYPES[type]} (${vehicles.length})</div>`;
+        
+        vehicles.forEach(v => {
+          const statusInfo = VEHICLE_STATUS[v.status] || VEHICLE_STATUS.working;
+          html += `
+            <div class="vehicle-card">
+              <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+                <strong>🚛 ${v.number}</strong>
+                <span class="status-badge ${statusInfo.color}">${statusInfo.icon} ${statusInfo.label}</span>
+              </div>
+              ${v.photo ? `<img src="${v.photo}" alt="صورة الآلية">` : ''}
+              ${v.notes ? `<div style="font-size:12px; color:rgba(255,255,255,0.7); margin-top:4px;">📝 ${v.notes}</div>` : ''}
+              <div style="display:flex; gap:8px; margin-top:8px;">
+                <button onclick="editVehicle('${v.id}', '${v.status}')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;background:rgba(255,152,0,0.5);">🔄 تغيير الحالة</button>
+                <button onclick="deleteVehicle('${v.id}', '${v.number}')" class="del-btn" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">حذف</button>
+              </div>
+            </div>
+          `;
+        });
+        
+        html += '</div>';
+      });
+
+      container.innerHTML = html;
+    });
+}
+
+async function editVehicle(vehicleId, currentStatus) {
+  const statuses = ['working', 'maintenance', 'broken'];
+  const currentIndex = statuses.indexOf(currentStatus);
+  const nextStatus = statuses[(currentIndex + 1) % statuses.length];
+  
+  await db.collection('vehicles').doc(vehicleId).update({
+    status: nextStatus,
+    statusLabel: VEHICLE_STATUS[nextStatus].label
+  });
+}
+
+async function deleteVehicle(vehicleId, number) {
+  if (!confirm(`حذف الآلية ${number}؟`)) return;
+  await db.collection('vehicles').doc(vehicleId).delete();
+}
+
+document.getElementById('exportVehiclesPdfBtn').addEventListener('click', async () => {
+  try {
+    const snapshot = await db.collection('vehicles').orderBy('type').get();
+    
+    if (snapshot.empty) {
+      alert('لا توجد آليات لتصديرها');
+      return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    pdf.setR2L(true);
+    
+    // العنوان
+    pdf.setFontSize(18);
+    pdf.text('تقرير الآليات - شركة سرت', 105, 20, { align: 'center' });
+    
+    const dateStr = new Date().toLocaleDateString('ar-LY', {
+      year: 'numeric', month: 'long', day: 'numeric'
+    });
+    pdf.setFontSize(10);
+    pdf.text(`تاريخ التقرير: ${dateStr}`, 105, 28, { align: 'center' });
+    
+    let yPos = 40;
+    
+    // تجميع الآليات حسب النوع
+    const grouped = {};
+    snapshot.docs.forEach(doc => {
+      const v = doc.data();
+      if (!grouped[v.type]) grouped[v.type] = [];
+      grouped[v.type].push(v);
+    });
+
+    Object.keys(grouped).forEach(type => {
+      const vehicles = grouped[type];
+      
+      if (yPos > 250) {
+        pdf.addPage();
+        yPos = 20;
+      }
+      
+      pdf.setFontSize(14);
+      pdf.text(VEHICLE_TYPES[type] + ` (${vehicles.length})`, 20, yPos, { align: 'right' });
+      yPos += 8;
+      
+      vehicles.forEach(v => {
+        const statusInfo = VEHICLE_STATUS[v.status] || VEHICLE_STATUS.working;
+        
+        pdf.setFontSize(11);
+        pdf.text(`الرقم: ${v.number}`, 20, yPos, { align: 'right' });
+        pdf.text(`الحالة: ${statusInfo.label}`, 190, yPos, { align: 'left' });
+        yPos += 7;
+        
+        if (v.notes) {
+          pdf.setFontSize(10);
+          const notesLines = pdf.splitTextToSize('ملاحظات: ' + v.notes, 170);
+          pdf.text(notesLines, 20, yPos, { align: 'right' });
+          yPos += (notesLines.length * 6);
+        }
+        
+        if (v.photo) {
+          try {
+            if (yPos > 240) {
+              pdf.addPage();
+              yPos = 20;
+            }
+            pdf.addImage(v.photo, 'JPEG', 60, yPos, 90, 67);
+            yPos += 75;
+          } catch (e) {
+            console.log('خطأ في إضافة صورة الآلية:', e);
+          }
+        }
+        
+        yPos += 5;
+      });
+      
+      yPos += 10;
+    });
+
+    pdf.save(`الآليات-سرت-${new Date().toISOString().slice(0,10)}.pdf`);
+  } catch (err) {
+    alert('خطأ في تصدير PDF: ' + err.message);
+  }
+});
 
 function showLanding() {
   document.getElementById('landing').style.display = 'block';

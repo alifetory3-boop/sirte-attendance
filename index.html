@@ -73,13 +73,12 @@
   .err { background: rgba(239,83,80,0.35); color: #ffffff; border: 1px solid rgba(239,83,80,0.6); }
   label { font-size: 14px; color: rgba(255,255,255,0.85); margin-bottom: 6px; display: block; }
   .divider { text-align: center; color: rgba(255,255,255,0.6); font-size: 13px; margin: 6px 0 14px; }
-
   h2 { font-size: 16px; color: #ffffff; }
   h3 { font-size: 14px; color: #ffffff; margin: 18px 0 8px; }
   input, textarea { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.4); font-size: 15px; margin-bottom: 10px; background: rgba(255,255,255,0.2); color: #ffffff; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
   input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.6); }
   .tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
-  .tab { flex: 1; text-align: center; padding: 10px; border-radius: 10px; background: rgba(255,255,255,0.14); color: rgba(255,255,255,0.85); font-weight: bold; cursor: pointer; border: 1px solid rgba(255,255,255,0.35); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); font-size: 13px; min-width: 80px; }
+  .tab { flex: 1; text-align: center; padding: 10px; border-radius: 10px; background: rgba(255,255,255,0.14); color: rgba(255,255,255,0.85); font-weight: bold; cursor: pointer; border: 1px solid rgba(255,255,255,0.35); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); font-size: 12px; min-width: 70px; }
   .tab.active { background: rgba(0,150,136,0.6); color: white; border-color: rgba(255,255,255,0.5); }
   .stats { display: flex; flex-wrap: wrap; gap: 10px; }
   .stat { flex: 1; min-width: 100px; padding: 14px; border-radius: 12px; text-align: center; background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.3); color: #fff; }
@@ -93,98 +92,32 @@
   .worker-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.15); font-size: 14px; color: #fff; }
   .worker-row .name { flex: 1; }
   .del-btn { width: auto; padding: 6px 10px; background: rgba(198,40,40,0.35); color: #ffcdd2; border: 1px solid rgba(255,120,120,0.5); margin: 0; font-size: 13px; }
-
-  .vehicle-card {
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.25);
-    border-radius: 12px;
-    padding: 12px;
-    margin-bottom: 10px;
-  }
-  .vehicle-card img {
-    width: 100%;
-    max-height: 150px;
-    object-fit: cover;
-    border-radius: 8px;
-    margin-bottom: 8px;
-  }
-  .status-badge {
-    display: inline-block;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: bold;
-  }
+  .vehicle-card { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.25); border-radius: 12px; padding: 12px; margin-bottom: 10px; }
+  .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
   .status-working { background: rgba(76,175,80,0.5); }
   .status-maintenance { background: rgba(255,152,0,0.5); }
   .status-broken { background: rgba(239,83,80,0.5); }
-  .image-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-    gap: 8px;
-    margin-top: 8px;
-  }
-  .image-grid img {
-    width: 100%;
-    height: 80px;
-    object-fit: cover;
-    border-radius: 8px;
-    border: 1px solid rgba(255,255,255,0.3);
-  }
-  .view-only-badge {
-    display: inline-block;
-    background: rgba(255,193,7,0.5);
-    color: #fff;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 11px;
-    font-weight: bold;
-  }
-  .role-badge {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 11px;
-    font-weight: bold;
-    margin-right: 4px;
-  }
+  .image-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px; margin-top: 8px; }
+  .image-grid img { width: 100%; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(255,255,255,0.3); }
+  .view-only-badge { display: inline-block; background: rgba(255,193,7,0.5); color: #fff; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
+  .role-badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; margin-right: 4px; }
   .role-owner { background: rgba(255,215,0,0.6); color: #fff; }
   .role-admin { background: rgba(156,39,176,0.6); color: #fff; }
   .role-supervisor { background: rgba(33,150,243,0.6); color: #fff; }
-  .pin-input {
-    letter-spacing: 10px;
-    font-size: 24px;
-    text-align: center;
-    font-weight: bold;
-  }
-  .permission-box {
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 10px;
-    padding: 12px;
-    margin-bottom: 10px;
-  }
-  .permission-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-  }
+  .pin-input { letter-spacing: 10px; font-size: 24px; text-align: center; font-weight: bold; }
+  .permission-box { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; padding: 12px; margin-bottom: 10px; }
+  .permission-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
   .permission-item:last-child { border-bottom: none; }
-  .permission-item label {
-    flex: 1;
-    margin: 0;
-    font-size: 13px;
-    cursor: pointer;
-  }
-  .permission-item input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    margin: 0;
-    cursor: pointer;
-    accent-color: #4caf50;
-  }
+  .permission-item label { flex: 1; margin: 0; font-size: 13px; cursor: pointer; }
+  .permission-item input[type="checkbox"] { width: 18px; height: 18px; margin: 0; cursor: pointer; accent-color: #4caf50; }
+  .shift-selector { display: flex; gap: 10px; margin-bottom: 15px; }
+  .shift-btn { flex: 1; padding: 14px; border-radius: 12px; border: 2px solid rgba(255,255,255,0.4); font-size: 16px; font-weight: bold; cursor: pointer; text-align: center; transition: all 0.3s; }
+  .shift-btn.morning { background: rgba(255,193,7,0.3); color: #fff; }
+  .shift-btn.morning.active { background: rgba(255,193,7,0.7); border-color: #ffc107; }
+  .shift-btn.night { background: rgba(63,81,181,0.3); color: #fff; }
+  .shift-btn.night.active { background: rgba(63,81,181,0.7); border-color: #3f51b5; }
+  .deduction-badge { background: rgba(244,67,54,0.6); color: #fff; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
+  .no-deduction-badge { background: rgba(76,175,80,0.5); color: #fff; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
 </style>
 </head>
 <body>
@@ -202,41 +135,40 @@
   <button onclick="showLanding()" style="max-width:420px;margin:0 auto 12px;display:block;background:rgba(255,255,255,0.14);">⬅ رجوع للصفحة الرئيسية</button>
   <div class="card">
     <h1>🔐 تسجيل الدخول</h1>
-    <p style="text-align:center;color:rgba(255,255,255,0.7);font-size:13px;margin-bottom:20px;">أدخل الاسم والرقم السري الذي تم إعطاؤه لك من الإدارة</p>
-    
+    <p style="text-align:center;color:rgba(255,255,255,0.7);font-size:13px;margin-bottom:20px;">أدخل الاسم والرقم السري</p>
     <label>👤 الاسم</label>
     <input id="loginName" placeholder="أدخل اسمك">
-    
     <label>🔢 الرقم السري</label>
     <input id="loginPin" type="password" class="pin-input" placeholder="••••" maxlength="6" inputmode="numeric" pattern="[0-9]*">
-    
     <button id="loginBtn">🔓 دخول</button>
     <div id="loginMsg"></div>
   </div>
 </div>
 
+<!-- صفحة العامل -->
 <div id="workerView" style="display:none;">
-  <button onclick="showLanding()" style="max-width:420px;margin:0 auto 12px;display:block;background:rgba(255,255,255,0.14);">⬅ رجوع للصفحة الرئيسية</button>
+  <button onclick="showLanding()" style="max-width:420px;margin:0 auto 12px;display:block;background:rgba(255,255,255,0.14);">⬅ رجوع</button>
   <div class="card">
     <h1>📍 تسجيل الحضور اليومي</h1>
-
+    <label>اختر الوردية</label>
+    <div class="shift-selector">
+      <div class="shift-btn morning active" onclick="selectWorkerShift('morning')">🌅 صباح</div>
+      <div class="shift-btn night" onclick="selectWorkerShift('night')">🌙 ليل</div>
+    </div>
     <label>اختر فريقك ثم اسمك</label>
     <select id="workerSelect">
       <option value="">جاري تحميل قائمة العمال...</option>
     </select>
-
     <button id="checkInBtn" disabled>✅ تسجيل الحضور الآن</button>
-
     <div class="divider">— أو —</div>
-
-    <button id="absentBtn" class="secondary" disabled>✗ غائب اليوم</button>
-    <button id="leaveBtn" class="secondary" disabled>📝 أخذت إذن اليوم</button>
-    <button id="sickBtn" class="secondary" disabled>🤒 الإبلاغ عن مرض اليوم</button>
-
+    <button id="absentBtn" class="secondary" disabled>✗ غائب اليوم (يوجد خصم)</button>
+    <button id="leaveBtn" class="secondary" disabled>📝 أخذت إذن اليوم (لا يوجد خصم)</button>
+    <button id="sickBtn" class="secondary" disabled>🤒 مريض اليوم (لا يوجد خصم)</button>
     <div id="status"></div>
   </div>
 </div>
 
+<!-- لوحة التحكم -->
 <div id="adminView" style="display:none;">
   <div style="max-width:100%;margin:0 auto 12px;display:flex;gap:8px;flex-wrap:wrap;">
     <button onclick="showLanding()" style="width:auto;background:rgba(255,255,255,0.14);">⬅ رجوع</button>
@@ -248,71 +180,80 @@
 
   <div id="dashboard">
     <div class="tabs" style="flex-wrap:wrap;" id="adminTabs">
-      <div class="tab active" data-tab="overview">📊 نظرة عامة</div>
-      <div class="tab" data-tab="daily">✅ تسجيل الحضور</div>
-      <div class="tab" data-tab="workers">👷 إدارة العمال</div>
-      <div class="tab" data-tab="monthly">📅 التقرير الشهري</div>
-      <div class="tab" data-tab="inventory">📦 المخزن</div>
-      <div class="tab" data-tab="reports">📋 تقارير العمل</div>
-      <div class="tab" data-tab="vehicles">🚛 الآليات</div>
-      <div class="tab" data-tab="permissions">🔑 إدارة المستخدمين</div>
+      <div class="tab active" data-tab="overview">📊 نظرة</div>
+      <div class="tab" data-tab="daily">✅ حضور</div>
+      <div class="tab" data-tab="workers">👷 عمال</div>
+      <div class="tab" data-tab="monthly">📅 شهري</div>
+      <div class="tab" data-tab="deductions">💰 خصومات</div>
+      <div class="tab" data-tab="inventory">📦 مخزن</div>
+      <div class="tab" data-tab="reports">📋 تقارير</div>
+      <div class="tab" data-tab="vehicles">🚛 آليات</div>
+      <div class="tab" data-tab="shifts">🔄 ورديات</div>
+      <div class="tab" data-tab="permissions">🔑 مستخدمين</div>
     </div>
 
+    <!-- نظرة عامة -->
     <div id="tab-overview">
       <div class="card">
-        <h1>حضور اليوم</h1>
+        <h1>حضور اليوم - الوردية الحالية</h1>
         <p id="todayDateDisplay" style="text-align:center; color:rgba(255,255,255,0.75); font-size:13px; margin-top:-10px; margin-bottom:14px;"></p>
+        <p id="currentShiftDisplay" style="text-align:center; color:#ffc107; font-size:14px; font-weight:bold; margin-bottom:14px;"></p>
         <div class="stats">
           <div class="stat" style="background:#e8f5e9;"><span class="num" id="presentCount">0</span>حاضر</div>
           <div class="stat" style="background:#fff3e0;"><span class="num" id="lateCount">0</span>متأخر</div>
           <div class="stat" style="background:#ede7f6;"><span class="num" id="leaveCount">0</span>إذن</div>
           <div class="stat" style="background:#fce4ec;"><span class="num" id="sickCount">0</span>مريض</div>
+          <div class="stat" style="background:#ffebee;"><span class="num" id="absentCount">0</span>غائب</div>
           <div class="stat" style="background:#eceff1;"><span class="num" id="totalCount">0</span>إجمالي</div>
         </div>
       </div>
-
       <div class="card">
-        <h2>⚠️ لم يسجلوا حضور اليوم</h2>
+        <h2>⚠️ لم يسجلوا حضور الوردية الحالية</h2>
         <div id="absentList">جاري التحميل...</div>
       </div>
-
       <div class="card">
         <h2>سجل الحضور اللحظي</h2>
-        <button id="exportBtn">📊 تصدير Excel (اليوم)</button>
+        <button id="exportBtn">📊 تصدير Excel</button>
         <button id="clearTodayBtn" style="background:rgba(198,40,40,0.4);">🗑️ مسح سجل اليوم</button>
         <div id="list">جاري التحميل...</div>
       </div>
     </div>
 
+    <!-- تسجيل الحضور اليومي -->
     <div id="tab-daily" style="display:none;">
       <div class="card">
         <h2>✅ سجّل حالة اليوم لكل عامل</h2>
         <p id="dailyDateDisplay" style="text-align:center; color:rgba(255,255,255,0.75); font-size:13px; margin-top:-6px; margin-bottom:12px;"></p>
+        <label>اختر الوردية</label>
+        <div class="shift-selector">
+          <div class="shift-btn morning active" onclick="selectAdminShift('morning')">🌅 صباح</div>
+          <div class="shift-btn night" onclick="selectAdminShift('night')">🌙 ليل</div>
+        </div>
         <input id="dailySearch" placeholder="🔍 ابحث باسم العامل">
         <div id="dailyMarkList">جاري التحميل...</div>
       </div>
     </div>
 
+    <!-- إدارة العمال -->
     <div id="tab-workers" style="display:none;">
       <div class="card">
         <h2>➕ تسجيل عامل جديد</h2>
-        <label style="color:#fff;font-size:13px;display:block;margin-bottom:6px;">1️⃣ التقط صورة العامل</label>
         <input type="file" id="newWorkerPhoto" accept="image/*" capture="user">
         <img id="newWorkerPreview" style="width:100%;border-radius:10px;display:none;margin-bottom:10px;">
-
-        <label style="color:#fff;font-size:13px;display:block;margin-bottom:6px;">2️⃣ اسم العامل</label>
-        <input id="newWorkerName" placeholder="اكتب الاسم الكامل">
-
-        <label style="color:#fff;font-size:13px;display:block;margin-bottom:6px;">3️⃣ الوظيفة</label>
+        <input id="newWorkerName" placeholder="اسم العامل">
         <select id="newWorkerTeam"></select>
-
-        <label style="color:#fff;font-size:13px;display:block;margin-bottom:6px;">4️⃣ المعدات بحوزته (اختياري)</label>
+        <label>الوردية الأساسية</label>
+        <select id="newWorkerShift">
+          <option value="morning">🌅 صباح</option>
+          <option value="night">🌙 ليل</option>
+          <option value="both">🔄 كلاهما</option>
+        </select>
+        <label>الراتب اليومي (للخصم)</label>
+        <input id="newWorkerSalary" type="number" placeholder="مثال: 50 دينار" min="0">
         <div id="newWorkerEquipment" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;"></div>
-
         <button id="addWorkerBtn">✅ تسجيل العامل</button>
         <div id="addWorkerMsg"></div>
       </div>
-
       <div class="card">
         <h2>العمال حسب الفريق</h2>
         <input id="workersSearch" placeholder="🔍 ابحث باسم العامل">
@@ -320,185 +261,151 @@
       </div>
     </div>
 
-    <div id="tab-inventory" style="display:none;">
-      <div class="card">
-        <h2>➕ إضافة صنف للمخزن</h2>
-        <input id="newItemName" placeholder="اسم الصنف (مثال: قفازات)">
-        <input id="newItemQty" type="number" placeholder="الكمية" min="0">
-        <input id="newItemUnit" placeholder="الوحدة (قطعة / كرتونة / لتر...)">
-        <button id="addItemBtn">➕ إضافة الصنف</button>
-        <div id="addItemMsg"></div>
-      </div>
-
-      <div class="card">
-        <h2>📤 صرف صنف لعامل</h2>
-        <select id="issueItemSelect"></select>
-        <select id="issueWorkerSelect"></select>
-        <input id="issueQty" type="number" placeholder="الكمية المصروفة" min="1" value="1">
-        <button id="issueBtn">📤 صرف الآن</button>
-        <div id="issueMsg"></div>
-      </div>
-
-      <div class="card">
-        <h2>📦 محتوى المخزن</h2>
-        <button id="exportInventoryBtn">📊 تصدير المخزن Excel</button>
-        <div id="inventoryList">جاري التحميل...</div>
-      </div>
-    </div>
-
+    <!-- التقرير الشهري -->
     <div id="tab-monthly" style="display:none;">
       <div class="card">
         <h2>📅 حضور الشهر</h2>
         <select id="monthSelect"></select>
         <input id="monthlySearch" placeholder="🔍 ابحث باسم العامل">
-        <button id="exportMonthlyBtn">📊 تصدير التقرير الشهري Excel</button>
+        <button id="exportMonthlyBtn">📊 تصدير Excel</button>
         <div style="overflow-x:auto; margin-top:10px;">
           <div id="monthlyGrid" style="min-width:600px;">جاري التحميل...</div>
-        </div>
-        <div style="display:flex; gap:14px; margin-top:12px; font-size:12px; color:rgba(255,255,255,0.8); flex-wrap:wrap;">
-          <span>✅ حاضر</span>
-          <span>⏰ متأخر</span>
-          <span>📝 إذن</span>
-          <span>🤒 مريض</span>
-          <span>✗ غائب</span>
         </div>
       </div>
     </div>
 
+    <!-- الخصومات -->
+    <div id="tab-deductions" style="display:none;">
+      <div class="card">
+        <h2>💰 تقرير الخصومات الشهري</h2>
+        <select id="deductionMonthSelect"></select>
+        <button id="exportDeductionsBtn">📊 تصدير Excel</button>
+        <div id="deductionsList">جاري التحميل...</div>
+      </div>
+      <div class="card">
+        <h2>⚙️ إعدادات الخصم</h2>
+        <label>قيمة الخصم عن كل يوم غياب (دينار)</label>
+        <input id="deductionAmount" type="number" value="50" min="0" placeholder="قيمة الخصم">
+        <button id="saveDeductionSettingsBtn">💾 حفظ الإعدادات</button>
+      </div>
+    </div>
+
+    <!-- المخزن -->
+    <div id="tab-inventory" style="display:none;">
+      <div class="card">
+        <h2>➕ إضافة صنف</h2>
+        <input id="newItemName" placeholder="اسم الصنف">
+        <input id="newItemQty" type="number" placeholder="الكمية" min="0">
+        <input id="newItemUnit" placeholder="الوحدة">
+        <button id="addItemBtn">➕ إضافة</button>
+        <div id="addItemMsg"></div>
+      </div>
+      <div class="card">
+        <h2>📤 صرف صنف</h2>
+        <select id="issueItemSelect"></select>
+        <select id="issueWorkerSelect"></select>
+        <input id="issueQty" type="number" placeholder="الكمية" min="1" value="1">
+        <button id="issueBtn">📤 صرف</button>
+        <div id="issueMsg"></div>
+      </div>
+      <div class="card">
+        <h2>📦 المخزن</h2>
+        <button id="exportInventoryBtn">📊 تصدير</button>
+        <div id="inventoryList">جاري التحميل...</div>
+      </div>
+    </div>
+
+    <!-- تقارير العمل -->
     <div id="tab-reports" style="display:none;">
       <div class="card">
-        <h2>📋 إنشاء تقرير عمل يومي</h2>
-        
-        <label>📅 تاريخ العمل</label>
+        <h2>📋 إنشاء تقرير</h2>
         <input type="date" id="reportDate">
-        
-        <label>👷 اسم العامل / الفريق</label>
         <select id="reportWorkerSelect"></select>
-        
-        <label>📍 موقع العمل</label>
-        <input id="reportLocation" placeholder="مثال: حي الأندلس، شارع الوحدة">
-        
-        <label>📝 وصف العمل المنجز</label>
-        <textarea id="reportDescription" rows="4" placeholder="اذكر تفاصيل العمل المنجز اليوم..."></textarea>
-        
-        <label>⚠️ ملاحظات / مشاكل (اختياري)</label>
-        <textarea id="reportNotes" rows="3" placeholder="أي ملاحظات أو مشاكل واجهتك"></textarea>
-        
-        <label>📸 صور العمل (يمكنك إضافة عدة صور)</label>
-        <input type="file" id="reportPhotos" accept="image/*" multiple capture="environment">
+        <input id="reportLocation" placeholder="موقع العمل">
+        <textarea id="reportDescription" rows="4" placeholder="وصف العمل"></textarea>
+        <textarea id="reportNotes" rows="3" placeholder="ملاحظات"></textarea>
+        <input type="file" id="reportPhotos" accept="image/*" multiple>
         <div id="reportPhotosPreview" class="image-grid"></div>
-        
-        <button id="saveReportBtn">💾 حفظ التقرير</button>
+        <button id="saveReportBtn">💾 حفظ</button>
         <div id="reportMsg"></div>
       </div>
-
       <div class="card">
-        <h2>📄 التقارير المحفوظة</h2>
+        <h2>📄 التقارير</h2>
         <div id="savedReports">جاري التحميل...</div>
       </div>
     </div>
 
+    <!-- الآليات -->
     <div id="tab-vehicles" style="display:none;">
       <div class="card">
         <h2>➕ إضافة آلية</h2>
-        
-        <label>🚛 نوع الآلية</label>
         <select id="vehicleType">
           <option value="small_compactor">كبس صغير</option>
           <option value="large_compactor">كبس كبير</option>
-          <option value="small_garbage_truck">سيارة صندوق قمامة صغيرة</option>
-          <option value="large_garbage_truck">سيارة صندوق قمامة كبيرة</option>
-          <option value="dump_truck">سيارة صندوق قلاب</option>
+          <option value="small_garbage_truck">صندوق قمامة صغير</option>
+          <option value="large_garbage_truck">صندوق قمامة كبير</option>
+          <option value="dump_truck">قلاب</option>
         </select>
-        
-        <label>🔢 رقم الآلية / اللوحة</label>
-        <input id="vehicleNumber" placeholder="مثال: 45-123456">
-        
-        <label>📊 حالة الآلية</label>
+        <input id="vehicleNumber" placeholder="رقم الآلية">
         <select id="vehicleStatus">
           <option value="working">✅ تعمل</option>
-          <option value="maintenance">🔧 تحت الصيانة</option>
+          <option value="maintenance">🔧 صيانة</option>
           <option value="broken">❌ معطلة</option>
         </select>
-        
-        <label>📝 ملاحظات (اختياري)</label>
-        <textarea id="vehicleNotes" rows="3" placeholder="أي ملاحظات عن حالة الآلية"></textarea>
-        
-        <label>📸 صورة الآلية</label>
-        <input type="file" id="vehiclePhoto" accept="image/*" capture="environment">
+        <textarea id="vehicleNotes" rows="3" placeholder="ملاحظات"></textarea>
+        <input type="file" id="vehiclePhoto" accept="image/*">
         <img id="vehiclePhotoPreview" style="width:100%;border-radius:10px;display:none;margin-bottom:10px;">
-        
-        <button id="saveVehicleBtn">💾 حفظ الآلية</button>
+        <button id="saveVehicleBtn">💾 حفظ</button>
         <div id="vehicleMsg"></div>
       </div>
-
       <div class="card">
-        <h2>🚛 الآليات المسجلة</h2>
-        <button id="exportVehiclesPdfBtn">📄 تصدير PDF للآليات</button>
+        <h2>🚛 الآليات</h2>
+        <button id="exportVehiclesPdfBtn">📄 PDF</button>
         <div id="vehiclesList">جاري التحميل...</div>
       </div>
     </div>
 
-    <!-- تبويب إدارة المستخدمين والصلاحيات -->
+    <!-- الورديات -->
+    <div id="tab-shifts" style="display:none;">
+      <div class="card">
+        <h2>🔄 الورديات</h2>
+        <input type="date" id="shiftDate">
+        <div class="shift-selector">
+          <div class="shift-btn morning active" onclick="selectShiftView('morning')">🌅 صباح</div>
+          <div class="shift-btn night" onclick="selectShiftView('night')">🌙 ليل</div>
+        </div>
+        <div id="shiftWorkersList">جاري التحميل...</div>
+      </div>
+    </div>
+
+    <!-- إدارة المستخدمين -->
     <div id="tab-permissions" style="display:none;">
       <div class="card">
-        <h2>👥 إضافة مستخدم جديد</h2>
-        <p style="font-size:12px;color:rgba(255,255,255,0.7);">أنت كمدير تقوم بإنشاء حساب لكل شخص وإعطائه الصلاحيات المناسبة</p>
-        
-        <label>👤 اسم المستخدم</label>
-        <input id="newUserName" placeholder="اسم الشخص">
-        
-        <label>🔢 الرقم السري (4-6 أرقام)</label>
-        <input id="newUserPin" type="password" class="pin-input" placeholder="••••" maxlength="6" inputmode="numeric" pattern="[0-9]*">
-        
-        <label>📊 نوع المستخدم</label>
+        <h2>👥 إضافة مستخدم</h2>
+        <input id="newUserName" placeholder="اسم المستخدم">
+        <input id="newUserPin" type="password" class="pin-input" placeholder="••••" maxlength="6">
         <select id="newUserRole">
-          <option value="supervisor">مشرف - صلاحيات محددة</option>
-          <option value="admin">مدير - صلاحيات كاملة</option>
+          <option value="supervisor">مشرف</option>
+          <option value="admin">مدير</option>
         </select>
-        
         <div id="permissionsSelection" class="permission-box" style="display:none;">
-          <h3 style="margin-top:0;">حدد الصلاحيات:</h3>
-          <div class="permission-item">
-            <label>📊 عرض نظرة عامة</label>
-            <input type="checkbox" id="perm-overview" checked>
-          </div>
-          <div class="permission-item">
-            <label>✅ تسجيل الحضور اليومي</label>
-            <input type="checkbox" id="perm-attendance" checked>
-          </div>
-          <div class="permission-item">
-            <label>👷 إدارة العمال</label>
-            <input type="checkbox" id="perm-workers">
-          </div>
-          <div class="permission-item">
-            <label>📅 عرض التقرير الشهري</label>
-            <input type="checkbox" id="perm-monthly" checked>
-          </div>
-          <div class="permission-item">
-            <label>📦 إدارة المخزن</label>
-            <input type="checkbox" id="perm-inventory">
-          </div>
-          <div class="permission-item">
-            <label>📋 تقارير العمل</label>
-            <input type="checkbox" id="perm-reports">
-          </div>
-          <div class="permission-item">
-            <label>🚛 إدارة الآليات</label>
-            <input type="checkbox" id="perm-vehicles">
-          </div>
-          <div class="permission-item">
-            <label>👁️ مشاهدة فقط (لا يمكنه التعديل)</label>
-            <input type="checkbox" id="perm-viewonly">
-          </div>
+          <h3>الصلاحيات:</h3>
+          <div class="permission-item"><label>📊 نظرة عامة</label><input type="checkbox" id="perm-overview" checked></div>
+          <div class="permission-item"><label>✅ حضور</label><input type="checkbox" id="perm-attendance" checked></div>
+          <div class="permission-item"><label>👷 عمال</label><input type="checkbox" id="perm-workers"></div>
+          <div class="permission-item"><label>📅 شهري</label><input type="checkbox" id="perm-monthly" checked></div>
+          <div class="permission-item"><label>💰 خصومات</label><input type="checkbox" id="perm-deductions"></div>
+          <div class="permission-item"><label>📦 مخزن</label><input type="checkbox" id="perm-inventory"></div>
+          <div class="permission-item"><label>📋 تقارير</label><input type="checkbox" id="perm-reports"></div>
+          <div class="permission-item"><label>🚛 آليات</label><input type="checkbox" id="perm-vehicles"></div>
+          <div class="permission-item"><label>🔄 ورديات</label><input type="checkbox" id="perm-shifts"></div>
+          <div class="permission-item"><label>👁️ مشاهدة فقط</label><input type="checkbox" id="perm-viewonly"></div>
         </div>
-        
-        <button id="addUserBtn">➕ إضافة المستخدم</button>
+        <button id="addUserBtn">➕ إضافة</button>
         <div id="addUserMsg"></div>
       </div>
-
       <div class="card">
-        <h2>📋 قائمة المستخدمين المسجلين</h2>
+        <h2>📋 المستخدمين</h2>
         <div id="usersList">جاري التحميل...</div>
       </div>
     </div>
@@ -516,36 +423,43 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// ============ الثوابت ============
-const OWNER_NAME = 'المدير'; // اسمك أنت كصاحب النظام
-const OWNER_PIN = '1234'; // رقمك السري الخاص - غيّره لما تريد
+// ============ الإعدادات ============
+const OWNER_NAME = 'المدير';
+const OWNER_PIN = '1234';
+let deductionAmountValue = 50; // قيمة الخصم الافتراضية
 
+// ============ المتغيرات ============
+let currentUser = null;
+let currentUserPermissions = {};
+let currentUserRole = '';
+let selectedShift = 'morning'; // الوردية المختارة
+let adminSelectedShift = 'morning'; // وردية المشرف
+let viewSelectedShift = 'morning'; // وردية العرض
+
+// ============ الثوابت ============
 const TEAMS = [
-  { id: 'dump_truck_drivers',      label: 'سائقين شاحنة دنبر' },
-  { id: 'container_drivers',       label: 'سائقين صندوق كنتر' },
+  { id: 'dump_truck_drivers', label: 'سائقين شاحنة دنبر' },
+  { id: 'container_drivers', label: 'سائقين صندوق كنتر' },
   { id: 'large_compactor_drivers', label: 'سائقين كباسة كبيرة' },
   { id: 'small_compactor_drivers', label: 'سائقين كباسة صغيرة' },
-  { id: 'guards',                  label: 'غفير' },
-  { id: 'gardens_workers',         label: 'عمال حدائق' },
-  { id: 'cleaning_workers',        label: 'عمال نظافة' },
-  { id: 'compactor_workers',       label: 'عمال كباسات' },
-  { id: 'electricians',           label: 'عمال كهربائي' },
-  { id: 'cleaning_supervisors',    label: 'مشرف نظافة' },
-  { id: '',                        label: 'أخرى / غير مصنّف' },
+  { id: 'guards', label: 'غفير' },
+  { id: 'gardens_workers', label: 'عمال حدائق' },
+  { id: 'cleaning_workers', label: 'عمال نظافة' },
+  { id: 'compactor_workers', label: 'عمال كباسات' },
+  { id: 'electricians', label: 'عمال كهربائي' },
+  { id: 'cleaning_supervisors', label: 'مشرف نظافة' },
+  { id: '', label: 'أخرى' },
 ];
 
 const EQUIPMENT = [
-  { id: 'broom',      label: 'مكنسة',        icon: '🧹' },
-  { id: 'axe',        label: 'فأس',          icon: '⛏️' },
-  { id: 'shovel',     label: 'بالة',         icon: '🧰' },
-  { id: 'wheelbarrow',label: 'بروطة',        icon: '🛒' },
-  { id: 'qonbali',    label: 'قنبالي',       icon: '🧰' },
-  { id: 'vest',       label: 'سترة',         icon: '🦺' },
-  { id: 'khabasha',   label: 'خباشة',        icon: '🧰' },
-  { id: 'mop',        label: 'مسحة',         icon: '🧽' },
-  { id: 'gloves',     label: 'قفاز',         icon: '🧤' },
-  { id: 'helmet',     label: 'طربوش عاكس',   icon: '⛑️' },
-  { id: 'ladder',     label: 'سلم',          icon: '🪜' },
+  { id: 'broom', label: 'مكنسة', icon: '🧹' },
+  { id: 'axe', label: 'فأس', icon: '⛏️' },
+  { id: 'shovel', label: 'بالة', icon: '🧰' },
+  { id: 'wheelbarrow', label: 'بروطة', icon: '🛒' },
+  { id: 'gloves', label: 'قفاز', icon: '🧤' },
+  { id: 'helmet', label: 'طربوش عاكس', icon: '⛑️' },
+  { id: 'vest', label: 'سترة', icon: '🦺' },
+  { id: 'ladder', label: 'سلم', icon: '🪜' },
 ];
 
 const VEHICLE_TYPES = {
@@ -553,48 +467,66 @@ const VEHICLE_TYPES = {
   large_compactor: 'كبس كبير',
   small_garbage_truck: 'صندوق قمامة صغير',
   large_garbage_truck: 'صندوق قمامة كبير',
-  dump_truck: 'صندوق قلاب'
+  dump_truck: 'قلاب'
 };
 
 const VEHICLE_STATUS = {
   working: { label: 'تعمل', color: 'status-working', icon: '✅' },
-  maintenance: { label: 'تحت الصيانة', color: 'status-maintenance', icon: '🔧' },
+  maintenance: { label: 'صيانة', color: 'status-maintenance', icon: '🔧' },
   broken: { label: 'معطلة', color: 'status-broken', icon: '❌' }
 };
 
-let currentUser = null;
-let currentUserPermissions = {};
-let currentUserRole = '';
+let allWorkers = [];
+let allInventory = [];
+let latestRecords = [];
+let latestInfoMap = {};
+let newWorkerPhotoBase64 = '';
+let reportPhotosArray = [];
+let vehiclePhotoBase64 = '';
 
 // ============ دوال مساعدة ============
-function equipmentLabel(id) {
-  const e = EQUIPMENT.find(e => e.id === id);
-  return e ? `${e.icon} ${e.label}` : id;
+function getCurrentShift() {
+  const hour = new Date().getHours();
+  return hour >= 6 && hour < 18 ? 'morning' : 'night';
 }
 
-function compressImageToBase64(file, maxWidth = 480, quality = 0.6) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    const reader = new FileReader();
-    reader.onload = (e) => { img.src = e.target.result; };
-    reader.onerror = reject;
-    img.onload = () => {
-      const scale = Math.min(1, maxWidth / img.width);
-      const canvas = document.createElement('canvas');
-      canvas.width = img.width * scale;
-      canvas.height = img.height * scale;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      resolve(canvas.toDataURL('image/jpeg', quality));
-    };
-    img.onerror = reject;
-    reader.readAsDataURL(file);
+function getShiftLabel(shift) {
+  return shift === 'morning' ? '🌅 صباح' : '🌙 ليل';
+}
+
+function selectWorkerShift(shift) {
+  selectedShift = shift;
+  document.querySelectorAll('#workerView .shift-btn').forEach(btn => {
+    btn.classList.remove('active');
+    if ((shift === 'morning' && btn.classList.contains('morning')) || 
+        (shift === 'night' && btn.classList.contains('night'))) {
+      btn.classList.add('active');
+    }
   });
 }
 
-function teamLabel(id) {
-  const t = TEAMS.find(t => t.id === (id || ''));
-  return t ? t.label : 'أخرى / غير مصنّف';
+function selectAdminShift(shift) {
+  adminSelectedShift = shift;
+  document.querySelectorAll('#tab-daily .shift-btn').forEach(btn => {
+    btn.classList.remove('active');
+    if ((shift === 'morning' && btn.classList.contains('morning')) || 
+        (shift === 'night' && btn.classList.contains('night'))) {
+      btn.classList.add('active');
+    }
+  });
+  renderDailyMarkList();
+}
+
+function selectShiftView(shift) {
+  viewSelectedShift = shift;
+  document.querySelectorAll('#tab-shifts .shift-btn').forEach(btn => {
+    btn.classList.remove('active');
+    if ((shift === 'morning' && btn.classList.contains('morning')) || 
+        (shift === 'night' && btn.classList.contains('night'))) {
+      btn.classList.add('active');
+    }
+  });
+  loadShiftWorkers();
 }
 
 // ============ نظام تسجيل الدخول ============
@@ -615,27 +547,14 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
     return;
   }
 
-  // التحقق من صاحب النظام أولاً
   if (name === OWNER_NAME && pin === OWNER_PIN) {
     currentUser = { name: OWNER_NAME, role: 'owner', viewOnly: false };
     currentUserRole = 'owner';
-    currentUserPermissions = {
-      viewOverview: true,
-      manageAttendance: true,
-      manageWorkers: true,
-      viewMonthly: true,
-      manageInventory: true,
-      manageReports: true,
-      manageVehicles: true,
-      managePermissions: true
-    };
-    
-    msg.innerHTML = '<p style="color:#c8f7d4;">✅ مرحباً بك يا صاحب النظام</p>';
+    currentUserPermissions = { all: true };
     enterAdminPanel();
     return;
   }
 
-  // البحث في المستخدمين المسجلين
   try {
     const snapshot = await db.collection('systemUsers')
       .where('name', '==', name)
@@ -647,34 +566,24 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
       return;
     }
     
-    let foundUser = null;
     snapshot.forEach(doc => {
-      foundUser = { id: doc.id, ...doc.data() };
+      currentUser = { id: doc.id, ...doc.data() };
     });
     
-    currentUser = foundUser;
-    currentUserRole = foundUser.role || 'supervisor';
-    currentUserPermissions = foundUser.permissions || {};
-    
-    msg.innerHTML = `<p style="color:#c8f7d4;">✅ مرحباً ${foundUser.name}</p>`;
+    currentUserRole = currentUser.role || 'supervisor';
+    currentUserPermissions = currentUser.permissions || {};
     enterAdminPanel();
-    
   } catch (err) {
-    console.error('خطأ:', err);
     msg.innerHTML = '<p style="color:#ffcdd2;">خطأ: ' + err.message + '</p>';
   }
 });
 
 function enterAdminPanel() {
-  // تنظيف الحقول
   document.getElementById('loginName').value = '';
   document.getElementById('loginPin').value = '';
   document.getElementById('loginMsg').innerHTML = '';
-  
-  // إظهار لوحة التحكم
   document.getElementById('adminLogin').style.display = 'none';
   document.getElementById('adminView').style.display = 'block';
-  
   updateUIForPermissions();
   initializeAdmin();
 }
@@ -688,7 +597,6 @@ function logoutAdmin() {
 
 function updateUIForPermissions() {
   const userInfo = document.getElementById('currentUserInfo');
-  
   if (currentUserRole === 'owner') {
     userInfo.innerHTML = '<span class="role-badge role-owner">👑 صاحب النظام</span> ' + currentUser.name;
   } else if (currentUserRole === 'admin') {
@@ -696,457 +604,52 @@ function updateUIForPermissions() {
   } else {
     userInfo.innerHTML = '<span class="role-badge role-supervisor">👤 مشرف</span> ' + currentUser.name;
   }
-  
   if (currentUser.viewOnly) {
     userInfo.innerHTML += ' <span class="view-only-badge">👁️ مشاهدة فقط</span>';
   }
-  
-  // إظهار/إخفاء التبويبات
-  const tabs = document.querySelectorAll('#adminTabs .tab');
-  tabs.forEach(tab => {
-    const tabName = tab.dataset.tab;
-    let show = false;
-    
-    if (currentUserRole === 'owner') {
-      show = true; // صاحب النظام يرى كل شيء
-    } else {
-      switch(tabName) {
-        case 'overview': show = currentUserPermissions.viewOverview !== false; break;
-        case 'daily': show = currentUserPermissions.manageAttendance === true; break;
-        case 'workers': show = currentUserPermissions.manageWorkers === true; break;
-        case 'monthly': show = currentUserPermissions.viewMonthly !== false; break;
-        case 'inventory': show = currentUserPermissions.manageInventory === true; break;
-        case 'reports': show = currentUserPermissions.manageReports === true; break;
-        case 'vehicles': show = currentUserPermissions.manageVehicles === true; break;
-        case 'permissions': show = currentUserPermissions.managePermissions === true || currentUserRole === 'admin'; break;
-      }
-    }
-    
-    tab.style.display = show ? 'block' : 'none';
-  });
-  
-  applyViewOnlyMode();
 }
 
-function applyViewOnlyMode() {
-  const isViewOnly = currentUser.viewOnly === true;
-  
-  const editButtons = [
-    'addWorkerBtn', 'addItemBtn', 'issueBtn', 'saveReportBtn', 
-    'saveVehicleBtn', 'addUserBtn', 'clearTodayBtn'
-  ];
-  
-  editButtons.forEach(btnId => {
-    const btn = document.getElementById(btnId);
-    if (btn) {
-      if (isViewOnly) {
-        btn.disabled = true;
-        btn.style.opacity = '0.5';
-      } else {
-        btn.disabled = false;
-        btn.style.opacity = '1';
-      }
-    }
-  });
-}
-
-// ============ إدارة المستخدمين ============
-document.getElementById('newUserRole').addEventListener('change', (e) => {
-  const permissionsDiv = document.getElementById('permissionsSelection');
-  if (e.target.value === 'supervisor') {
-    permissionsDiv.style.display = 'block';
-  } else {
-    permissionsDiv.style.display = 'none';
-  }
-});
-
-document.getElementById('addUserBtn').addEventListener('click', async () => {
-  const name = document.getElementById('newUserName').value.trim();
-  const pin = document.getElementById('newUserPin').value.trim();
-  const role = document.getElementById('newUserRole').value;
-  const msg = document.getElementById('addUserMsg');
-
-  if (!name || !pin) {
-    msg.innerHTML = '<p style="color:#ffcdd2;">أدخل اسم المستخدم والرقم السري</p>';
-    return;
-  }
-
-  if (pin.length < 4 || pin.length > 6 || !/^\d+$/.test(pin)) {
-    msg.innerHTML = '<p style="color:#ffcdd2;">الرقم السري يجب أن يكون 4-6 أرقام</p>';
-    return;
-  }
-
-  try {
-    // التحقق من عدم وجود نفس الاسم
-    const existingCheck = await db.collection('systemUsers')
-      .where('name', '==', name)
-      .get();
-    
-    if (!existingCheck.empty) {
-      msg.innerHTML = '<p style="color:#ffcdd2;">يوجد مستخدم بنفس الاسم بالفعل</p>';
-      return;
-    }
-
-    let permissions = {};
-    let viewOnly = false;
-
-    if (role === 'admin') {
-      permissions = {
-        viewOverview: true,
-        manageAttendance: true,
-        manageWorkers: true,
-        viewMonthly: true,
-        manageInventory: true,
-        manageReports: true,
-        manageVehicles: true,
-        managePermissions: true
-      };
-    } else {
-      permissions = {
-        viewOverview: document.getElementById('perm-overview').checked,
-        manageAttendance: document.getElementById('perm-attendance').checked,
-        manageWorkers: document.getElementById('perm-workers').checked,
-        viewMonthly: document.getElementById('perm-monthly').checked,
-        manageInventory: document.getElementById('perm-inventory').checked,
-        manageReports: document.getElementById('perm-reports').checked,
-        manageVehicles: document.getElementById('perm-vehicles').checked,
-        managePermissions: false
-      };
-      viewOnly = document.getElementById('perm-viewonly').checked;
-    }
-
-    await db.collection('systemUsers').add({
-      name: name,
-      pin: pin,
-      role: role,
-      permissions: permissions,
-      viewOnly: viewOnly,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    
-    msg.innerHTML = `<p style="color:#c8f7d4;">✅ تم إضافة ${name} بنجاح - الرقم السري: ${pin}</p>`;
-    
-    document.getElementById('newUserName').value = '';
-    document.getElementById('newUserPin').value = '';
-    document.getElementById('newUserRole').value = 'supervisor';
-    document.getElementById('permissionsSelection').style.display = 'block';
-    
-    loadUsersList();
-  } catch (err) {
-    msg.innerHTML = '<p style="color:#ffcdd2;">خطأ: ' + err.message + '</p>';
-  }
-});
-
-function loadUsersList() {
-  db.collection('systemUsers').onSnapshot(snapshot => {
-    const container = document.getElementById('usersList');
-    
-    if (snapshot.empty) {
-      container.innerHTML = '<p style="text-align:center;color:rgba(255,255,255,0.7);">لا يوجد مستخدمين مسجلين بعد</p>';
-      return;
-    }
-    
-    container.innerHTML = snapshot.docs.map(doc => {
-      const u = doc.data();
-      const roleLabel = u.role === 'admin' ? '👤 مدير' : '👤 مشرف';
-      const roleClass = u.role === 'admin' ? 'role-admin' : 'role-supervisor';
-      
-      // عرض الصلاحيات
-      const permLabels = [];
-      if (u.permissions?.manageWorkers) permLabels.push('👷 عمال');
-      if (u.permissions?.manageInventory) permLabels.push('📦 مخزن');
-      if (u.permissions?.manageVehicles) permLabels.push('🚛 آليات');
-      if (u.permissions?.manageReports) permLabels.push('📋 تقارير');
-      if (u.permissions?.manageAttendance) permLabels.push('✅ حضور');
-      
-      return `
-        <div class="vehicle-card">
-          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
-            <div>
-              <strong>${u.name}</strong>
-              <div style="font-size:12px; color:rgba(255,255,255,0.7);">🔢 الرقم: ${u.pin}</div>
-            </div>
-            <span class="role-badge ${roleClass}">${roleLabel}</span>
-          </div>
-          
-          ${u.viewOnly ? '<span class="view-only-badge">👁️ مشاهدة فقط</span>' : ''}
-          
-          ${permLabels.length > 0 ? `
-            <div style="margin-top:8px;font-size:12px;color:rgba(255,255,255,0.8);">
-              الصلاحيات: ${permLabels.join('، ')}
-            </div>
-          ` : ''}
-          
-          <div style="display:flex; gap:8px; margin-top:10px;">
-            <button onclick="toggleViewOnly('${doc.id}')" style="width:auto;padding:6px 10px;font-size:12px;margin:0;background:${u.viewOnly ? 'rgba(255,193,7,0.5)' : 'rgba(255,255,255,0.2)'}">
-              ${u.viewOnly ? '👁️ إلغاء المشاهدة' : '👁️ مشاهدة فقط'}
-            </button>
-            <button onclick="deleteUser('${doc.id}', '${u.name}')" class="del-btn" style="width:auto;padding:6px 10px;font-size:12px;margin:0;">حذف</button>
-          </div>
-        </div>
-      `;
-    }).join('');
-  });
-}
-
-async function toggleViewOnly(userId) {
-  try {
-    const docRef = db.collection('systemUsers').doc(userId);
-    const doc = await docRef.get();
-    const data = doc.data();
-    await docRef.update({ viewOnly: !data.viewOnly });
-  } catch (err) {
-    alert('خطأ: ' + err.message);
-  }
-}
-
-async function deleteUser(userId, name) {
-  if (!confirm(`حذف المستخدم ${name}؟`)) return;
-  try {
-    await db.collection('systemUsers').doc(userId).delete();
-  } catch (err) {
-    alert('خطأ: ' + err.message);
-  }
-}
-
-// ============ باقي الدوال ============
-const workerSelect = document.getElementById('workerSelect');
-const checkInBtn = document.getElementById('checkInBtn');
-const absentBtn = document.getElementById('absentBtn');
-const sickBtn = document.getElementById('sickBtn');
-const leaveBtn = document.getElementById('leaveBtn');
-const statusDiv = document.getElementById('status');
-
-function showStatus(msg, type) {
-  statusDiv.textContent = msg;
-  statusDiv.className = type;
-  statusDiv.style.display = 'block';
-}
-
-function updateButtonState() {
-  checkInBtn.disabled = !workerSelect.value;
-  absentBtn.disabled = !workerSelect.value;
-  sickBtn.disabled = !workerSelect.value;
-  leaveBtn.disabled = !workerSelect.value;
-}
-
-function loadWorkerSelect() {
-  db.collection('workers').orderBy('name').get().then(snapshot => {
-    if (snapshot.empty) {
-      workerSelect.innerHTML = '<option value="">لا يوجد عمال مسجلين بعد - راجع الإدارة</option>';
-      return;
-    }
-
-    const byTeam = {};
-    TEAMS.forEach(t => byTeam[t.id] = []);
-
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      const teamId = TEAMS.some(t => t.id === (data.team || '')) ? (data.team || '') : '';
-      byTeam[teamId].push({ id: doc.id, name: data.name || doc.id });
-    });
-
-    workerSelect.innerHTML = '<option value="">-- اختر اسمك --</option>';
-    TEAMS.forEach(team => {
-      const members = byTeam[team.id];
-      if (!members.length) return;
-      const group = document.createElement('optgroup');
-      group.label = team.label;
-      members.forEach(w => {
-        const opt = document.createElement('option');
-        opt.value = w.id;
-        opt.textContent = w.name;
-        group.appendChild(opt);
-      });
-      workerSelect.appendChild(group);
-    });
-  }).catch(err => {
-    showStatus('تعذر تحميل قائمة العمال: ' + err.message, 'err');
-  });
-}
-
-workerSelect.addEventListener('change', updateButtonState);
-
-checkInBtn.addEventListener('click', async () => {
-  checkInBtn.disabled = true;
-  showStatus('جاري تحديد موقعك...', 'warn');
-
-  if (!navigator.geolocation) {
-    showStatus('المتصفح لا يدعم تحديد الموقع', 'err');
-    checkInBtn.disabled = false;
-    return;
-  }
-
-  navigator.geolocation.getCurrentPosition(async (position) => {
-    try {
-      const accuracy = Math.round(position.coords.accuracy || 0);
-
-      if (accuracy > 150) {
-        showStatus(`⚠️ دقة الموقع ضعيفة (${accuracy} م) - حاول في مكان مفتوح`, 'warn');
-        checkInBtn.disabled = false;
-        return;
-      }
-
-      showStatus(`جاري حفظ سجل الحضور... (دقة الموقع ${accuracy} م)`, 'warn');
-      const workerId = workerSelect.value;
-
-      const now = new Date();
-      const cutoff = new Date(now);
-      cutoff.setHours(8, 0, 0, 0);
-      const status = now > cutoff ? 'late' : 'present';
-
-      await db.collection('attendance').add({
-        workerId: workerId,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-        lat: position.coords.latitude,
-        lng: position.coords.longitude,
-        accuracy: accuracy,
-        status: status
-      });
-
-      showStatus(status === 'present' ? `✅ تم تسجيل حضورك بدقة ${accuracy} م` : `⏰ تم تسجيل حضورك (متأخر) بدقة ${accuracy} م`, 'ok');
-    } catch (err) {
-      showStatus('خطأ: ' + err.message, 'err');
-    } finally {
-      checkInBtn.disabled = false;
-    }
-  }, (err) => {
-    showStatus('تعذر تحديد الموقع: فعّل خدمة الموقع للمتصفح من الإعدادات', 'err');
-    checkInBtn.disabled = false;
-  }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
-});
-
-absentBtn.addEventListener('click', async () => {
-  absentBtn.disabled = true;
-  showStatus('جاري تسجيل الحالة...', 'warn');
-  try {
-    const workerId = workerSelect.value;
-    await db.collection('attendance').add({
-      workerId: workerId,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-      lat: null,
-      lng: null,
-      photoBase64: '',
-      status: 'absent'
-    });
-    showStatus('✗ تم تسجيل غيابك اليوم', 'ok');
-  } catch (err) {
-    showStatus('خطأ: ' + err.message, 'err');
-  } finally {
-    absentBtn.disabled = false;
-  }
-});
-
-sickBtn.addEventListener('click', async () => {
-  sickBtn.disabled = true;
-  showStatus('جاري تسجيل الحالة...', 'warn');
-  try {
-    const workerId = workerSelect.value;
-    await db.collection('attendance').add({
-      workerId: workerId,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-      lat: null,
-      lng: null,
-      photoBase64: '',
-      status: 'sick'
-    });
-    showStatus('🤒 تم تسجيل حالتك (مريض) اليوم - سلامتك', 'ok');
-  } catch (err) {
-    showStatus('خطأ: ' + err.message, 'err');
-  } finally {
-    sickBtn.disabled = false;
-  }
-});
-
-leaveBtn.addEventListener('click', async () => {
-  leaveBtn.disabled = true;
-  showStatus('جاري تسجيل الحالة...', 'warn');
-  try {
-    const workerId = workerSelect.value;
-    await db.collection('attendance').add({
-      workerId: workerId,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-      lat: null,
-      lng: null,
-      photoBase64: '',
-      status: 'leave'
-    });
-    showStatus('📝 تم تسجيل إذنك اليوم', 'ok');
-  } catch (err) {
-    showStatus('خطأ: ' + err.message, 'err');
-  } finally {
-    leaveBtn.disabled = false;
-  }
-});
-
-// ============ تهيئة لوحة التحكم ============
+// ============ تهيئة ============
 function initializeAdmin() {
   populateTeamSelect();
   populateEquipmentCheckboxes();
   populateMonthSelect();
+  populateDeductionMonthSelect();
   displayTodayDate();
   setDefaultReportDate();
+  setDefaultShiftDate();
+  loadDeductionSettings();
   watchAttendance();
   watchWorkers();
   watchInventory();
-  
   if (currentUserRole === 'owner' || currentUserPermissions.managePermissions) {
     loadUsersList();
   }
-  
-  const firstVisibleTab = document.querySelector('#adminTabs .tab:not([style*="display: none"])');
-  if (firstVisibleTab) {
-    firstVisibleTab.click();
-  }
 }
 
-const dashboard = document.getElementById('dashboard');
-
-document.querySelectorAll('.tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    
-    const tabs = ['overview', 'daily', 'workers', 'monthly', 'inventory', 'reports', 'vehicles', 'permissions'];
-    tabs.forEach(t => {
-      const el = document.getElementById('tab-' + t);
-      if (el) el.style.display = tab.dataset.tab === t ? 'block' : 'none';
-    });
-    
-    if (tab.dataset.tab === 'monthly') loadMonthlyReport();
-    if (tab.dataset.tab === 'daily') renderDailyMarkList();
-    if (tab.dataset.tab === 'reports') loadSavedReports();
-    if (tab.dataset.tab === 'vehicles') loadVehicles();
-    if (tab.dataset.tab === 'permissions') loadUsersList();
-  });
-});
-
 function displayTodayDate() {
-  const todayStr = new Date().toLocaleDateString('ar-LY', {
-    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-  });
-  const el1 = document.getElementById('todayDateDisplay');
-  const el2 = document.getElementById('dailyDateDisplay');
-  if (el1) el1.textContent = '📅 ' + todayStr;
-  if (el2) el2.textContent = '📅 ' + todayStr;
+  const todayStr = new Date().toLocaleDateString('ar-LY', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  document.getElementById('todayDateDisplay').textContent = '📅 ' + todayStr;
+  document.getElementById('dailyDateDisplay').textContent = '📅 ' + todayStr;
+  document.getElementById('currentShiftDisplay').textContent = 'الوردية الحالية: ' + getShiftLabel(getCurrentShift());
 }
 
 function setDefaultReportDate() {
-  const today = new Date().toISOString().slice(0, 10);
-  document.getElementById('reportDate').value = today;
+  document.getElementById('reportDate').value = new Date().toISOString().slice(0, 10);
 }
 
-function populateReportWorkerSelect() {
-  const select = document.getElementById('reportWorkerSelect');
-  select.innerHTML = '<option value="">-- اختر العامل --</option>' + 
-    allWorkers.map(w => `<option value="${w.id}">${w.name} - ${teamLabel(w.team)}</option>`).join('');
+function setDefaultShiftDate() {
+  document.getElementById('shiftDate').value = new Date().toISOString().slice(0, 10);
+}
+
+function populateTeamSelect() {
+  document.getElementById('newWorkerTeam').innerHTML = TEAMS.map(t => `<option value="${t.id}">${t.label}</option>`).join('');
 }
 
 function populateEquipmentCheckboxes() {
-  const container = document.getElementById('newWorkerEquipment');
-  container.innerHTML = EQUIPMENT.map(e => `
-    <label style="display:flex; align-items:center; gap:4px; width:auto; background:rgba(255,255,255,0.15); padding:6px 10px; border-radius:8px; font-size:13px; margin:0;">
-      <input type="checkbox" value="${e.id}" style="width:auto; margin:0;"> ${e.icon} ${e.label}
+  document.getElementById('newWorkerEquipment').innerHTML = EQUIPMENT.map(e => `
+    <label style="display:flex;align-items:center;gap:4px;background:rgba(255,255,255,0.15);padding:6px 10px;border-radius:8px;font-size:13px;">
+      <input type="checkbox" value="${e.id}" style="width:auto;margin:0;"> ${e.icon} ${e.label}
     </label>
   `).join('');
 }
@@ -1154,97 +657,343 @@ function populateEquipmentCheckboxes() {
 function populateMonthSelect() {
   const select = document.getElementById('monthSelect');
   const now = new Date();
-  const options = [];
+  let options = '';
   for (let i = 0; i < 6; i++) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
     const value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-    const label = d.toLocaleDateString('ar-LY', { year: 'numeric', month: 'long' });
-    options.push(`<option value="${value}">${label}</option>`);
+    options += `<option value="${value}">${d.toLocaleDateString('ar-LY', { year: 'numeric', month: 'long' })}</option>`;
   }
-  select.innerHTML = options.join('');
-  select.addEventListener('change', loadMonthlyReport);
+  select.innerHTML = options;
 }
 
-function populateTeamSelect() {
-  const select = document.getElementById('newWorkerTeam');
-  select.innerHTML = TEAMS.map(t => `<option value="${t.id}">${t.label}</option>`).join('');
+function populateDeductionMonthSelect() {
+  const select = document.getElementById('deductionMonthSelect');
+  const now = new Date();
+  let options = '';
+  for (let i = 0; i < 6; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    options += `<option value="${value}">${d.toLocaleDateString('ar-LY', { year: 'numeric', month: 'long' })}</option>`;
+  }
+  select.innerHTML = options;
+  select.addEventListener('change', loadDeductions);
 }
 
-// ============ المتغيرات العامة ============
-let monthlyData = null;
-let allInventory = [];
-let allWorkersRaw = [];
-let allWorkers = [];
-let latestRecords = [];
-let latestInfoMap = {};
-let newWorkerPhotoBase64 = '';
-let reportPhotosArray = [];
-let vehiclePhotoBase64 = '';
-
-// ============ دوال العمال ============
-document.getElementById('newWorkerPhoto').addEventListener('change', async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  newWorkerPhotoBase64 = await compressImageToBase64(file);
-  const preview = document.getElementById('newWorkerPreview');
-  preview.src = newWorkerPhotoBase64;
-  preview.style.display = 'block';
-});
-
-document.getElementById('addWorkerBtn').addEventListener('click', async () => {
-  if (currentUser.viewOnly) {
-    alert('أنت في وضع المشاهدة فقط');
-    return;
-  }
-
-  const name = document.getElementById('newWorkerName').value.trim();
-  const team = document.getElementById('newWorkerTeam').value;
-  const equipment = Array.from(document.querySelectorAll('#newWorkerEquipment input:checked')).map(cb => cb.value);
-  const msg = document.getElementById('addWorkerMsg');
-
-  if (!newWorkerPhotoBase64) {
-    msg.innerHTML = '<p style="color:#ffcdd2;">التقط صورة العامل أولاً</p>';
-    return;
-  }
-  if (!name) {
-    msg.innerHTML = '<p style="color:#ffcdd2;">اكتب اسم العامل</p>';
-    return;
-  }
-
+// ============ إعدادات الخصم ============
+async function loadDeductionSettings() {
   try {
-    await db.collection('workers').add({
-      name: name,
-      team: team,
-      role: 'worker',
-      referencePhotoUrl: newWorkerPhotoBase64,
-      equipment: equipment
-    });
-    document.getElementById('newWorkerName').value = '';
-    document.getElementById('newWorkerPhoto').value = '';
-    document.getElementById('newWorkerPreview').style.display = 'none';
-    document.querySelectorAll('#newWorkerEquipment input:checked').forEach(cb => cb.checked = false);
-    newWorkerPhotoBase64 = '';
-    msg.innerHTML = `<p style="color:#c8f7d4;">✅ تمت إضافة ${name}</p>`;
+    const doc = await db.collection('settings').doc('deductions').get();
+    if (doc.exists) {
+      deductionAmountValue = doc.data().amount || 50;
+      document.getElementById('deductionAmount').value = deductionAmountValue;
+    }
+  } catch (err) {}
+}
+
+document.getElementById('saveDeductionSettingsBtn').addEventListener('click', async () => {
+  const amount = Number(document.getElementById('deductionAmount').value) || 0;
+  try {
+    await db.collection('settings').doc('deductions').set({ amount });
+    deductionAmountValue = amount;
+    alert('✅ تم حفظ إعدادات الخصم');
   } catch (err) {
-    msg.innerHTML = '<p style="color:#ffcdd2;">خطأ: ' + err.message + '</p>';
+    alert('خطأ: ' + err.message);
   }
 });
+
+// ============ تحميل الخصومات ============
+async function loadDeductions() {
+  const container = document.getElementById('deductionsList');
+  container.innerHTML = 'جاري التحميل...';
+  
+  const [year, month] = document.getElementById('deductionMonthSelect').value.split('-').map(Number);
+  const from = new Date(year, month - 1, 1);
+  const to = new Date(year, month, 1);
+  
+  const snapshot = await db.collection('attendance')
+    .where('timestamp', '>=', from)
+    .where('timestamp', '<', to)
+    .get();
+  
+  // حساب الغياب لكل عامل (فقط absent بدون إذن أو مرض)
+  const deductions = {};
+  snapshot.forEach(doc => {
+    const r = doc.data();
+    if (r.status === 'absent') {
+      if (!deductions[r.workerId]) deductions[r.workerId] = 0;
+      deductions[r.workerId]++;
+    }
+  });
+  
+  if (Object.keys(deductions).length === 0) {
+    container.innerHTML = '<p style="text-align:center;color:rgba(255,255,255,0.7);">لا يوجد خصومات هذا الشهر ✅</p>';
+    return;
+  }
+  
+  let html = '';
+  let totalDeductions = 0;
+  
+  for (const workerId of Object.keys(deductions)) {
+    const worker = allWorkers.find(w => w.id === workerId);
+    const days = deductions[workerId];
+    const amount = days * deductionAmountValue;
+    totalDeductions += amount;
+    
+    html += `
+      <div class="worker-row" style="flex-wrap:wrap;">
+        <img src="${worker?.photo || ''}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" onerror="this.style.visibility='hidden'">
+        <span class="name">${worker?.name || workerId}</span>
+        <span class="deduction-badge">${days} يوم غياب</span>
+        <span class="deduction-badge" style="background:rgba(255,152,0,0.6);">-${amount} دينار</span>
+      </div>
+    `;
+  }
+  
+  html += `
+    <div style="margin-top:15px;padding:15px;background:rgba(244,67,54,0.3);border-radius:10px;text-align:center;">
+      <strong>إجمالي الخصومات: ${totalDeductions} دينار</strong>
+    </div>
+  `;
+  
+  container.innerHTML = html;
+}
+
+document.getElementById('exportDeductionsBtn').addEventListener('click', async () => {
+  const [year, month] = document.getElementById('deductionMonthSelect').value.split('-').map(Number);
+  const from = new Date(year, month - 1, 1);
+  const to = new Date(year, month, 1);
+  
+  const snapshot = await db.collection('attendance')
+    .where('timestamp', '>=', from)
+    .where('timestamp', '<', to)
+    .get();
+  
+  const deductions = {};
+  snapshot.forEach(doc => {
+    const r = doc.data();
+    if (r.status === 'absent') {
+      if (!deductions[r.workerId]) deductions[r.workerId] = 0;
+      deductions[r.workerId]++;
+    }
+  });
+  
+  const headers = ['اسم العامل', 'الفريق', 'أيام الغياب', 'قيمة الخصم (دينار)'];
+  const rows = Object.keys(deductions).map(workerId => {
+    const worker = allWorkers.find(w => w.id === workerId);
+    const days = deductions[workerId];
+    return [worker?.name || workerId, teamLabel(worker?.team || ''), days, days * deductionAmountValue];
+  });
+  
+  if (rows.length === 0) {
+    alert('لا يوجد خصومات');
+    return;
+  }
+  
+  const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'الخصومات');
+  XLSX.writeFile(workbook, `خصومات-${year}-${String(month).padStart(2, '0')}.xlsx`);
+});
+
+// ============ تسجيل الحضور للعامل ============
+function loadWorkerSelect() {
+  db.collection('workers').orderBy('name').get().then(snapshot => {
+    if (snapshot.empty) {
+      document.getElementById('workerSelect').innerHTML = '<option value="">لا يوجد عمال</option>';
+      return;
+    }
+    const byTeam = {};
+    TEAMS.forEach(t => byTeam[t.id] = []);
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const teamId = TEAMS.some(t => t.id === (data.team || '')) ? (data.team || '') : '';
+      byTeam[teamId].push({ id: doc.id, name: data.name || doc.id });
+    });
+    let html = '<option value="">-- اختر اسمك --</option>';
+    TEAMS.forEach(team => {
+      const members = byTeam[team.id];
+      if (!members.length) return;
+      html += `<optgroup label="${team.label}">`;
+      members.forEach(w => { html += `<option value="${w.id}">${w.name}</option>`; });
+      html += '</optgroup>';
+    });
+    document.getElementById('workerSelect').innerHTML = html;
+  });
+}
+
+document.getElementById('workerSelect').addEventListener('change', () => {
+  const hasValue = document.getElementById('workerSelect').value !== '';
+  document.getElementById('checkInBtn').disabled = !hasValue;
+  document.getElementById('absentBtn').disabled = !hasValue;
+  document.getElementById('leaveBtn').disabled = !hasValue;
+  document.getElementById('sickBtn').disabled = !hasValue;
+});
+
+document.getElementById('checkInBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('checkInBtn');
+  btn.disabled = true;
+  const statusDiv = document.getElementById('status');
+  statusDiv.textContent = 'جاري تحديد موقعك...';
+  statusDiv.className = 'warn';
+  statusDiv.style.display = 'block';
+  
+  if (!navigator.geolocation) {
+    statusDiv.textContent = 'المتصفح لا يدعم تحديد الموقع';
+    statusDiv.className = 'err';
+    btn.disabled = false;
+    return;
+  }
+  
+  navigator.geolocation.getCurrentPosition(async (position) => {
+    try {
+      const accuracy = Math.round(position.coords.accuracy || 0);
+      const workerId = document.getElementById('workerSelect').value;
+      const now = new Date();
+      const cutoff = new Date(now);
+      cutoff.setHours(8, 0, 0, 0);
+      const status = now > cutoff ? 'late' : 'present';
+      
+      await db.collection('attendance').add({
+        workerId,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+        accuracy,
+        status,
+        shift: selectedShift,
+        hasDeduction: false // حاضر = لا خصم
+      });
+      
+      statusDiv.textContent = `✅ تم تسجيل حضورك (${getShiftLabel(selectedShift)})`;
+      statusDiv.className = 'ok';
+    } catch (err) {
+      statusDiv.textContent = 'خطأ: ' + err.message;
+      statusDiv.className = 'err';
+    } finally {
+      btn.disabled = false;
+    }
+  }, (err) => {
+    statusDiv.textContent = 'تعذر تحديد الموقع';
+    statusDiv.className = 'err';
+    btn.disabled = false;
+  });
+});
+
+document.getElementById('absentBtn').addEventListener('click', async () => {
+  const workerId = document.getElementById('workerSelect').value;
+  const statusDiv = document.getElementById('status');
+  await db.collection('attendance').add({
+    workerId,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    status: 'absent',
+    shift: selectedShift,
+    hasDeduction: true // غائب = عليه خصم
+  });
+  statusDiv.textContent = '✗ تم تسجيل غيابك (سيتم الخصم)';
+  statusDiv.className = 'ok';
+  statusDiv.style.display = 'block';
+});
+
+document.getElementById('leaveBtn').addEventListener('click', async () => {
+  const workerId = document.getElementById('workerSelect').value;
+  const statusDiv = document.getElementById('status');
+  await db.collection('attendance').add({
+    workerId,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    status: 'leave',
+    shift: selectedShift,
+    hasDeduction: false // إذن = لا خصم
+  });
+  statusDiv.textContent = '📝 تم تسجيل إذنك (لا يوجد خصم)';
+  statusDiv.className = 'ok';
+  statusDiv.style.display = 'block';
+});
+
+document.getElementById('sickBtn').addEventListener('click', async () => {
+  const workerId = document.getElementById('workerSelect').value;
+  const statusDiv = document.getElementById('status');
+  await db.collection('attendance').add({
+    workerId,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    status: 'sick',
+    shift: selectedShift,
+    hasDeduction: false // مريض = لا خصم
+  });
+  statusDiv.textContent = '🤒 تم تسجيل مرضك (لا يوجد خصم) - سلامتك';
+  statusDiv.className = 'ok';
+  statusDiv.style.display = 'block';
+});
+
+// ============ دوال الحضور للمشرف ============
+function watchAttendance() {
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+  
+  db.collection('attendance')
+    .where('timestamp', '>=', startOfDay)
+    .orderBy('timestamp', 'desc')
+    .onSnapshot(async (snapshot) => {
+      const records = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      latestRecords = records;
+      
+      const present = records.filter(r => r.status === 'present').length;
+      const late = records.filter(r => r.status === 'late').length;
+      const leave = records.filter(r => r.status === 'leave').length;
+      const sick = records.filter(r => r.status === 'sick').length;
+      const absent = records.filter(r => r.status === 'absent').length;
+      
+      document.getElementById('presentCount').textContent = present;
+      document.getElementById('lateCount').textContent = late;
+      document.getElementById('leaveCount').textContent = leave;
+      document.getElementById('sickCount').textContent = sick;
+      document.getElementById('absentCount').textContent = absent;
+      document.getElementById('totalCount').textContent = records.length;
+      
+      // عرض السجل
+      const listDiv = document.getElementById('list');
+      if (records.length === 0) {
+        listDiv.innerHTML = '<p style="text-align:center;color:#888;">لا يوجد حضور اليوم</p>';
+      } else {
+        const statusMeta = {
+          present: { color: '#2e7d32', label: 'حاضر' },
+          late: { color: '#ef6c00', label: 'متأخر' },
+          leave: { color: '#673ab7', label: 'إذن' },
+          sick: { color: '#ad1457', label: 'مريض' },
+          absent: { color: '#c62828', label: 'غائب (خصم)' }
+        };
+        
+        listDiv.innerHTML = records.map(r => {
+          const time = r.timestamp ? new Date(r.timestamp.seconds * 1000).toLocaleTimeString('ar-LY') : '--';
+          const meta = statusMeta[r.status] || { color: '#607d8b', label: r.status };
+          const shiftLabel = r.shift ? getShiftLabel(r.shift) : '';
+          return `
+            <div class="row">
+              <div class="info">
+                <div>${r.workerId}</div>
+                <div style="color:rgba(255,255,255,0.7);font-size:12px;">${time} ${shiftLabel}</div>
+              </div>
+              <span class="badge" style="background:${meta.color}">${meta.label}</span>
+            </div>
+          `;
+        }).join('');
+      }
+    });
+}
+
+// ============ باقي الدوال ============
+function teamLabel(id) {
+  const t = TEAMS.find(t => t.id === (id || ''));
+  return t ? t.label : 'أخرى';
+}
 
 function watchWorkers() {
   db.collection('workers').orderBy('name').onSnapshot(snapshot => {
     const workersList = [];
-
     snapshot.forEach(doc => {
       const data = doc.data();
-      if (data.role === 'admin' || data.role === 'supervisor') return;
-      const teamId = TEAMS.some(t => t.id === (data.team || '')) ? (data.team || '') : '';
-      const worker = { id: doc.id, name: data.name || doc.id, team: teamId, photo: data.referencePhotoUrl || '', equipment: data.equipment || [] };
-      workersList.push(worker);
+      workersList.push({ id: doc.id, ...data });
     });
-
     allWorkers = workersList;
-    allWorkersRaw = workersList;
-    renderAbsentList();
     renderWorkersList();
     renderDailyMarkList();
     populateIssueWorkerSelect();
@@ -1253,288 +1002,139 @@ function watchWorkers() {
 }
 
 function renderWorkersList() {
-  const searchTerm = (document.getElementById('workersSearch').value || '').trim();
-  const filtered = searchTerm
-    ? allWorkersRaw.filter(w => w.name.includes(searchTerm))
-    : allWorkersRaw;
-
+  const container = document.getElementById('workersByTeam');
+  const searchTerm = (document.getElementById('workersSearch')?.value || '').trim();
+  const filtered = searchTerm ? allWorkers.filter(w => w.name.includes(searchTerm)) : allWorkers;
+  
   const byTeam = {};
   TEAMS.forEach(t => byTeam[t.id] = []);
-  filtered.forEach(w => byTeam[w.team].push(w));
-
-  const container = document.getElementById('workersByTeam');
+  filtered.forEach(w => {
+    const teamId = TEAMS.some(t => t.id === w.team) ? w.team : '';
+    byTeam[teamId].push(w);
+  });
+  
   let html = '';
   TEAMS.forEach(team => {
     const members = byTeam[team.id];
     if (!members.length) return;
-    html += `<div class="team-group">
-      <div class="team-title">${team.label} (${members.length})</div>`;
+    html += `<div class="team-group"><div class="team-title">${team.label} (${members.length})</div>`;
     members.forEach(w => {
-      const equipTags = (w.equipment || []).map(id => {
-        const e = EQUIPMENT.find(e => e.id === id);
-        return e ? `<span style="background:rgba(255,255,255,0.18);border-radius:6px;padding:2px 6px;font-size:11px;">${e.icon} ${e.label}</span>` : '';
-      }).join(' ');
-      html += `<div class="worker-row" style="flex-wrap:wrap;">
-        <img src="${w.photo}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;background:rgba(255,255,255,0.2);" onerror="this.style.visibility='hidden'">
-        <span class="name">${w.name}</span>
-        <button onclick="openEquipmentEditor('${w.id}')" style="width:auto;padding:5px 8px;margin:0;font-size:13px;background:rgba(255,152,0,0.4);border:1px solid rgba(255,255,255,0.3);">🧰 المعدات</button>
-        <button class="del-btn" onclick="deleteWorker('${w.id}','${w.name.replace(/'/g,"\\'")}')">حذف</button>
-        <div style="width:100%; display:flex; flex-wrap:wrap; gap:4px; margin-top:4px;">${equipTags}</div>
-        <div id="equipEditor-${w.id}" style="display:none; width:100%; background:rgba(0,0,0,0.2); border-radius:8px; padding:8px; margin-top:6px;"></div>
-      </div>`;
+      const shiftLabel = w.shift === 'both' ? '🔄 كلاهما' : getShiftLabel(w.shift || 'morning');
+      html += `
+        <div class="worker-row" style="flex-wrap:wrap;">
+          <img src="${w.referencePhotoUrl || ''}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" onerror="this.style.visibility='hidden'">
+          <span class="name">${w.name}</span>
+          <span style="font-size:11px;">${shiftLabel}</span>
+          <button class="del-btn" onclick="deleteWorker('${w.id}','${w.name}')">حذف</button>
+        </div>
+      `;
     });
-    html += `</div>`;
+    html += '</div>';
   });
-  container.innerHTML = html || '<p style="text-align:center;color:#888;">لا يوجد عامل مطابق</p>';
+  container.innerHTML = html || '<p style="text-align:center;color:#888;">لا يوجد عمال</p>';
 }
 
 function renderDailyMarkList() {
-  const searchInput = document.getElementById('dailySearch');
-  const searchTerm = (searchInput?.value || '').trim();
-  const filtered = searchTerm
-    ? allWorkersRaw.filter(w => w.name.includes(searchTerm))
-    : allWorkersRaw;
-
-  const byTeam = {};
-  TEAMS.forEach(t => byTeam[t.id] = []);
-  filtered.forEach(w => byTeam[w.team].push(w));
-
   const container = document.getElementById('dailyMarkList');
   if (!container) return;
-
-  let html = '';
-  TEAMS.forEach(team => {
-    const members = byTeam[team.id];
-    if (!members.length) return;
-    html += `<div class="team-group">
-      <div class="team-title">${team.label} (${members.length})</div>`;
-    members.forEach(w => {
-      html += `<div class="worker-row">
-        <img src="${w.photo}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;background:rgba(255,255,255,0.2);" onerror="this.style.visibility='hidden'">
-        <span class="name">${w.name}</span>
-        <button onclick="manualMark('${w.id}','present')" style="width:auto;padding:6px 10px;margin:0;font-size:16px;background:rgba(46,125,50,0.4);border:1px solid rgba(255,255,255,0.3);">✅</button>
-        <button onclick="manualMark('${w.id}','absent')" style="width:auto;padding:6px 10px;margin:0;font-size:16px;background:rgba(198,40,40,0.4);border:1px solid rgba(255,255,255,0.3);">✗</button>
-        <button onclick="manualMark('${w.id}','leave')" style="width:auto;padding:6px 10px;margin:0;font-size:16px;background:rgba(103,58,183,0.4);border:1px solid rgba(255,255,255,0.3);">📝</button>
-        <button onclick="manualMark('${w.id}','sick')" style="width:auto;padding:6px 10px;margin:0;font-size:16px;background:rgba(173,20,87,0.4);border:1px solid rgba(255,255,255,0.3);">🤒</button>
-      </div>`;
-    });
-    html += `</div>`;
-  });
-  container.innerHTML = html || '<p style="text-align:center;color:#888;">لا يوجد عامل مطابق</p>';
-}
-
-document.getElementById('dailySearch')?.addEventListener('input', renderDailyMarkList);
-
-function openEquipmentEditor(workerId) {
-  if (currentUser.viewOnly) return;
-  const panel = document.getElementById('equipEditor-' + workerId);
-  if (!panel) return;
-  if (panel.style.display === 'block') {
-    panel.style.display = 'none';
-    return;
-  }
-  const worker = allWorkersRaw.find(w => w.id === workerId);
-  const current = new Set(worker?.equipment || []);
-  panel.innerHTML = EQUIPMENT.map(e => `
-    <label style="display:inline-flex; align-items:center; gap:4px; width:auto; background:rgba(255,255,255,0.15); padding:5px 8px; border-radius:8px; font-size:12px; margin:2px;">
-      <input type="checkbox" class="equip-cb-${workerId}" value="${e.id}" ${current.has(e.id) ? 'checked' : ''} style="width:auto; margin:0;"> ${e.icon} ${e.label}
-    </label>
-  `).join('') + `<button onclick="saveEquipment('${workerId}')" style="margin-top:8px;">💾 حفظ المعدات</button>`;
-  panel.style.display = 'block';
-}
-
-async function saveEquipment(workerId) {
-  if (currentUser.viewOnly) return;
-  const checked = Array.from(document.querySelectorAll(`.equip-cb-${workerId}:checked`)).map(cb => cb.value);
-  try {
-    await db.collection('workers').doc(workerId).update({ equipment: checked });
-    document.getElementById('equipEditor-' + workerId).style.display = 'none';
-  } catch (err) {
-    alert('خطأ: ' + err.message);
-  }
-}
-
-document.getElementById('workersSearch').addEventListener('input', renderWorkersList);
-
-function renderAbsentList() {
-  const absentDiv = document.getElementById('absentList');
-  if (!absentDiv) return;
-
-  const checkedInIds = new Set(latestRecords.map(r => r.workerId));
-  const absentees = allWorkers.filter(w => !checkedInIds.has(w.id));
-
-  if (allWorkers.length === 0) {
-    absentDiv.innerHTML = '<p style="text-align:center;color:rgba(255,255,255,0.7);">لا يوجد عمال مسجلين بعد</p>';
-    return;
-  }
-  if (absentees.length === 0) {
-    absentDiv.innerHTML = '<p style="text-align:center;color:#c8f7d4;">✅ الجميع سجّل حضوره أو حالته اليوم</p>';
-    return;
-  }
-
+  const searchTerm = (document.getElementById('dailySearch')?.value || '').trim();
+  const filtered = searchTerm ? allWorkers.filter(w => w.name.includes(searchTerm)) : allWorkers;
+  
   const byTeam = {};
   TEAMS.forEach(t => byTeam[t.id] = []);
-  absentees.forEach(w => byTeam[w.team].push(w));
-
+  filtered.forEach(w => {
+    const teamId = TEAMS.some(t => t.id === w.team) ? w.team : '';
+    byTeam[teamId].push(w);
+  });
+  
   let html = '';
   TEAMS.forEach(team => {
     const members = byTeam[team.id];
     if (!members.length) return;
-    html += `<div class="team-group">
-      <div class="team-title">${team.label} (${members.length})</div>`;
+    html += `<div class="team-group"><div class="team-title">${team.label} (${members.length})</div>`;
     members.forEach(w => {
-      html += `<div class="worker-row">
-        <img src="${w.photo}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;background:rgba(255,255,255,0.2);" onerror="this.style.visibility='hidden'">
-        <span class="name">${w.name}</span>
-      </div>`;
+      html += `
+        <div class="worker-row">
+          <img src="${w.referencePhotoUrl || ''}" style="width:32px;height:32px;border-radius:50%;" onerror="this.style.visibility='hidden'">
+          <span class="name">${w.name}</span>
+          <button onclick="manualMark('${w.id}','present')" style="width:auto;padding:6px;margin:0;font-size:14px;background:rgba(46,125,50,0.4);">✅</button>
+          <button onclick="manualMark('${w.id}','absent')" style="width:auto;padding:6px;margin:0;font-size:14px;background:rgba(198,40,40,0.4);">✗</button>
+          <button onclick="manualMark('${w.id}','leave')" style="width:auto;padding:6px;margin:0;font-size:14px;background:rgba(103,58,183,0.4);">📝</button>
+          <button onclick="manualMark('${w.id}','sick')" style="width:auto;padding:6px;margin:0;font-size:14px;background:rgba(173,20,87,0.4);">🤒</button>
+        </div>
+      `;
     });
-    html += `</div>`;
+    html += '</div>';
   });
-  absentDiv.innerHTML = html;
-}
-
-function deleteWorker(id, name) {
-  if (currentUser.viewOnly) return;
-  if (!confirm('حذف ' + name + ' نهائياً؟')) return;
-  db.collection('workers').doc(id).delete();
+  container.innerHTML = html || '<p style="text-align:center;color:#888;">لا يوجد عمال</p>';
 }
 
 async function manualMark(workerId, status) {
-  if (currentUser.viewOnly) return;
-  try {
-    await db.collection('attendance').add({
-      workerId: workerId,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-      lat: null,
-      lng: null,
-      photoBase64: '',
-      accuracy: null,
-      status: status
-    });
-  } catch (err) {
-    alert('خطأ: ' + err.message);
-  }
-}
-
-// ============ دوال الحضور ============
-function watchAttendance() {
-  const startOfDay = new Date();
-  startOfDay.setHours(0, 0, 0, 0);
-
-  db.collection('attendance')
-    .where('timestamp', '>=', startOfDay)
-    .orderBy('timestamp', 'desc')
-    .onSnapshot(async (snapshot) => {
-      const records = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-      latestRecords = records;
-      renderAbsentList();
-
-      const present = records.filter(r => r.status === 'present').length;
-      const late = records.filter(r => r.status === 'late').length;
-      const leave = records.filter(r => r.status === 'leave').length;
-      const sick = records.filter(r => r.status === 'sick').length;
-
-      document.getElementById('presentCount').textContent = present;
-      document.getElementById('lateCount').textContent = late;
-      document.getElementById('leaveCount').textContent = leave;
-      document.getElementById('sickCount').textContent = sick;
-      document.getElementById('totalCount').textContent = records.length;
-
-      const workerIds = [...new Set(records.map(r => r.workerId))];
-      const infoMap = {};
-      await Promise.all(workerIds.map(async (id) => {
-        const wDoc = await db.collection('workers').doc(id).get();
-        infoMap[id] = {
-          name: wDoc.data()?.name || id,
-          team: wDoc.data()?.team || ''
-        };
-      }));
-      latestInfoMap = infoMap;
-
-      const listDiv = document.getElementById('list');
-      if (records.length === 0) {
-        listDiv.innerHTML = '<p style="text-align:center; color:#888;">لا يوجد حضور مسجل اليوم بعد</p>';
-        return;
-      }
-
-      const statusMeta = {
-        present: { color: '#2e7d32', label: 'حاضر' },
-        late:    { color: '#ef6c00', label: 'متأخر' },
-        leave:   { color: '#673ab7', label: 'إذن' },
-        sick:    { color: '#ad1457', label: 'مريض' },
-        absent:  { color: '#c62828', label: 'غائب' },
-        rejected:{ color: '#c62828', label: 'مرفوض' }
-      };
-
-      listDiv.innerHTML = records.map(r => {
-        const time = r.timestamp ? new Date(r.timestamp.seconds * 1000).toLocaleTimeString('ar-LY') : '--';
-        const meta = statusMeta[r.status] || { color: '#607d8b', label: r.status };
-        const info = infoMap[r.workerId] || { name: r.workerId, team: '' };
-        return `
-          <div class="row">
-            <img src="${r.photoBase64 || ''}" onerror="this.style.display='none'">
-            <div class="info">
-              <div>${info.name}</div>
-              <div style="color:rgba(255,255,255,0.7); font-size:12px;">${teamLabel(info.team)} • ${time}${r.accuracy ? ' • دقة ' + r.accuracy + ' م' : ''}</div>
-            </div>
-            <span class="badge" style="background:${meta.color}">${meta.label}</span>
-          </div>
-        `;
-      }).join('');
-    });
-}
-
-function exportToExcel() {
-  if (!latestRecords.length) {
-    alert('لا يوجد بيانات لتصديرها بعد');
-    return;
-  }
-  const statusLabels = { present: 'حاضر', late: 'متأخر', leave: 'إذن', sick: 'مريض', absent: 'غائب', rejected: 'مرفوض' };
-  const headers = ['الاسم', 'الفريق', 'الحالة', 'الوقت', 'دقة الموقع (م)'];
-  const rows = latestRecords.map(r => {
-    const info = latestInfoMap[r.workerId] || { name: r.workerId, team: '' };
-    const time = r.timestamp ? new Date(r.timestamp.seconds * 1000).toLocaleString('ar-LY') : '';
-    return [
-      info.name,
-      teamLabel(info.team),
-      statusLabels[r.status] || r.status,
-      time,
-      r.accuracy || ''
-    ];
+  await db.collection('attendance').add({
+    workerId,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    status,
+    shift: adminSelectedShift,
+    hasDeduction: status === 'absent'
   });
-
-  const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-  worksheet['!cols'] = [{ wch: 20 }, { wch: 22 }, { wch: 12 }, { wch: 20 }, { wch: 14 }];
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'الحضور');
-
-  const dateStr = new Date().toISOString().slice(0, 10);
-  XLSX.writeFile(workbook, `حضور-سرت-${dateStr}.xlsx`);
 }
 
-document.getElementById('exportBtn').addEventListener('click', exportToExcel);
+function deleteWorker(id, name) {
+  if (!confirm(`حذف ${name}؟`)) return;
+  db.collection('workers').doc(id).delete();
+}
 
-document.getElementById('clearTodayBtn').addEventListener('click', async () => {
-  if (currentUser.viewOnly) return;
-  if (!latestRecords.length) {
-    alert('لا يوجد سجل اليوم لمسحه');
+function populateIssueWorkerSelect() {
+  const select = document.getElementById('issueWorkerSelect');
+  select.innerHTML = allWorkers.map(w => `<option value="${w.id}">${w.name}</option>`).join('');
+}
+
+function populateReportWorkerSelect() {
+  const select = document.getElementById('reportWorkerSelect');
+  select.innerHTML = '<option value="">-- اختر --</option>' + allWorkers.map(w => `<option value="${w.id}">${w.name}</option>`).join('');
+}
+
+// ============ إضافة عامل ============
+document.getElementById('newWorkerPhoto').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  newWorkerPhotoBase64 = await compressImageToBase64(file);
+  document.getElementById('newWorkerPreview').src = newWorkerPhotoBase64;
+  document.getElementById('newWorkerPreview').style.display = 'block';
+});
+
+document.getElementById('addWorkerBtn').addEventListener('click', async () => {
+  const name = document.getElementById('newWorkerName').value.trim();
+  const team = document.getElementById('newWorkerTeam').value;
+  const shift = document.getElementById('newWorkerShift').value;
+  const salary = Number(document.getElementById('newWorkerSalary').value) || 50;
+  
+  if (!name) {
+    document.getElementById('addWorkerMsg').innerHTML = '<p style="color:#ffcdd2;">اكتب اسم العامل</p>';
     return;
   }
-  if (!confirm(`هل أنت متأكد من مسح ${latestRecords.length} سجل حضور لليوم؟`)) return;
-
+  
   try {
-    const batch = db.batch();
-    latestRecords.forEach(r => {
-      batch.delete(db.collection('attendance').doc(r.id));
+    await db.collection('workers').add({
+      name,
+      team,
+      shift,
+      dailySalary: salary,
+      referencePhotoUrl: newWorkerPhotoBase64,
+      equipment: []
     });
-    await batch.commit();
-    alert('تم مسح سجل اليوم بنجاح');
+    document.getElementById('newWorkerName').value = '';
+    document.getElementById('newWorkerSalary').value = '';
+    document.getElementById('newWorkerPhoto').value = '';
+    document.getElementById('newWorkerPreview').style.display = 'none';
+    newWorkerPhotoBase64 = '';
+    document.getElementById('addWorkerMsg').innerHTML = `<p style="color:#c8f7d4;">✅ تمت إضافة ${name}</p>`;
   } catch (err) {
-    alert('خطأ: ' + err.message);
+    document.getElementById('addWorkerMsg').innerHTML = '<p style="color:#ffcdd2;">خطأ: ' + err.message + '</p>';
   }
 });
 
-// ============ دوال المخزن ============
+// ============ المخزن ============
 function watchInventory() {
   db.collection('inventory').orderBy('name').onSnapshot(snapshot => {
     allInventory = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -1546,45 +1146,32 @@ function watchInventory() {
 function renderInventoryList() {
   const container = document.getElementById('inventoryList');
   if (!allInventory.length) {
-    container.innerHTML = '<p style="text-align:center;color:rgba(255,255,255,0.7);">المخزن فارغ حالياً</p>';
+    container.innerHTML = '<p style="text-align:center;">المخزن فارغ</p>';
     return;
   }
   container.innerHTML = allInventory.map(item => `
     <div class="worker-row">
       <span class="name">${item.name}</span>
-      <span style="background:rgba(255,255,255,0.2); padding:4px 10px; border-radius:20px; font-size:13px;">${item.quantity} ${item.unit || ''}</span>
-      <button onclick="adjustQuantity('${item.id}', 1)" style="width:auto;padding:5px 10px;margin:0;font-size:14px;background:rgba(46,125,50,0.4);border:1px solid rgba(255,255,255,0.3);">+1</button>
-      <button onclick="adjustQuantity('${item.id}', -1)" style="width:auto;padding:5px 10px;margin:0;font-size:14px;background:rgba(198,40,40,0.4);border:1px solid rgba(255,255,255,0.3);">-1</button>
-      <button class="del-btn" onclick="deleteItem('${item.id}','${item.name.replace(/'/g,"\\'")}')">حذف</button>
+      <span>${item.quantity} ${item.unit || ''}</span>
+      <button onclick="adjustQuantity('${item.id}',1)" style="width:auto;padding:5px;margin:0;">+</button>
+      <button onclick="adjustQuantity('${item.id}',-1)" style="width:auto;padding:5px;margin:0;">-</button>
+      <button class="del-btn" onclick="deleteItem('${item.id}','${item.name}')">حذف</button>
     </div>
   `).join('');
 }
 
 document.getElementById('addItemBtn').addEventListener('click', async () => {
-  if (currentUser.viewOnly) return;
   const name = document.getElementById('newItemName').value.trim();
-  const qty = Number(document.getElementById('newItemQty').value) || 0;
+  const quantity = Number(document.getElementById('newItemQty').value) || 0;
   const unit = document.getElementById('newItemUnit').value.trim();
-  const msg = document.getElementById('addItemMsg');
-
-  if (!name) {
-    msg.innerHTML = '<p style="color:#ffcdd2;">اكتب اسم الصنف</p>';
-    return;
-  }
-
-  try {
-    await db.collection('inventory').add({ name, quantity: qty, unit });
-    document.getElementById('newItemName').value = '';
-    document.getElementById('newItemQty').value = '';
-    document.getElementById('newItemUnit').value = '';
-    msg.innerHTML = `<p style="color:#c8f7d4;">✅ تمت إضافة ${name}</p>`;
-  } catch (err) {
-    msg.innerHTML = '<p style="color:#ffcdd2;">خطأ: ' + err.message + '</p>';
-  }
+  if (!name) return;
+  await db.collection('inventory').add({ name, quantity, unit });
+  document.getElementById('newItemName').value = '';
+  document.getElementById('newItemQty').value = '';
+  document.getElementById('newItemUnit').value = '';
 });
 
 async function adjustQuantity(itemId, delta) {
-  if (currentUser.viewOnly) return;
   const item = allInventory.find(i => i.id === itemId);
   if (!item) return;
   const newQty = Math.max(0, (item.quantity || 0) + delta);
@@ -1592,441 +1179,154 @@ async function adjustQuantity(itemId, delta) {
 }
 
 function deleteItem(itemId, name) {
-  if (currentUser.viewOnly) return;
-  if (!confirm('حذف ' + name + ' نهائياً من المخزن؟')) return;
+  if (!confirm(`حذف ${name}؟`)) return;
   db.collection('inventory').doc(itemId).delete();
 }
 
 function populateIssueItemSelect() {
   const select = document.getElementById('issueItemSelect');
-  const current = select.value;
-  select.innerHTML = allInventory.map(i => `<option value="${i.id}">${i.name} (متوفر: ${i.quantity} ${i.unit || ''})</option>`).join('')
-    || '<option value="">لا يوجد أصناف بعد</option>';
-  if (current) select.value = current;
-}
-
-function populateIssueWorkerSelect() {
-  const select = document.getElementById('issueWorkerSelect');
-  const current = select.value;
-  select.innerHTML = allWorkers.map(w => `<option value="${w.id}">${w.name}</option>`).join('')
-    || '<option value="">لا يوجد عمال بعد</option>';
-  if (current) select.value = current;
+  select.innerHTML = allInventory.map(i => `<option value="${i.id}">${i.name} (${i.quantity})</option>`).join('');
 }
 
 document.getElementById('issueBtn').addEventListener('click', async () => {
-  if (currentUser.viewOnly) return;
   const itemId = document.getElementById('issueItemSelect').value;
   const workerId = document.getElementById('issueWorkerSelect').value;
   const qty = Number(document.getElementById('issueQty').value) || 1;
-  const msg = document.getElementById('issueMsg');
-
   const item = allInventory.find(i => i.id === itemId);
   const worker = allWorkers.find(w => w.id === workerId);
-
-  if (!item || !worker) {
-    msg.innerHTML = '<p style="color:#ffcdd2;">اختر الصنف والعامل أولاً</p>';
-    return;
-  }
-  if (item.quantity < qty) {
-    msg.innerHTML = '<p style="color:#ffcdd2;">الكمية المتوفرة غير كافية</p>';
-    return;
-  }
-
-  try {
-    await db.collection('inventory').doc(itemId).update({ quantity: item.quantity - qty });
-    await db.collection('inventoryLog').add({
-      itemName: item.name,
-      workerId: workerId,
-      workerName: worker.name,
-      quantity: qty,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    msg.innerHTML = `<p style="color:#c8f7d4;">✅ تم صرف ${qty} ${item.unit || ''} من ${item.name} إلى ${worker.name}</p>`;
-  } catch (err) {
-    msg.innerHTML = '<p style="color:#ffcdd2;">خطأ: ' + err.message + '</p>';
-  }
-});
-
-document.getElementById('exportInventoryBtn').addEventListener('click', () => {
-  if (!allInventory.length) {
-    alert('المخزن فارغ');
-    return;
-  }
-  const headers = ['اسم الصنف', 'الكمية', 'الوحدة'];
-  const rows = allInventory.map(item => [item.name, item.quantity, item.unit || '']);
-  const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'المخزن');
-  XLSX.writeFile(workbook, `مخزن-سرت-${new Date().toISOString().slice(0, 10)}.xlsx`);
-});
-
-// ============ دوال التقرير الشهري ============
-async function loadMonthlyReport() {
-  const gridDiv = document.getElementById('monthlyGrid');
-  gridDiv.innerHTML = 'جاري التحميل...';
-
-  const [year, month] = document.getElementById('monthSelect').value.split('-').map(Number);
-  const from = new Date(year, month - 1, 1);
-  const to = new Date(year, month, 1);
-  const daysInMonth = new Date(year, month, 0).getDate();
-
-  const snapshot = await db.collection('attendance')
-    .where('timestamp', '>=', from)
-    .where('timestamp', '<', to)
-    .get();
-
-  const perWorkerDay = {};
-  snapshot.forEach(doc => {
-    const r = doc.data();
-    if (!r.timestamp) return;
-    const d = r.timestamp.toDate();
-    const day = d.getDate();
-    if (!perWorkerDay[r.workerId]) perWorkerDay[r.workerId] = {};
-    const priority = { present: 5, late: 4, leave: 3, sick: 2, absent: 1, rejected: 0 };
-    const existing = perWorkerDay[r.workerId][day];
-    if (!existing || (priority[r.status] || 0) > (priority[existing] || 0)) {
-      perWorkerDay[r.workerId][day] = r.status;
-    }
-  });
-
-  monthlyData = { year, month, daysInMonth, perWorkerDay, workers: allWorkers };
-  renderMonthlyTable();
-}
-
-function symbolFor(status) {
-  if (status === 'present') return '✅';
-  if (status === 'late') return '⏰';
-  if (status === 'leave') return '📝';
-  if (status === 'sick') return '🤒';
-  return '✗';
-}
-
-function renderMonthlyTable() {
-  const gridDiv = document.getElementById('monthlyGrid');
-  if (!monthlyData) return;
-  const { daysInMonth, perWorkerDay } = monthlyData;
-
-  if (!allWorkers.length) {
-    gridDiv.innerHTML = '<p style="color:rgba(255,255,255,0.7);">لا يوجد عمال مسجلين بعد</p>';
-    return;
-  }
-
-  const searchTerm = (document.getElementById('monthlySearch').value || '').trim();
-  const filteredWorkers = searchTerm ? allWorkers.filter(w => w.name.includes(searchTerm)) : allWorkers;
-
-  let html = '<table style="border-collapse:collapse; font-size:11px; color:#fff;">';
-  html += '<tr><th style="padding:4px 8px; text-align:right; position:sticky; right:0; background:#134e4a;">الاسم</th>';
-  for (let d = 1; d <= daysInMonth; d++) html += `<th style="padding:2px 4px;">${d}</th>`;
-  html += '</tr>';
-
-  filteredWorkers.forEach(w => {
-    html += `<tr><td style="padding:4px 8px; white-space:nowrap; position:sticky; right:0; background:#134e4a;">
-      <div style="display:flex; align-items:center; gap:6px;">
-        <img src="${w.photo}" style="width:22px;height:22px;border-radius:50%;object-fit:cover;background:rgba(255,255,255,0.2);" onerror="this.style.visibility='hidden'">
-        <span>${w.name}</span>
-      </div>
-    </td>`;
-    for (let d = 1; d <= daysInMonth; d++) {
-      const status = (perWorkerDay[w.id] || {})[d];
-      html += `<td style="padding:2px 4px; text-align:center;">${symbolFor(status)}</td>`;
-    }
-    html += '</tr>';
-  });
-  html += '</table>';
-  gridDiv.innerHTML = html;
-}
-
-document.getElementById('monthlySearch').addEventListener('input', renderMonthlyTable);
-
-document.getElementById('exportMonthlyBtn').addEventListener('click', () => {
-  if (!monthlyData || !monthlyData.workers.length) {
-    alert('لا يوجد بيانات');
-    return;
-  }
-  const { daysInMonth, perWorkerDay, workers, year, month } = monthlyData;
-  const statusLabels = { present: 'حاضر', late: 'متأخر', leave: 'إذن', sick: 'مريض', absent: 'غائب' };
-  const headers = ['الاسم', 'الفريق', ...Array.from({ length: daysInMonth }, (_, i) => String(i + 1))];
-  const rows = workers.map(w => {
-    const days = Array.from({ length: daysInMonth }, (_, i) => {
-      const status = (perWorkerDay[w.id] || {})[i + 1];
-      return status ? statusLabels[status] || status : 'غائب';
-    });
-    return [w.name, teamLabel(w.team), ...days];
-  });
-  const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'التقرير الشهري');
-  XLSX.writeFile(workbook, `تقرير-شهري-${year}-${String(month).padStart(2, '0')}.xlsx`);
-});
-
-// ============ دوال تقارير العمل ============
-document.getElementById('reportPhotos').addEventListener('change', async (e) => {
-  const files = e.target.files;
-  reportPhotosArray = [];
-  const previewDiv = document.getElementById('reportPhotosPreview');
-  previewDiv.innerHTML = '';
   
-  for (let i = 0; i < files.length; i++) {
-    const base64 = await compressImageToBase64(files[i], 800, 0.7);
-    reportPhotosArray.push(base64);
-    const img = document.createElement('img');
-    img.src = base64;
-    previewDiv.appendChild(img);
-  }
-});
-
-document.getElementById('saveReportBtn').addEventListener('click', async () => {
-  if (currentUser.viewOnly) return;
-  const date = document.getElementById('reportDate').value;
-  const workerId = document.getElementById('reportWorkerSelect').value;
-  const location = document.getElementById('reportLocation').value.trim();
-  const description = document.getElementById('reportDescription').value.trim();
-  const notes = document.getElementById('reportNotes').value.trim();
-  const msg = document.getElementById('reportMsg');
-
-  if (!date || !workerId || !location || !description) {
-    msg.innerHTML = '<p style="color:#ffcdd2;">يرجى ملء جميع الحقول المطلوبة</p>';
+  if (!item || !worker) return;
+  if (item.quantity < qty) {
+    alert('الكمية غير كافية');
     return;
   }
-
-  const worker = allWorkers.find(w => w.id === workerId);
-
-  try {
-    await db.collection('workReports').add({
-      date, workerId,
-      workerName: worker?.name || 'غير معروف',
-      workerTeam: worker?.team || '',
-      location, description, notes,
-      photos: reportPhotosArray,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    msg.innerHTML = '<p style="color:#c8f7d4;">✅ تم حفظ التقرير بنجاح</p>';
-    document.getElementById('reportLocation').value = '';
-    document.getElementById('reportDescription').value = '';
-    document.getElementById('reportNotes').value = '';
-    document.getElementById('reportPhotos').value = '';
-    document.getElementById('reportPhotosPreview').innerHTML = '';
-    reportPhotosArray = [];
-    loadSavedReports();
-  } catch (err) {
-    msg.innerHTML = '<p style="color:#ffcdd2;">خطأ: ' + err.message + '</p>';
-  }
+  
+  await db.collection('inventory').doc(itemId).update({ quantity: item.quantity - qty });
+  await db.collection('inventoryLog').add({
+    itemName: item.name,
+    workerName: worker.name,
+    quantity: qty,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  });
 });
 
-function loadSavedReports() {
-  db.collection('workReports').orderBy('timestamp', 'desc').limit(50).onSnapshot(snapshot => {
-    const container = document.getElementById('savedReports');
+// ============ إدارة المستخدمين ============
+document.getElementById('newUserRole').addEventListener('change', (e) => {
+  document.getElementById('permissionsSelection').style.display = e.target.value === 'supervisor' ? 'block' : 'none';
+});
+
+document.getElementById('addUserBtn').addEventListener('click', async () => {
+  const name = document.getElementById('newUserName').value.trim();
+  const pin = document.getElementById('newUserPin').value.trim();
+  const role = document.getElementById('newUserRole').value;
+  
+  if (!name || !pin) return;
+  if (pin.length < 4 || pin.length > 6) {
+    alert('الرقم السري 4-6 أرقام');
+    return;
+  }
+  
+  let permissions = {};
+  let viewOnly = false;
+  
+  if (role === 'admin') {
+    permissions = { all: true };
+  } else {
+    permissions = {
+      viewOverview: document.getElementById('perm-overview').checked,
+      manageAttendance: document.getElementById('perm-attendance').checked,
+      manageWorkers: document.getElementById('perm-workers').checked,
+      viewMonthly: document.getElementById('perm-monthly').checked,
+      manageDeductions: document.getElementById('perm-deductions').checked,
+      manageInventory: document.getElementById('perm-inventory').checked,
+      manageReports: document.getElementById('perm-reports').checked,
+      manageVehicles: document.getElementById('perm-vehicles').checked,
+      manageShifts: document.getElementById('perm-shifts').checked,
+      managePermissions: false
+    };
+    viewOnly = document.getElementById('perm-viewonly').checked;
+  }
+  
+  await db.collection('systemUsers').add({
+    name, pin, role, permissions, viewOnly,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+  
+  document.getElementById('newUserName').value = '';
+  document.getElementById('newUserPin').value = '';
+  loadUsersList();
+});
+
+function loadUsersList() {
+  db.collection('systemUsers').onSnapshot(snapshot => {
+    const container = document.getElementById('usersList');
     if (snapshot.empty) {
-      container.innerHTML = '<p style="text-align:center;color:rgba(255,255,255,0.7);">لا توجد تقارير محفوظة بعد</p>';
+      container.innerHTML = '<p style="text-align:center;">لا يوجد مستخدمين</p>';
       return;
     }
     container.innerHTML = snapshot.docs.map(doc => {
-      const r = doc.data();
-      const photos = (r.photos || []).slice(0, 3).map(p => 
-        `<img src="${p}" style="width:60px;height:60px;object-fit:cover;border-radius:6px;margin:2px;">`
-      ).join('');
+      const u = doc.data();
       return `
         <div class="vehicle-card">
-          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
-            <strong>${r.workerName}</strong>
-            <span style="font-size:12px;">${r.date}</span>
-          </div>
-          <div style="font-size:13px; color:rgba(255,255,255,0.8); margin-top:4px;">📍 ${r.location}</div>
-          <div style="font-size:13px; color:rgba(255,255,255,0.8); margin-top:4px;">📝 ${r.description}</div>
-          ${r.notes ? `<div style="font-size:12px; color:rgba(255,200,200,0.8); margin-top:4px;">⚠️ ${r.notes}</div>` : ''}
-          ${photos ? `<div style="display:flex; gap:4px; margin-top:8px;">${photos}</div>` : ''}
-          <div style="display:flex; gap:8px; margin-top:8px;">
-            <button onclick="exportReportPdf('${doc.id}')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;background:rgba(33,150,243,0.5);">📄 PDF</button>
-            <button onclick="deleteReport('${doc.id}')" class="del-btn" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">حذف</button>
-          </div>
+          <strong>${u.name}</strong> - <span style="font-size:12px;">🔢 ${u.pin}</span>
+          <span class="role-badge ${u.role === 'admin' ? 'role-admin' : 'role-supervisor'}">${u.role === 'admin' ? 'مدير' : 'مشرف'}</span>
+          ${u.viewOnly ? '<span class="view-only-badge">👁️ مشاهدة</span>' : ''}
+          <button class="del-btn" onclick="deleteUser('${doc.id}','${u.name}')">حذف</button>
         </div>
       `;
     }).join('');
   });
 }
 
-async function exportReportPdf(reportId) {
-  try {
-    const doc = await db.collection('workReports').doc(reportId).get();
-    const r = doc.data();
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    pdf.setR2L(true);
-    pdf.setFontSize(18);
-    pdf.text('تقرير عمل يومي', 105, 20, { align: 'center' });
-    pdf.setFontSize(12);
-    pdf.text(`التاريخ: ${r.date}`, 20, 35, { align: 'right' });
-    pdf.text(`اسم العامل: ${r.workerName}`, 20, 42, { align: 'right' });
-    pdf.text(`موقع العمل: ${r.location}`, 20, 49, { align: 'right' });
-    pdf.text('وصف العمل:', 20, 56, { align: 'right' });
-    const descLines = pdf.splitTextToSize(r.description, 170);
-    pdf.text(descLines, 20, 63, { align: 'right' });
-    let yPos = 63 + (descLines.length * 7);
-    if (r.photos && r.photos.length > 0) {
-      for (let i = 0; i < r.photos.length; i++) {
-        if (yPos > 250) { pdf.addPage(); yPos = 20; }
-        yPos += 10;
-        try {
-          pdf.addImage(r.photos[i], 'JPEG', 40, yPos, 130, 97);
-          yPos += 105;
-        } catch (e) {}
-      }
-    }
-    pdf.save(`تقرير-عمل-${r.date}-${r.workerName}.pdf`);
-  } catch (err) {
-    alert('خطأ: ' + err.message);
-  }
+async function deleteUser(userId, name) {
+  if (!confirm(`حذف ${name}؟`)) return;
+  await db.collection('systemUsers').doc(userId).delete();
 }
 
-async function deleteReport(reportId) {
-  if (currentUser.viewOnly) return;
-  if (!confirm('حذف هذا التقرير؟')) return;
-  await db.collection('workReports').doc(reportId).delete();
-}
-
-// ============ دوال الآليات ============
-document.getElementById('vehiclePhoto').addEventListener('change', async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  vehiclePhotoBase64 = await compressImageToBase64(file, 600, 0.7);
-  const preview = document.getElementById('vehiclePhotoPreview');
-  preview.src = vehiclePhotoBase64;
-  preview.style.display = 'block';
-});
-
-document.getElementById('saveVehicleBtn').addEventListener('click', async () => {
-  if (currentUser.viewOnly) return;
-  const type = document.getElementById('vehicleType').value;
-  const number = document.getElementById('vehicleNumber').value.trim();
-  const status = document.getElementById('vehicleStatus').value;
-  const notes = document.getElementById('vehicleNotes').value.trim();
-  const msg = document.getElementById('vehicleMsg');
-
-  if (!number) {
-    msg.innerHTML = '<p style="color:#ffcdd2;">اكتب رقم الآلية</p>';
+// ============ الورديات ============
+function loadShiftWorkers() {
+  const container = document.getElementById('shiftWorkersList');
+  const date = document.getElementById('shiftDate').value;
+  const shift = viewSelectedShift;
+  
+  // عرض العمال المسجلين في هذه الوردية
+  const shiftWorkers = allWorkers.filter(w => w.shift === shift || w.shift === 'both');
+  
+  if (!shiftWorkers.length) {
+    container.innerHTML = '<p style="text-align:center;">لا يوجد عمال في هذه الوردية</p>';
     return;
   }
+  
+  container.innerHTML = shiftWorkers.map(w => `
+    <div class="worker-row">
+      <img src="${w.referencePhotoUrl || ''}" style="width:32px;height:32px;border-radius:50%;" onerror="this.style.visibility='hidden'">
+      <span class="name">${w.name}</span>
+      <span style="font-size:12px;">${teamLabel(w.team)}</span>
+    </div>
+  `).join('');
+}
 
-  try {
-    await db.collection('vehicles').add({
-      type, typeLabel: VEHICLE_TYPES[type], number, status,
-      statusLabel: VEHICLE_STATUS[status].label, notes,
-      photo: vehiclePhotoBase64,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    msg.innerHTML = '<p style="color:#c8f7d4;">✅ تم حفظ الآلية بنجاح</p>';
-    document.getElementById('vehicleNumber').value = '';
-    document.getElementById('vehicleNotes').value = '';
-    document.getElementById('vehiclePhoto').value = '';
-    document.getElementById('vehiclePhotoPreview').style.display = 'none';
-    vehiclePhotoBase64 = '';
-    loadVehicles();
-  } catch (err) {
-    msg.innerHTML = '<p style="color:#ffcdd2;">خطأ: ' + err.message + '</p>';
-  }
-});
-
-function loadVehicles() {
-  db.collection('vehicles').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
-    const container = document.getElementById('vehiclesList');
-    if (snapshot.empty) {
-      container.innerHTML = '<p style="text-align:center;color:rgba(255,255,255,0.7);">لا توجد آليات مسجلة بعد</p>';
-      return;
-    }
-    const grouped = {};
-    snapshot.docs.forEach(doc => {
-      const v = { id: doc.id, ...doc.data() };
-      if (!grouped[v.type]) grouped[v.type] = [];
-      grouped[v.type].push(v);
-    });
-    let html = '';
-    Object.keys(grouped).forEach(type => {
-      const vehicles = grouped[type];
-      html += `<div class="team-group"><div class="team-title">${VEHICLE_TYPES[type]} (${vehicles.length})</div>`;
-      vehicles.forEach(v => {
-        const statusInfo = VEHICLE_STATUS[v.status] || VEHICLE_STATUS.working;
-        html += `
-          <div class="vehicle-card">
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
-              <strong>🚛 ${v.number}</strong>
-              <span class="status-badge ${statusInfo.color}">${statusInfo.icon} ${statusInfo.label}</span>
-            </div>
-            ${v.photo ? `<img src="${v.photo}" alt="صورة الآلية">` : ''}
-            ${v.notes ? `<div style="font-size:12px; color:rgba(255,255,255,0.7); margin-top:4px;">📝 ${v.notes}</div>` : ''}
-            <div style="display:flex; gap:8px; margin-top:8px;">
-              <button onclick="editVehicle('${v.id}', '${v.status}')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;background:rgba(255,152,0,0.5);">🔄 تغيير الحالة</button>
-              <button onclick="deleteVehicle('${v.id}', '${v.number}')" class="del-btn" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">حذف</button>
-            </div>
-          </div>`;
-      });
-      html += '</div>';
-    });
-    container.innerHTML = html;
+// ============ الضغط والتكبير ============
+function compressImageToBase64(file, maxWidth = 480, quality = 0.6) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const reader = new FileReader();
+    reader.onload = (e) => { img.src = e.target.result; };
+    reader.onerror = reject;
+    img.onload = () => {
+      const scale = Math.min(1, maxWidth / img.width);
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    reader.readAsDataURL(file);
   });
 }
 
-async function editVehicle(vehicleId, currentStatus) {
-  if (currentUser.viewOnly) return;
-  const statuses = ['working', 'maintenance', 'broken'];
-  const currentIndex = statuses.indexOf(currentStatus);
-  const nextStatus = statuses[(currentIndex + 1) % statuses.length];
-  await db.collection('vehicles').doc(vehicleId).update({
-    status: nextStatus,
-    statusLabel: VEHICLE_STATUS[nextStatus].label
-  });
-}
-
-async function deleteVehicle(vehicleId, number) {
-  if (currentUser.viewOnly) return;
-  if (!confirm(`حذف الآلية ${number}؟`)) return;
-  await db.collection('vehicles').doc(vehicleId).delete();
-}
-
-document.getElementById('exportVehiclesPdfBtn').addEventListener('click', async () => {
-  try {
-    const snapshot = await db.collection('vehicles').orderBy('type').get();
-    if (snapshot.empty) { alert('لا توجد آليات'); return; }
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    pdf.setR2L(true);
-    pdf.setFontSize(18);
-    pdf.text('تقرير الآليات - شركة سرت', 105, 20, { align: 'center' });
-    let yPos = 35;
-    const grouped = {};
-    snapshot.docs.forEach(doc => {
-      const v = doc.data();
-      if (!grouped[v.type]) grouped[v.type] = [];
-      grouped[v.type].push(v);
-    });
-    Object.keys(grouped).forEach(type => {
-      const vehicles = grouped[type];
-      if (yPos > 250) { pdf.addPage(); yPos = 20; }
-      pdf.setFontSize(14);
-      pdf.text(`${VEHICLE_TYPES[type]} (${vehicles.length})`, 20, yPos, { align: 'right' });
-      yPos += 8;
-      vehicles.forEach(v => {
-        const statusInfo = VEHICLE_STATUS[v.status] || VEHICLE_STATUS.working;
-        pdf.setFontSize(11);
-        pdf.text(`الرقم: ${v.number} - الحالة: ${statusInfo.label}`, 20, yPos, { align: 'right' });
-        yPos += 7;
-        if (v.photo) {
-          try {
-            if (yPos > 240) { pdf.addPage(); yPos = 20; }
-            pdf.addImage(v.photo, 'JPEG', 60, yPos, 90, 67);
-            yPos += 75;
-          } catch (e) {}
-        }
-        yPos += 5;
-      });
-      yPos += 10;
-    });
-    pdf.save(`الآليات-سرت-${new Date().toISOString().slice(0,10)}.pdf`);
-  } catch (err) {
-    alert('خطأ: ' + err.message);
-  }
-});
-
-// ============ دوال العرض ============
+// ============ التنقل ============
 function showLanding() {
   document.getElementById('landing').style.display = 'block';
   document.getElementById('adminLogin').style.display = 'none';
@@ -2043,12 +1343,7 @@ function showWorker() {
 }
 
 // تحميل أولي
-document.addEventListener('DOMContentLoaded', () => {
-  loadWorkerSelect();
-});
-
 showLanding();
 </script>
-
 </body>
 </html>

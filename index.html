@@ -43,6 +43,7 @@
     color: #ffffff;
     -webkit-backdrop-filter: blur(6px);
     backdrop-filter: blur(6px);
+    cursor: pointer;
   }
   select option, select optgroup { color: #111; }
   button {
@@ -52,7 +53,7 @@
     font-weight: bold;
     cursor: pointer;
   }
-  button:disabled { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.5); }
+  button:disabled { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.5); cursor: not-allowed; }
   button.secondary {
     background: rgba(198,40,40,0.35);
     color: #fff;
@@ -138,6 +139,55 @@
     border-radius: 8px;
     border: 1px solid rgba(255,255,255,0.3);
   }
+
+  .permission-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  .permission-toggle label {
+    flex: 1;
+    margin: 0;
+    cursor: pointer;
+  }
+  .permission-toggle input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    cursor: pointer;
+    accent-color: #4caf50;
+  }
+  .view-only-badge {
+    display: inline-block;
+    background: rgba(255,193,7,0.5);
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: bold;
+  }
+  .role-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: bold;
+    margin-right: 4px;
+  }
+  .role-admin { background: rgba(156,39,176,0.6); color: #fff; }
+  .role-supervisor { background: rgba(33,150,243,0.6); color: #fff; }
+  .role-worker { background: rgba(76,175,80,0.5); color: #fff; }
+  .pin-input {
+    letter-spacing: 10px;
+    font-size: 24px;
+    text-align: center;
+    font-weight: bold;
+  }
 </style>
 </head>
 <body>
@@ -147,227 +197,278 @@
   <h1 style="margin-bottom:4px;">نظام حضور سرت</h1>
   <p style="color:rgba(255,255,255,0.7); font-size:13px; margin:0 0 22px;">اختر الدخول المناسب لك</p>
   <button onclick="showWorker()" style="padding:16px; font-size:16px;">👷 تسجيل الحضور اليومي</button>
-  <button onclick="showAdmin()" style="background:rgba(103,58,183,0.5); padding:16px; font-size:16px;">🖥️ لوحة الإدارة</button>
+  <button onclick="showAdminLogin()" style="background:rgba(103,58,183,0.5); padding:16px; font-size:16px;">🔐 دخول المشرفين</button>
+</div>
+
+<!-- صفحة تسجيل دخول المشرفين -->
+<div id="adminLogin" style="display:none;">
+  <button onclick="showLanding()" style="max-width:420px;margin:0 auto 12px;display:block;background:rgba(255,255,255,0.14);">⬅ رجوع للصفحة الرئيسية</button>
+  <div class="card">
+    <h1>🔐 دخول المشرفين</h1>
+    <p style="text-align:center;color:rgba(255,255,255,0.7);font-size:13px;margin-bottom:20px;">أدخل اسمك والرقم السري الذي تم إعطاؤه لك</p>
+    
+    <label>👤 الاسم</label>
+    <input id="loginName" placeholder="أدخل اسمك">
+    
+    <label>🔢 الرقم السري</label>
+    <input id="loginPin" type="password" class="pin-input" placeholder="••••" maxlength="6" inputmode="numeric" pattern="[0-9]*">
+    
+    <button id="loginBtn">🔓 دخول</button>
+    <div id="loginMsg"></div>
+  </div>
 </div>
 
 <div id="workerView" style="display:none;">
   <button onclick="showLanding()" style="max-width:420px;margin:0 auto 12px;display:block;background:rgba(255,255,255,0.14);">⬅ رجوع للصفحة الرئيسية</button>
-<div class="card">
-  <h1>📍 تسجيل الحضور اليومي</h1>
+  <div class="card">
+    <h1>📍 تسجيل الحضور اليومي</h1>
 
-  <label>اختر فريقك ثم اسمك</label>
-  <select id="workerSelect">
-    <option value="">جاري تحميل قائمة العمال...</option>
-  </select>
+    <label>اختر فريقك ثم اسمك</label>
+    <select id="workerSelect">
+      <option value="">جاري تحميل قائمة العمال...</option>
+    </select>
 
-  <button id="checkInBtn" disabled>✅ تسجيل الحضور الآن</button>
+    <button id="checkInBtn" disabled>✅ تسجيل الحضور الآن</button>
 
-  <div class="divider">— أو —</div>
+    <div class="divider">— أو —</div>
 
-  <button id="absentBtn" class="secondary" disabled>✗ غائب اليوم</button>
-  <button id="leaveBtn" class="secondary" disabled>📝 أخذت إذن اليوم</button>
-  <button id="sickBtn" class="secondary" disabled>🤒 الإبلاغ عن مرض اليوم</button>
+    <button id="absentBtn" class="secondary" disabled>✗ غائب اليوم</button>
+    <button id="leaveBtn" class="secondary" disabled>📝 أخذت إذن اليوم</button>
+    <button id="sickBtn" class="secondary" disabled>🤒 الإبلاغ عن مرض اليوم</button>
 
-  <div id="status"></div>
-</div>
+    <div id="status"></div>
+  </div>
 </div>
 
 <div id="adminView" style="display:none;">
-  <button onclick="showLanding()" style="max-width:100%;margin:0 auto 12px;display:block;background:rgba(255,255,255,0.14);">⬅ رجوع للصفحة الرئيسية</button>
-<div id="dashboard">
-  <div class="tabs" style="flex-wrap:wrap;">
-    <div class="tab active" data-tab="overview">📊 نظرة عامة</div>
-    <div class="tab" data-tab="daily">✅ تسجيل الحضور</div>
-    <div class="tab" data-tab="workers">👷 إدارة العمال</div>
-    <div class="tab" data-tab="monthly">📅 التقرير الشهري</div>
-    <div class="tab" data-tab="inventory">📦 المخزن</div>
-    <div class="tab" data-tab="reports">📋 تقارير العمل</div>
-    <div class="tab" data-tab="vehicles">🚛 الآليات</div>
+  <div style="max-width:100%;margin:0 auto 12px;display:flex;gap:8px;flex-wrap:wrap;">
+    <button onclick="showLanding()" style="width:auto;background:rgba(255,255,255,0.14);">⬅ رجوع</button>
+    <div style="flex:1;text-align:center;color:#fff;padding:10px;background:rgba(255,255,255,0.1);border-radius:10px;">
+      <span id="currentUserInfo"></span>
+    </div>
+    <button onclick="logoutAdmin()" style="width:auto;background:rgba(198,40,40,0.5);">🚪 خروج</button>
   </div>
 
-  <div id="tab-overview">
-    <div class="card">
-      <h1>حضور اليوم</h1>
-      <p id="todayDateDisplay" style="text-align:center; color:rgba(255,255,255,0.75); font-size:13px; margin-top:-10px; margin-bottom:14px;"></p>
-      <div class="stats">
-        <div class="stat" style="background:#e8f5e9;"><span class="num" id="presentCount">0</span>حاضر</div>
-        <div class="stat" style="background:#fff3e0;"><span class="num" id="lateCount">0</span>متأخر</div>
-        <div class="stat" style="background:#ede7f6;"><span class="num" id="leaveCount">0</span>إذن</div>
-        <div class="stat" style="background:#fce4ec;"><span class="num" id="sickCount">0</span>مريض</div>
-        <div class="stat" style="background:#eceff1;"><span class="num" id="totalCount">0</span>إجمالي</div>
+  <div id="dashboard">
+    <div class="tabs" style="flex-wrap:wrap;" id="adminTabs">
+      <div class="tab active" data-tab="overview">📊 نظرة عامة</div>
+      <div class="tab" data-tab="daily">✅ تسجيل الحضور</div>
+      <div class="tab" data-tab="workers">👷 إدارة العمال</div>
+      <div class="tab" data-tab="monthly">📅 التقرير الشهري</div>
+      <div class="tab" data-tab="inventory">📦 المخزن</div>
+      <div class="tab" data-tab="reports">📋 تقارير العمل</div>
+      <div class="tab" data-tab="vehicles">🚛 الآليات</div>
+      <div class="tab" data-tab="permissions">🔑 الصلاحيات</div>
+    </div>
+
+    <div id="tab-overview">
+      <div class="card">
+        <h1>حضور اليوم</h1>
+        <p id="todayDateDisplay" style="text-align:center; color:rgba(255,255,255,0.75); font-size:13px; margin-top:-10px; margin-bottom:14px;"></p>
+        <div class="stats">
+          <div class="stat" style="background:#e8f5e9;"><span class="num" id="presentCount">0</span>حاضر</div>
+          <div class="stat" style="background:#fff3e0;"><span class="num" id="lateCount">0</span>متأخر</div>
+          <div class="stat" style="background:#ede7f6;"><span class="num" id="leaveCount">0</span>إذن</div>
+          <div class="stat" style="background:#fce4ec;"><span class="num" id="sickCount">0</span>مريض</div>
+          <div class="stat" style="background:#eceff1;"><span class="num" id="totalCount">0</span>إجمالي</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>⚠️ لم يسجلوا حضور اليوم</h2>
+        <div id="absentList">جاري التحميل...</div>
+      </div>
+
+      <div class="card">
+        <h2>سجل الحضور اللحظي</h2>
+        <button id="exportBtn">📊 تصدير Excel (اليوم)</button>
+        <button id="clearTodayBtn" style="background:rgba(198,40,40,0.4);">🗑️ مسح سجل اليوم</button>
+        <div id="list">جاري التحميل...</div>
       </div>
     </div>
 
-    <div class="card">
-      <h2>⚠️ لم يسجلوا حضور اليوم</h2>
-      <div id="absentList">جاري التحميل...</div>
-    </div>
-
-    <div class="card">
-      <h2>سجل الحضور اللحظي</h2>
-      <button id="exportBtn">📊 تصدير Excel (اليوم)</button>
-      <button id="clearTodayBtn" style="background:rgba(198,40,40,0.4);">🗑️ مسح سجل اليوم</button>
-      <div id="list">جاري التحميل...</div>
-    </div>
-  </div>
-
-  <div id="tab-daily" style="display:none;">
-    <div class="card">
-      <h2>✅ سجّل حالة اليوم لكل عامل</h2>
-      <p id="dailyDateDisplay" style="text-align:center; color:rgba(255,255,255,0.75); font-size:13px; margin-top:-6px; margin-bottom:12px;"></p>
-      <input id="dailySearch" placeholder="🔍 ابحث باسم العامل">
-      <div id="dailyMarkList">جاري التحميل...</div>
-    </div>
-  </div>
-
-  <div id="tab-workers" style="display:none;">
-    <div class="card">
-      <h2>➕ تسجيل عامل جديد</h2>
-      <label style="color:#fff;font-size:13px;display:block;margin-bottom:6px;">1️⃣ التقط صورة العامل</label>
-      <input type="file" id="newWorkerPhoto" accept="image/*" capture="user">
-      <img id="newWorkerPreview" style="width:100%;border-radius:10px;display:none;margin-bottom:10px;">
-
-      <label style="color:#fff;font-size:13px;display:block;margin-bottom:6px;">2️⃣ اسم العامل</label>
-      <input id="newWorkerName" placeholder="اكتب الاسم الكامل">
-
-      <label style="color:#fff;font-size:13px;display:block;margin-bottom:6px;">3️⃣ الوظيفة</label>
-      <select id="newWorkerTeam"></select>
-
-      <label style="color:#fff;font-size:13px;display:block;margin-bottom:6px;">4️⃣ المعدات بحوزته (اختياري)</label>
-      <div id="newWorkerEquipment" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;"></div>
-
-      <button id="addWorkerBtn">✅ تسجيل العامل</button>
-      <div id="addWorkerMsg"></div>
-    </div>
-
-    <div class="card">
-      <h2>العمال حسب الفريق</h2>
-      <input id="workersSearch" placeholder="🔍 ابحث باسم العامل">
-      <div id="workersByTeam">جاري التحميل...</div>
-    </div>
-  </div>
-
-  <div id="tab-inventory" style="display:none;">
-    <div class="card">
-      <h2>➕ إضافة صنف للمخزن</h2>
-      <input id="newItemName" placeholder="اسم الصنف (مثال: قفازات)">
-      <input id="newItemQty" type="number" placeholder="الكمية" min="0">
-      <input id="newItemUnit" placeholder="الوحدة (قطعة / كرتونة / لتر...)">
-      <button id="addItemBtn">➕ إضافة الصنف</button>
-      <div id="addItemMsg"></div>
-    </div>
-
-    <div class="card">
-      <h2>📤 صرف صنف لعامل</h2>
-      <select id="issueItemSelect"></select>
-      <select id="issueWorkerSelect"></select>
-      <input id="issueQty" type="number" placeholder="الكمية المصروفة" min="1" value="1">
-      <button id="issueBtn">📤 صرف الآن</button>
-      <div id="issueMsg"></div>
-    </div>
-
-    <div class="card">
-      <h2>📦 محتوى المخزن</h2>
-      <button id="exportInventoryBtn">📊 تصدير المخزن Excel</button>
-      <div id="inventoryList">جاري التحميل...</div>
-    </div>
-  </div>
-
-  <div id="tab-monthly" style="display:none;">
-    <div class="card">
-      <h2>📅 حضور الشهر</h2>
-      <select id="monthSelect"></select>
-      <input id="monthlySearch" placeholder="🔍 ابحث باسم العامل">
-      <button id="exportMonthlyBtn">📊 تصدير التقرير الشهري Excel</button>
-      <div style="overflow-x:auto; margin-top:10px;">
-        <div id="monthlyGrid" style="min-width:600px;">جاري التحميل...</div>
-      </div>
-      <div style="display:flex; gap:14px; margin-top:12px; font-size:12px; color:rgba(255,255,255,0.8); flex-wrap:wrap;">
-        <span>✅ حاضر</span>
-        <span>⏰ متأخر</span>
-        <span>📝 إذن</span>
-        <span>🤒 مريض</span>
-        <span>✗ غائب</span>
+    <div id="tab-daily" style="display:none;">
+      <div class="card">
+        <h2>✅ سجّل حالة اليوم لكل عامل</h2>
+        <p id="dailyDateDisplay" style="text-align:center; color:rgba(255,255,255,0.75); font-size:13px; margin-top:-6px; margin-bottom:12px;"></p>
+        <input id="dailySearch" placeholder="🔍 ابحث باسم العامل">
+        <div id="dailyMarkList">جاري التحميل...</div>
       </div>
     </div>
+
+    <div id="tab-workers" style="display:none;">
+      <div class="card">
+        <h2>➕ تسجيل عامل جديد</h2>
+        <label style="color:#fff;font-size:13px;display:block;margin-bottom:6px;">1️⃣ التقط صورة العامل</label>
+        <input type="file" id="newWorkerPhoto" accept="image/*" capture="user">
+        <img id="newWorkerPreview" style="width:100%;border-radius:10px;display:none;margin-bottom:10px;">
+
+        <label style="color:#fff;font-size:13px;display:block;margin-bottom:6px;">2️⃣ اسم العامل</label>
+        <input id="newWorkerName" placeholder="اكتب الاسم الكامل">
+
+        <label style="color:#fff;font-size:13px;display:block;margin-bottom:6px;">3️⃣ الوظيفة</label>
+        <select id="newWorkerTeam"></select>
+
+        <label style="color:#fff;font-size:13px;display:block;margin-bottom:6px;">4️⃣ المعدات بحوزته (اختياري)</label>
+        <div id="newWorkerEquipment" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;"></div>
+
+        <button id="addWorkerBtn">✅ تسجيل العامل</button>
+        <div id="addWorkerMsg"></div>
+      </div>
+
+      <div class="card">
+        <h2>العمال حسب الفريق</h2>
+        <input id="workersSearch" placeholder="🔍 ابحث باسم العامل">
+        <div id="workersByTeam">جاري التحميل...</div>
+      </div>
+    </div>
+
+    <div id="tab-inventory" style="display:none;">
+      <div class="card">
+        <h2>➕ إضافة صنف للمخزن</h2>
+        <input id="newItemName" placeholder="اسم الصنف (مثال: قفازات)">
+        <input id="newItemQty" type="number" placeholder="الكمية" min="0">
+        <input id="newItemUnit" placeholder="الوحدة (قطعة / كرتونة / لتر...)">
+        <button id="addItemBtn">➕ إضافة الصنف</button>
+        <div id="addItemMsg"></div>
+      </div>
+
+      <div class="card">
+        <h2>📤 صرف صنف لعامل</h2>
+        <select id="issueItemSelect"></select>
+        <select id="issueWorkerSelect"></select>
+        <input id="issueQty" type="number" placeholder="الكمية المصروفة" min="1" value="1">
+        <button id="issueBtn">📤 صرف الآن</button>
+        <div id="issueMsg"></div>
+      </div>
+
+      <div class="card">
+        <h2>📦 محتوى المخزن</h2>
+        <button id="exportInventoryBtn">📊 تصدير المخزن Excel</button>
+        <div id="inventoryList">جاري التحميل...</div>
+      </div>
+    </div>
+
+    <div id="tab-monthly" style="display:none;">
+      <div class="card">
+        <h2>📅 حضور الشهر</h2>
+        <select id="monthSelect"></select>
+        <input id="monthlySearch" placeholder="🔍 ابحث باسم العامل">
+        <button id="exportMonthlyBtn">📊 تصدير التقرير الشهري Excel</button>
+        <div style="overflow-x:auto; margin-top:10px;">
+          <div id="monthlyGrid" style="min-width:600px;">جاري التحميل...</div>
+        </div>
+        <div style="display:flex; gap:14px; margin-top:12px; font-size:12px; color:rgba(255,255,255,0.8); flex-wrap:wrap;">
+          <span>✅ حاضر</span>
+          <span>⏰ متأخر</span>
+          <span>📝 إذن</span>
+          <span>🤒 مريض</span>
+          <span>✗ غائب</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-reports" style="display:none;">
+      <div class="card">
+        <h2>📋 إنشاء تقرير عمل يومي</h2>
+        
+        <label>📅 تاريخ العمل</label>
+        <input type="date" id="reportDate">
+        
+        <label>👷 اسم العامل / الفريق</label>
+        <select id="reportWorkerSelect"></select>
+        
+        <label>📍 موقع العمل</label>
+        <input id="reportLocation" placeholder="مثال: حي الأندلس، شارع الوحدة">
+        
+        <label>📝 وصف العمل المنجز</label>
+        <textarea id="reportDescription" rows="4" placeholder="اذكر تفاصيل العمل المنجز اليوم..."></textarea>
+        
+        <label>⚠️ ملاحظات / مشاكل (اختياري)</label>
+        <textarea id="reportNotes" rows="3" placeholder="أي ملاحظات أو مشاكل واجهتك"></textarea>
+        
+        <label>📸 صور العمل (يمكنك إضافة عدة صور)</label>
+        <input type="file" id="reportPhotos" accept="image/*" multiple capture="environment">
+        <div id="reportPhotosPreview" class="image-grid"></div>
+        
+        <button id="saveReportBtn">💾 حفظ التقرير</button>
+        <div id="reportMsg"></div>
+      </div>
+
+      <div class="card">
+        <h2>📄 التقارير المحفوظة</h2>
+        <div id="savedReports">جاري التحميل...</div>
+      </div>
+    </div>
+
+    <div id="tab-vehicles" style="display:none;">
+      <div class="card">
+        <h2>➕ إضافة آلية</h2>
+        
+        <label>🚛 نوع الآلية</label>
+        <select id="vehicleType">
+          <option value="small_compactor">كبس صغير</option>
+          <option value="large_compactor">كبس كبير</option>
+          <option value="small_garbage_truck">سيارة صندوق قمامة صغيرة</option>
+          <option value="large_garbage_truck">سيارة صندوق قمامة كبيرة</option>
+          <option value="dump_truck">سيارة صندوق قلاب</option>
+        </select>
+        
+        <label>🔢 رقم الآلية / اللوحة</label>
+        <input id="vehicleNumber" placeholder="مثال: 45-123456">
+        
+        <label>📊 حالة الآلية</label>
+        <select id="vehicleStatus">
+          <option value="working">✅ تعمل</option>
+          <option value="maintenance">🔧 تحت الصيانة</option>
+          <option value="broken">❌ معطلة</option>
+        </select>
+        
+        <label>📝 ملاحظات (اختياري)</label>
+        <textarea id="vehicleNotes" rows="3" placeholder="أي ملاحظات عن حالة الآلية"></textarea>
+        
+        <label>📸 صورة الآلية</label>
+        <input type="file" id="vehiclePhoto" accept="image/*" capture="environment">
+        <img id="vehiclePhotoPreview" style="width:100%;border-radius:10px;display:none;margin-bottom:10px;">
+        
+        <button id="saveVehicleBtn">💾 حفظ الآلية</button>
+        <div id="vehicleMsg"></div>
+      </div>
+
+      <div class="card">
+        <h2>🚛 الآليات المسجلة</h2>
+        <button id="exportVehiclesPdfBtn">📄 تصدير PDF للآليات</button>
+        <div id="vehiclesList">جاري التحميل...</div>
+      </div>
+    </div>
+
+    <!-- تبويب الصلاحيات -->
+    <div id="tab-permissions" style="display:none;">
+      <div class="card">
+        <h2>👥 إضافة مشرف جديد</h2>
+        
+        <label>👤 اسم المشرف</label>
+        <input id="newSupervisorName" placeholder="اسم المشرف">
+        
+        <label>🔢 الرقم السري (4-6 أرقام)</label>
+        <input id="newSupervisorPin" type="password" class="pin-input" placeholder="••••" maxlength="6" inputmode="numeric" pattern="[0-9]*">
+        
+        <label>📊 نوع الصلاحية</label>
+        <select id="newSupervisorRole">
+          <option value="supervisor">مشرف (صلاحيات مخصصة)</option>
+          <option value="admin">مدير عام (كل الصلاحيات)</option>
+        </select>
+        
+        <button id="addSupervisorBtn">➕ إضافة المشرف</button>
+        <div id="addSupervisorMsg"></div>
+      </div>
+
+      <div class="card">
+        <h2>📋 قائمة المشرفين</h2>
+        <div id="supervisorsList">جاري التحميل...</div>
+      </div>
+    </div>
   </div>
-
-  <!-- تبويب تقارير العمل اليومي -->
-  <div id="tab-reports" style="display:none;">
-    <div class="card">
-      <h2>📋 إنشاء تقرير عمل يومي</h2>
-      
-      <label>📅 تاريخ العمل</label>
-      <input type="date" id="reportDate">
-      
-      <label>👷 اسم العامل / الفريق</label>
-      <select id="reportWorkerSelect"></select>
-      
-      <label>📍 موقع العمل</label>
-      <input id="reportLocation" placeholder="مثال: حي الأندلس، شارع الوحدة">
-      
-      <label>📝 وصف العمل المنجز</label>
-      <textarea id="reportDescription" rows="4" placeholder="اذكر تفاصيل العمل المنجز اليوم..."></textarea>
-      
-      <label>⚠️ ملاحظات / مشاكل (اختياري)</label>
-      <textarea id="reportNotes" rows="3" placeholder="أي ملاحظات أو مشاكل واجهتك"></textarea>
-      
-      <label>📸 صور العمل (يمكنك إضافة عدة صور)</label>
-      <input type="file" id="reportPhotos" accept="image/*" multiple capture="environment">
-      <div id="reportPhotosPreview" class="image-grid"></div>
-      
-      <button id="saveReportBtn">💾 حفظ التقرير</button>
-      <div id="reportMsg"></div>
-    </div>
-
-    <div class="card">
-      <h2>📄 التقارير المحفوظة</h2>
-      <div id="savedReports">جاري التحميل...</div>
-    </div>
-  </div>
-
-  <!-- تبويب الآليات -->
-  <div id="tab-vehicles" style="display:none;">
-    <div class="card">
-      <h2>➕ إضافة آلية</h2>
-      
-      <label>🚛 نوع الآلية</label>
-      <select id="vehicleType">
-        <option value="small_compactor">كبس صغير</option>
-        <option value="large_compactor">كبس كبير</option>
-        <option value="small_garbage_truck">سيارة صندوق قمامة صغيرة</option>
-        <option value="large_garbage_truck">سيارة صندوق قمامة كبيرة</option>
-        <option value="dump_truck">سيارة صندوق قلاب</option>
-      </select>
-      
-      <label>🔢 رقم الآلية / اللوحة</label>
-      <input id="vehicleNumber" placeholder="مثال: 45-123456">
-      
-      <label>📊 حالة الآلية</label>
-      <select id="vehicleStatus">
-        <option value="working">✅ تعمل</option>
-        <option value="maintenance">🔧 تحت الصيانة</option>
-        <option value="broken">❌ معطلة</option>
-      </select>
-      
-      <label>📝 ملاحظات (اختياري)</label>
-      <textarea id="vehicleNotes" rows="3" placeholder="أي ملاحظات عن حالة الآلية"></textarea>
-      
-      <label>📸 صورة الآلية</label>
-      <input type="file" id="vehiclePhoto" accept="image/*" capture="environment">
-      <img id="vehiclePhotoPreview" style="width:100%;border-radius:10px;display:none;margin-bottom:10px;">
-      
-      <button id="saveVehicleBtn">💾 حفظ الآلية</button>
-      <div id="vehicleMsg"></div>
-    </div>
-
-    <div class="card">
-      <h2>🚛 الآليات المسجلة</h2>
-      <button id="exportVehiclesPdfBtn">📄 تصدير PDF للآليات</button>
-      <div id="vehiclesList">جاري التحميل...</div>
-    </div>
-  </div>
-</div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -423,6 +524,22 @@ const VEHICLE_STATUS = {
   broken: { label: 'معطلة', color: 'status-broken', icon: '❌' }
 };
 
+// الصلاحيات الافتراضية
+const DEFAULT_PERMISSIONS = {
+  viewOverview: true,
+  manageAttendance: true,
+  manageWorkers: false,
+  viewMonthly: true,
+  manageInventory: false,
+  manageReports: false,
+  manageVehicles: false,
+  managePermissions: false
+};
+
+let currentUser = null;
+let currentUserPermissions = { ...DEFAULT_PERMISSIONS };
+let currentUserRole = '';
+
 function equipmentLabel(id) {
   const e = EQUIPMENT.find(e => e.id === id);
   return e ? `${e.icon} ${e.label}` : id;
@@ -448,6 +565,358 @@ function compressImageToBase64(file, maxWidth = 480, quality = 0.6) {
   });
 }
 
+// ============ نظام تسجيل الدخول بالاسم والرقم السري ============
+
+function showAdminLogin() {
+  document.getElementById('landing').style.display = 'none';
+  document.getElementById('adminLogin').style.display = 'block';
+  document.getElementById('workerView').style.display = 'none';
+  document.getElementById('adminView').style.display = 'none';
+}
+
+// تسجيل الدخول
+document.getElementById('loginBtn').addEventListener('click', async () => {
+  const name = document.getElementById('loginName').value.trim();
+  const pin = document.getElementById('loginPin').value.trim();
+  const msg = document.getElementById('loginMsg');
+
+  if (!name || !pin) {
+    msg.innerHTML = '<p style="color:#ffcdd2;">أدخل اسمك والرقم السري</p>';
+    return;
+  }
+
+  try {
+    msg.innerHTML = '<p style="color:#fff;">جاري التحقق...</p>';
+    
+    // البحث عن المشرف بالاسم
+    const snapshot = await db.collection('supervisors')
+      .where('name', '==', name)
+      .get();
+    
+    if (snapshot.empty) {
+      msg.innerHTML = '<p style="color:#ffcdd2;">❌ الاسم غير موجود</p>';
+      return;
+    }
+    
+    // التحقق من الرقم السري
+    let foundUser = null;
+    let foundUserId = null;
+    
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      if (data.pin === pin) {
+        foundUser = data;
+        foundUserId = doc.id;
+      }
+    });
+    
+    if (!foundUser) {
+      msg.innerHTML = '<p style="color:#ffcdd2;">❌ الرقم السري غير صحيح</p>';
+      return;
+    }
+    
+    // تسجيل الدخول بنجاح
+    currentUser = { ...foundUser, id: foundUserId };
+    currentUserRole = foundUser.role || 'supervisor';
+    currentUserPermissions = foundUser.permissions || { ...DEFAULT_PERMISSIONS };
+    
+    // إذا كان مدير عام، يعطى كل الصلاحيات
+    if (currentUserRole === 'admin') {
+      currentUserPermissions = {
+        viewOverview: true,
+        manageAttendance: true,
+        manageWorkers: true,
+        viewMonthly: true,
+        manageInventory: true,
+        manageReports: true,
+        manageVehicles: true,
+        managePermissions: true
+      };
+    }
+    
+    msg.innerHTML = '<p style="color:#c8f7d4;">✅ تم تسجيل الدخول بنجاح</p>';
+    
+    // تنظيف الحقول
+    document.getElementById('loginName').value = '';
+    document.getElementById('loginPin').value = '';
+    
+    // إظهار لوحة التحكم
+    document.getElementById('adminLogin').style.display = 'none';
+    document.getElementById('adminView').style.display = 'block';
+    
+    // تحديث واجهة المستخدم
+    updateUIForPermissions();
+    initializeAdmin();
+    
+  } catch (err) {
+    console.error('خطأ في تسجيل الدخول:', err);
+    msg.innerHTML = '<p style="color:#ffcdd2;">خطأ: ' + err.message + '</p>';
+  }
+});
+
+function logoutAdmin() {
+  currentUser = null;
+  currentUserPermissions = { ...DEFAULT_PERMISSIONS };
+  currentUserRole = '';
+  showLanding();
+}
+
+function updateUIForPermissions() {
+  // تحديث معلومات المستخدم
+  const userInfo = document.getElementById('currentUserInfo');
+  if (currentUser) {
+    const roleLabel = currentUserRole === 'admin' ? '👑 مدير عام' : '👤 مشرف';
+    const roleClass = currentUserRole === 'admin' ? 'role-admin' : 'role-supervisor';
+    const viewOnlyBadge = currentUser.viewOnly ? ' <span class="view-only-badge">👁️ مشاهدة فقط</span>' : '';
+    userInfo.innerHTML = `<span class="role-badge ${roleClass}">${roleLabel}</span> ${currentUser.name || 'مشرف'}${viewOnlyBadge}`;
+  }
+  
+  // إظهار/إخفاء التبويبات حسب الصلاحيات
+  const tabs = document.querySelectorAll('#adminTabs .tab');
+  tabs.forEach(tab => {
+    const tabName = tab.dataset.tab;
+    let show = true;
+    
+    switch(tabName) {
+      case 'overview':
+        show = currentUserPermissions.viewOverview;
+        break;
+      case 'daily':
+        show = currentUserPermissions.manageAttendance;
+        break;
+      case 'workers':
+        show = currentUserPermissions.manageWorkers;
+        break;
+      case 'monthly':
+        show = currentUserPermissions.viewMonthly;
+        break;
+      case 'inventory':
+        show = currentUserPermissions.manageInventory;
+        break;
+      case 'reports':
+        show = currentUserPermissions.manageReports;
+        break;
+      case 'vehicles':
+        show = currentUserPermissions.manageVehicles;
+        break;
+      case 'permissions':
+        show = currentUserPermissions.managePermissions;
+        break;
+    }
+    
+    tab.style.display = show ? 'block' : 'none';
+  });
+  
+  // تطبيق وضع المشاهدة فقط
+  applyViewOnlyMode();
+}
+
+function applyViewOnlyMode() {
+  const isViewOnly = currentUser.viewOnly || false;
+  
+  // تعطيل أزرار التعديل
+  const editButtons = [
+    'addWorkerBtn', 'addItemBtn', 'issueBtn', 'saveReportBtn', 
+    'saveVehicleBtn', 'addSupervisorBtn', 'clearTodayBtn'
+  ];
+  
+  editButtons.forEach(btnId => {
+    const btn = document.getElementById(btnId);
+    if (btn) {
+      if (isViewOnly) {
+        btn.disabled = true;
+        btn.style.opacity = '0.5';
+        btn.title = 'وضع المشاهدة فقط - لا يمكنك التعديل';
+      } else {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btn.title = '';
+      }
+    }
+  });
+  
+  // تعطيل حقول الإدخال في وضع المشاهدة
+  const inputs = document.querySelectorAll('#adminView input, #adminView textarea, #adminView select');
+  inputs.forEach(input => {
+    if (isViewOnly) {
+      input.disabled = true;
+      input.style.opacity = '0.6';
+    } else {
+      input.disabled = false;
+      input.style.opacity = '1';
+    }
+  });
+}
+
+// ============ إدارة المشرفين ============
+
+document.getElementById('addSupervisorBtn').addEventListener('click', async () => {
+  if (currentUser.viewOnly) {
+    alert('أنت في وضع المشاهدة فقط');
+    return;
+  }
+
+  const name = document.getElementById('newSupervisorName').value.trim();
+  const pin = document.getElementById('newSupervisorPin').value.trim();
+  const role = document.getElementById('newSupervisorRole').value;
+  const msg = document.getElementById('addSupervisorMsg');
+
+  if (!name || !pin) {
+    msg.innerHTML = '<p style="color:#ffcdd2;">أدخل اسم المشرف والرقم السري</p>';
+    return;
+  }
+
+  if (pin.length < 4 || pin.length > 6) {
+    msg.innerHTML = '<p style="color:#ffcdd2;">الرقم السري يجب أن يكون 4-6 أرقام</p>';
+    return;
+  }
+
+  if (!/^\d+$/.test(pin)) {
+    msg.innerHTML = '<p style="color:#ffcdd2;">الرقم السري يجب أن يكون أرقام فقط</p>';
+    return;
+  }
+
+  try {
+    // التحقق من عدم وجود نفس الاسم
+    const existingCheck = await db.collection('supervisors')
+      .where('name', '==', name)
+      .get();
+    
+    if (!existingCheck.empty) {
+      msg.innerHTML = '<p style="color:#ffcdd2;">يوجد مشرف بنفس الاسم بالفعل</p>';
+      return;
+    }
+
+    // حفظ بيانات المشرف
+    await db.collection('supervisors').add({
+      name: name,
+      pin: pin,
+      role: role,
+      permissions: role === 'admin' ? {
+        viewOverview: true,
+        manageAttendance: true,
+        manageWorkers: true,
+        viewMonthly: true,
+        manageInventory: true,
+        manageReports: true,
+        manageVehicles: true,
+        managePermissions: true
+      } : { ...DEFAULT_PERMISSIONS },
+      viewOnly: false,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    
+    msg.innerHTML = `<p style="color:#c8f7d4;">✅ تم إضافة المشرف ${name} بنجاح</p>`;
+    
+    // تنظيف الحقول
+    document.getElementById('newSupervisorName').value = '';
+    document.getElementById('newSupervisorPin').value = '';
+    
+    loadSupervisors();
+  } catch (err) {
+    console.error('خطأ في إضافة المشرف:', err);
+    msg.innerHTML = '<p style="color:#ffcdd2;">خطأ: ' + err.message + '</p>';
+  }
+});
+
+function loadSupervisors() {
+  db.collection('supervisors').onSnapshot(snapshot => {
+    const container = document.getElementById('supervisorsList');
+    
+    if (snapshot.empty) {
+      container.innerHTML = '<p style="text-align:center;color:rgba(255,255,255,0.7);">لا يوجد مشرفين مسجلين</p>';
+      return;
+    }
+    
+    container.innerHTML = snapshot.docs.map(doc => {
+      const s = doc.data();
+      const roleLabel = s.role === 'admin' ? '👑 مدير عام' : '👤 مشرف';
+      const roleClass = s.role === 'admin' ? 'role-admin' : 'role-supervisor';
+      const isViewOnly = s.viewOnly;
+      
+      return `
+        <div class="vehicle-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+            <div>
+              <strong>${s.name}</strong>
+              <div style="font-size:12px; color:rgba(255,255,255,0.7);">🔢 الرقم السري: ${s.pin}</div>
+            </div>
+            <span class="role-badge ${roleClass}">${roleLabel}</span>
+          </div>
+          
+          ${isViewOnly ? '<span class="view-only-badge">👁️ مشاهدة فقط</span>' : ''}
+          
+          <div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;">
+            ${currentUserRole === 'admin' || currentUserPermissions.managePermissions ? `
+              <button onclick="togglePermission('${doc.id}', 'manageWorkers')" style="width:auto;padding:6px 10px;font-size:12px;margin:0;background:${s.permissions?.manageWorkers ? 'rgba(76,175,80,0.5)' : 'rgba(255,255,255,0.2)'}">
+                👷 عمال
+              </button>
+              <button onclick="togglePermission('${doc.id}', 'manageInventory')" style="width:auto;padding:6px 10px;font-size:12px;margin:0;background:${s.permissions?.manageInventory ? 'rgba(76,175,80,0.5)' : 'rgba(255,255,255,0.2)'}">
+                📦 مخزن
+              </button>
+              <button onclick="togglePermission('${doc.id}', 'manageVehicles')" style="width:auto;padding:6px 10px;font-size:12px;margin:0;background:${s.permissions?.manageVehicles ? 'rgba(76,175,80,0.5)' : 'rgba(255,255,255,0.2)'}">
+                🚛 آليات
+              </button>
+              <button onclick="togglePermission('${doc.id}', 'manageReports')" style="width:auto;padding:6px 10px;font-size:12px;margin:0;background:${s.permissions?.manageReports ? 'rgba(76,175,80,0.5)' : 'rgba(255,255,255,0.2)'}">
+                📋 تقارير
+              </button>
+              <button onclick="togglePermission('${doc.id}', 'manageAttendance')" style="width:auto;padding:6px 10px;font-size:12px;margin:0;background:${s.permissions?.manageAttendance ? 'rgba(76,175,80,0.5)' : 'rgba(255,255,255,0.2)'}">
+                ✅ حضور
+              </button>
+              <button onclick="toggleViewOnly('${doc.id}')" style="width:auto;padding:6px 10px;font-size:12px;margin:0;background:${isViewOnly ? 'rgba(255,193,7,0.5)' : 'rgba(255,255,255,0.2)'}">
+                ${isViewOnly ? '👁️ إلغاء المشاهدة' : '👁️ مشاهدة فقط'}
+              </button>
+              ${s.role !== 'admin' ? `
+                <button onclick="deleteSupervisor('${doc.id}', '${s.name}')" class="del-btn" style="width:auto;padding:6px 10px;font-size:12px;margin:0;">حذف</button>
+              ` : ''}
+            ` : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+  });
+}
+
+async function togglePermission(supervisorId, permission) {
+  try {
+    const docRef = db.collection('supervisors').doc(supervisorId);
+    const doc = await docRef.get();
+    const data = doc.data();
+    const permissions = data.permissions || { ...DEFAULT_PERMISSIONS };
+    
+    permissions[permission] = !permissions[permission];
+    
+    await docRef.update({ permissions: permissions });
+  } catch (err) {
+    alert('خطأ: ' + err.message);
+  }
+}
+
+async function toggleViewOnly(supervisorId) {
+  try {
+    const docRef = db.collection('supervisors').doc(supervisorId);
+    const doc = await docRef.get();
+    const data = doc.data();
+    
+    await docRef.update({ viewOnly: !data.viewOnly });
+  } catch (err) {
+    alert('خطأ: ' + err.message);
+  }
+}
+
+async function deleteSupervisor(supervisorId, name) {
+  if (!confirm(`حذف المشرف ${name}؟`)) return;
+  
+  try {
+    await db.collection('supervisors').doc(supervisorId).delete();
+    alert('تم حذف المشرف بنجاح');
+  } catch (err) {
+    alert('خطأ: ' + err.message);
+  }
+}
+
+// ============ باقي الدوال ============
+
 const workerSelect = document.getElementById('workerSelect');
 const checkInBtn = document.getElementById('checkInBtn');
 const absentBtn = document.getElementById('absentBtn');
@@ -466,16 +935,6 @@ function updateButtonState() {
   absentBtn.disabled = !workerSelect.value;
   sickBtn.disabled = !workerSelect.value;
   leaveBtn.disabled = !workerSelect.value;
-}
-
-auth.signInAnonymously().then(() => {
-  loadWorkerSelect();
-}).catch(err => {
-  showStatus('خطأ في الاتصال: ' + err.message, 'err');
-});
-
-if (auth.currentUser) {
-  loadWorkerSelect();
 }
 
 function loadWorkerSelect() {
@@ -648,23 +1107,22 @@ document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     tab.classList.add('active');
-    document.getElementById('tab-overview').style.display = tab.dataset.tab === 'overview' ? 'block' : 'none';
-    document.getElementById('tab-daily').style.display = tab.dataset.tab === 'daily' ? 'block' : 'none';
-    document.getElementById('tab-workers').style.display = tab.dataset.tab === 'workers' ? 'block' : 'none';
-    document.getElementById('tab-monthly').style.display = tab.dataset.tab === 'monthly' ? 'block' : 'none';
-    document.getElementById('tab-inventory').style.display = tab.dataset.tab === 'inventory' ? 'block' : 'none';
-    document.getElementById('tab-reports').style.display = tab.dataset.tab === 'reports' ? 'block' : 'none';
-    document.getElementById('tab-vehicles').style.display = tab.dataset.tab === 'vehicles' ? 'block' : 'none';
+    
+    const tabs = ['overview', 'daily', 'workers', 'monthly', 'inventory', 'reports', 'vehicles', 'permissions'];
+    tabs.forEach(t => {
+      const el = document.getElementById('tab-' + t);
+      if (el) el.style.display = tab.dataset.tab === t ? 'block' : 'none';
+    });
+    
     if (tab.dataset.tab === 'monthly') loadMonthlyReport();
     if (tab.dataset.tab === 'daily') renderDailyMarkList();
     if (tab.dataset.tab === 'reports') loadSavedReports();
     if (tab.dataset.tab === 'vehicles') loadVehicles();
+    if (tab.dataset.tab === 'permissions') loadSupervisors();
   });
 });
 
-auth.onAuthStateChanged(async (user) => {
-  if (!user) return;
-
+function initializeAdmin() {
   dashboard.style.display = 'block';
   populateTeamSelect();
   populateEquipmentCheckboxes();
@@ -675,7 +1133,17 @@ auth.onAuthStateChanged(async (user) => {
   watchAttendance();
   watchWorkers();
   watchInventory();
-});
+  
+  if (currentUserPermissions.managePermissions) {
+    loadSupervisors();
+  }
+  
+  // تفعيل أول تبويب مرئي
+  const firstVisibleTab = document.querySelector('#adminTabs .tab:not([style*="display: none"])');
+  if (firstVisibleTab) {
+    firstVisibleTab.click();
+  }
+}
 
 function displayTodayDate() {
   const todayStr = new Date().toLocaleDateString('ar-LY', {
@@ -722,6 +1190,11 @@ function populateMonthSelect() {
 }
 
 let monthlyData = null;
+let allInventory = [];
+let allWorkersRaw = [];
+let allWorkers = [];
+let latestRecords = [];
+let latestInfoMap = {};
 
 async function loadMonthlyReport() {
   const gridDiv = document.getElementById('monthlyGrid');
@@ -838,6 +1311,11 @@ function populateTeamSelect() {
 }
 
 document.getElementById('addWorkerBtn').addEventListener('click', async () => {
+  if (currentUser.viewOnly) {
+    alert('أنت في وضع المشاهدة فقط - لا يمكنك التعديل');
+    return;
+  }
+
   const name = document.getElementById('newWorkerName').value.trim();
   const team = document.getElementById('newWorkerTeam').value;
   const equipment = Array.from(document.querySelectorAll('#newWorkerEquipment input:checked')).map(cb => cb.value);
@@ -870,12 +1348,6 @@ document.getElementById('addWorkerBtn').addEventListener('click', async () => {
     msg.innerHTML = '<p style="color:#ffcdd2;">خطأ: ' + err.message + '</p>';
   }
 });
-
-let allInventory = [];
-let allWorkersRaw = [];
-let allWorkers = [];
-let latestRecords = [];
-let latestInfoMap = {};
 
 document.getElementById('exportInventoryBtn').addEventListener('click', () => {
   if (!allInventory.length) {
@@ -920,6 +1392,11 @@ function renderInventoryList() {
 }
 
 document.getElementById('addItemBtn').addEventListener('click', async () => {
+  if (currentUser.viewOnly) {
+    alert('أنت في وضع المشاهدة فقط');
+    return;
+  }
+
   const name = document.getElementById('newItemName').value.trim();
   const qty = Number(document.getElementById('newItemQty').value) || 0;
   const unit = document.getElementById('newItemUnit').value.trim();
@@ -942,6 +1419,7 @@ document.getElementById('addItemBtn').addEventListener('click', async () => {
 });
 
 async function adjustQuantity(itemId, delta) {
+  if (currentUser.viewOnly) return;
   const item = allInventory.find(i => i.id === itemId);
   if (!item) return;
   const newQty = Math.max(0, (item.quantity || 0) + delta);
@@ -949,6 +1427,7 @@ async function adjustQuantity(itemId, delta) {
 }
 
 function deleteItem(itemId, name) {
+  if (currentUser.viewOnly) return;
   if (!confirm('حذف ' + name + ' نهائياً من المخزن؟')) return;
   db.collection('inventory').doc(itemId).delete();
 }
@@ -970,6 +1449,11 @@ function populateIssueWorkerSelect() {
 }
 
 document.getElementById('issueBtn').addEventListener('click', async () => {
+  if (currentUser.viewOnly) {
+    alert('أنت في وضع المشاهدة فقط');
+    return;
+  }
+
   const itemId = document.getElementById('issueItemSelect').value;
   const workerId = document.getElementById('issueWorkerSelect').value;
   const qty = Number(document.getElementById('issueQty').value) || 1;
@@ -1098,6 +1582,7 @@ function renderDailyMarkList() {
 document.getElementById('dailySearch')?.addEventListener('input', renderDailyMarkList);
 
 function openEquipmentEditor(workerId) {
+  if (currentUser.viewOnly) return;
   const panel = document.getElementById('equipEditor-' + workerId);
   if (!panel) return;
   if (panel.style.display === 'block') {
@@ -1115,6 +1600,7 @@ function openEquipmentEditor(workerId) {
 }
 
 async function saveEquipment(workerId) {
+  if (currentUser.viewOnly) return;
   const checked = Array.from(document.querySelectorAll(`.equip-cb-${workerId}:checked`)).map(cb => cb.value);
   try {
     await db.collection('workers').doc(workerId).update({ equipment: checked });
@@ -1164,11 +1650,13 @@ function renderAbsentList() {
 }
 
 function deleteWorker(id, name) {
+  if (currentUser.viewOnly) return;
   if (!confirm('حذف ' + name + ' نهائياً؟')) return;
   db.collection('workers').doc(id).delete();
 }
 
 async function manualMark(workerId, status) {
+  if (currentUser.viewOnly) return;
   try {
     await db.collection('attendance').add({
       workerId: workerId,
@@ -1215,6 +1703,7 @@ function exportToExcel() {
 document.getElementById('exportBtn').addEventListener('click', exportToExcel);
 
 document.getElementById('clearTodayBtn').addEventListener('click', async () => {
+  if (currentUser.viewOnly) return;
   if (!latestRecords.length) {
     alert('لا يوجد سجل اليوم لمسحه');
     return;
@@ -1300,7 +1789,7 @@ function watchAttendance() {
     });
 }
 
-// ============ نظام تقارير العمل اليومي ============
+// ============ تقارير العمل ============
 let reportPhotosArray = [];
 
 document.getElementById('reportPhotos').addEventListener('change', async (e) => {
@@ -1319,6 +1808,11 @@ document.getElementById('reportPhotos').addEventListener('change', async (e) => 
 });
 
 document.getElementById('saveReportBtn').addEventListener('click', async () => {
+  if (currentUser.viewOnly) {
+    alert('أنت في وضع المشاهدة فقط');
+    return;
+  }
+
   const date = document.getElementById('reportDate').value;
   const workerId = document.getElementById('reportWorkerSelect').value;
   const location = document.getElementById('reportLocation').value.trim();
@@ -1348,7 +1842,6 @@ document.getElementById('saveReportBtn').addEventListener('click', async () => {
 
     msg.innerHTML = '<p style="color:#c8f7d4;">✅ تم حفظ التقرير بنجاح</p>';
     
-    // تنظيف الحقول
     document.getElementById('reportLocation').value = '';
     document.getElementById('reportDescription').value = '';
     document.getElementById('reportNotes').value = '';
@@ -1410,29 +1903,24 @@ async function exportReportPdf(reportId) {
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF('p', 'mm', 'a4');
     
-    // إعداد الخط العربي
     pdf.setFont('helvetica', 'normal');
     pdf.setR2L(true);
     
-    // العنوان
     pdf.setFontSize(18);
     pdf.text('تقرير عمل يومي', 105, 20, { align: 'center' });
     
-    // البيانات
     pdf.setFontSize(12);
     pdf.text(`التاريخ: ${r.date}`, 20, 35, { align: 'right' });
     pdf.text(`اسم العامل: ${r.workerName}`, 20, 42, { align: 'right' });
     pdf.text(`الفريق: ${teamLabel(r.workerTeam)}`, 20, 49, { align: 'right' });
     pdf.text(`موقع العمل: ${r.location}`, 20, 56, { align: 'right' });
     
-    // وصف العمل
     pdf.text('وصف العمل:', 20, 63, { align: 'right' });
     const descriptionLines = pdf.splitTextToSize(r.description, 170);
     pdf.text(descriptionLines, 20, 70, { align: 'right' });
     
     let yPos = 70 + (descriptionLines.length * 7);
     
-    // ملاحظات
     if (r.notes) {
       yPos += 10;
       pdf.text('ملاحظات:', 20, yPos, { align: 'right' });
@@ -1441,7 +1929,6 @@ async function exportReportPdf(reportId) {
       yPos += 7 + (notesLines.length * 7);
     }
     
-    // الصور
     if (r.photos && r.photos.length > 0) {
       for (let i = 0; i < r.photos.length; i++) {
         if (yPos > 250) {
@@ -1467,11 +1954,12 @@ async function exportReportPdf(reportId) {
 }
 
 async function deleteReport(reportId) {
+  if (currentUser.viewOnly) return;
   if (!confirm('حذف هذا التقرير؟')) return;
   await db.collection('workReports').doc(reportId).delete();
 }
 
-// ============ نظام الآليات ============
+// ============ الآليات ============
 let vehiclePhotoBase64 = '';
 
 document.getElementById('vehiclePhoto').addEventListener('change', async (e) => {
@@ -1484,6 +1972,11 @@ document.getElementById('vehiclePhoto').addEventListener('change', async (e) => 
 });
 
 document.getElementById('saveVehicleBtn').addEventListener('click', async () => {
+  if (currentUser.viewOnly) {
+    alert('أنت في وضع المشاهدة فقط');
+    return;
+  }
+
   const type = document.getElementById('vehicleType').value;
   const number = document.getElementById('vehicleNumber').value.trim();
   const status = document.getElementById('vehicleStatus').value;
@@ -1509,7 +2002,6 @@ document.getElementById('saveVehicleBtn').addEventListener('click', async () => 
 
     msg.innerHTML = '<p style="color:#c8f7d4;">✅ تم حفظ الآلية بنجاح</p>';
     
-    // تنظيف الحقول
     document.getElementById('vehicleNumber').value = '';
     document.getElementById('vehicleNotes').value = '';
     document.getElementById('vehiclePhoto').value = '';
@@ -1532,7 +2024,6 @@ function loadVehicles() {
         return;
       }
 
-      // تجميع حسب النوع
       const grouped = {};
       snapshot.docs.forEach(doc => {
         const v = { id: doc.id, ...doc.data() };
@@ -1572,6 +2063,7 @@ function loadVehicles() {
 }
 
 async function editVehicle(vehicleId, currentStatus) {
+  if (currentUser.viewOnly) return;
   const statuses = ['working', 'maintenance', 'broken'];
   const currentIndex = statuses.indexOf(currentStatus);
   const nextStatus = statuses[(currentIndex + 1) % statuses.length];
@@ -1583,6 +2075,7 @@ async function editVehicle(vehicleId, currentStatus) {
 }
 
 async function deleteVehicle(vehicleId, number) {
+  if (currentUser.viewOnly) return;
   if (!confirm(`حذف الآلية ${number}؟`)) return;
   await db.collection('vehicles').doc(vehicleId).delete();
 }
@@ -1600,7 +2093,6 @@ document.getElementById('exportVehiclesPdfBtn').addEventListener('click', async 
     const pdf = new jsPDF('p', 'mm', 'a4');
     pdf.setR2L(true);
     
-    // العنوان
     pdf.setFontSize(18);
     pdf.text('تقرير الآليات - شركة سرت', 105, 20, { align: 'center' });
     
@@ -1612,7 +2104,6 @@ document.getElementById('exportVehiclesPdfBtn').addEventListener('click', async 
     
     let yPos = 40;
     
-    // تجميع الآليات حسب النوع
     const grouped = {};
     snapshot.docs.forEach(doc => {
       const v = doc.data();
@@ -1674,19 +2165,23 @@ document.getElementById('exportVehiclesPdfBtn').addEventListener('click', async 
 
 function showLanding() {
   document.getElementById('landing').style.display = 'block';
+  document.getElementById('adminLogin').style.display = 'none';
   document.getElementById('workerView').style.display = 'none';
   document.getElementById('adminView').style.display = 'none';
 }
+
 function showWorker() {
   document.getElementById('landing').style.display = 'none';
+  document.getElementById('adminLogin').style.display = 'none';
   document.getElementById('workerView').style.display = 'block';
   document.getElementById('adminView').style.display = 'none';
+  loadWorkerSelect();
 }
-function showAdmin() {
-  document.getElementById('landing').style.display = 'none';
-  document.getElementById('workerView').style.display = 'none';
-  document.getElementById('adminView').style.display = 'block';
-}
+
+// تحميل قائمة العمال عند فتح الصفحة
+document.addEventListener('DOMContentLoaded', () => {
+  loadWorkerSelect();
+});
 
 showLanding();
 </script>

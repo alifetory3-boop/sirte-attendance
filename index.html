@@ -70,6 +70,7 @@
   button.export-btn { background: rgba(33,150,243,0.5); }
   button.camera-btn { background: rgba(255,152,0,0.5); }
   button.edit-btn { background: rgba(255,152,0,0.5); width: auto; padding: 5px 10px; font-size: 12px; margin: 0; }
+  button.word-btn { background: rgba(76,175,80,0.5); }
   label { font-size: 13px; color: rgba(255,255,255,0.85); margin-bottom: 5px; display: block; }
   input, textarea {
     width: 100%; padding: 12px; border-radius: 10px;
@@ -126,7 +127,8 @@
   .permission-item label { flex: 1; margin: 0; font-size: 12px; }
   .permission-item input[type="checkbox"] { width: 16px; height: 16px; margin: 0; accent-color: #4caf50; }
   .edit-form { display: none; width: 100%; background: rgba(0,0,0,0.3); border-radius: 10px; padding: 12px; margin-top: 8px; }
-  .info-tag { font-size: 10px; background: rgba(255,255,255,0.15); padding: 2px 6px; border-radius: 6px; display: inline-block; margin: 2px; }
+  .report-photos-grid { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px; }
+  .report-photos-grid img { width: 70px; height: 70px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(255,255,255,0.4); }
 </style>
 </head>
 <body>
@@ -184,6 +186,7 @@
     <div class="tabs" id="adminTabs">
       <div class="tab active" data-tab="overview">📊</div>
       <div class="tab" data-tab="daily">✅</div>
+      <div class="tab" data-tab="reports">📋</div>
       <div class="tab" data-tab="workers">👷</div>
       <div class="tab" data-tab="deductions">💰</div>
       <div class="tab" data-tab="inventory">📦</div>
@@ -223,6 +226,37 @@
       </div>
     </div>
 
+    <!-- تقارير يومية -->
+    <div id="tab-reports" style="display:none;">
+      <div class="card">
+        <h2>📋 تقرير يومي</h2>
+        
+        <label>📅 التاريخ</label>
+        <input type="date" id="reportDate">
+        
+        <label>👷 اسم العامل / المشرف</label>
+        <input id="reportWorkerName" placeholder="اسم كاتب التقرير">
+        
+        <label>📍 موقع العمل</label>
+        <input id="reportLocation" placeholder="مكان العمل">
+        
+        <label>📝 نص التقرير</label>
+        <textarea id="reportText" rows="5" placeholder="اكتب التقرير هنا..."></textarea>
+        
+        <label>📸 صور التقرير</label>
+        <div class="report-photos-grid" id="reportPhotosPreview"></div>
+        <input type="file" id="reportPhotosInput" accept="image/*" multiple style="display:none;">
+        <button class="camera-btn" onclick="document.getElementById('reportPhotosInput').click()">📷 إضافة صور</button>
+        
+        <button class="word-btn" onclick="saveReport()">💾 حفظ التقرير</button>
+      </div>
+      
+      <div class="card">
+        <h2>📄 التقارير المحفوظة</h2>
+        <div id="savedReportsList">لا توجد تقارير</div>
+      </div>
+    </div>
+
     <!-- عمال -->
     <div id="tab-workers" style="display:none;">
       <div class="card">
@@ -248,7 +282,7 @@
           <option value="both">🔄 كلاهما</option>
         </select>
         
-        <label>🏦 رقم الحساب (للسائقين)</label>
+        <label>🏦 رقم الحساب</label>
         <input id="newWorkerAccount" placeholder="رقم الحساب البنكي">
         
         <label>🏛️ اسم المصرف</label>
@@ -358,6 +392,7 @@
         <div id="permissionsBox" class="permission-box">
           <div class="permission-item"><label>📊 نظرة</label><input type="checkbox" id="perm-overview" checked></div>
           <div class="permission-item"><label>✅ حضور</label><input type="checkbox" id="perm-attendance" checked></div>
+          <div class="permission-item"><label>📋 تقارير</label><input type="checkbox" id="perm-reports"></div>
           <div class="permission-item"><label>👷 عمال</label><input type="checkbox" id="perm-workers"></div>
           <div class="permission-item"><label>💰 خصومات</label><input type="checkbox" id="perm-deductions"></div>
           <div class="permission-item"><label>📦 مخزن</label><input type="checkbox" id="perm-inventory"></div>
@@ -397,6 +432,7 @@ let allInventory = [];
 let latestAttendanceRecords = [];
 let workerPhotoBase64 = '';
 let vehiclePhotoBase64 = '';
+let reportPhotosArray = [];
 
 const TEAMS = [
   { id: 'dump_truck_drivers', label: 'سائقين دنبر' },
@@ -417,6 +453,8 @@ function getTodayDate() {
   return new Date().toLocaleDateString('ar-LY', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 }
 function getTodayISO() { return new Date().toISOString().slice(0, 10); }
+function getNowTime() { return new Date().toLocaleTimeString('ar-LY'); }
+function getNowDateTime() { return getTodayDate() + ' - ' + getNowTime(); }
 
 function compressImage(file, maxWidth = 400, quality = 0.6) {
   return new Promise((resolve, reject) => {
@@ -454,6 +492,22 @@ document.getElementById('vehiclePhotoInput').addEventListener('change', async (e
   const preview = document.getElementById('vehiclePhotoPreview');
   preview.src = vehiclePhotoBase64;
   preview.style.display = 'block';
+});
+
+// صور التقرير
+document.getElementById('reportPhotosInput').addEventListener('change', async (e) => {
+  const files = e.target.files;
+  reportPhotosArray = [];
+  const preview = document.getElementById('reportPhotosPreview');
+  preview.innerHTML = '';
+  
+  for (let i = 0; i < files.length; i++) {
+    const base64 = await compressImage(files[i], 600, 0.7);
+    reportPhotosArray.push(base64);
+    const img = document.createElement('img');
+    img.src = base64;
+    preview.appendChild(img);
+  }
 });
 
 // تسجيل الدخول
@@ -501,6 +555,7 @@ function enterAdmin() {
   else ui.innerHTML = '<span class="role-badge role-supervisor">👤</span> ' + currentUser.name;
   clearLogin();
   initializeAdmin();
+  setDefaultReportDate();
 }
 
 function clearLogin() {
@@ -530,6 +585,10 @@ function updateShiftButtons(container, s) {
   });
 }
 
+function setDefaultReportDate() {
+  document.getElementById('reportDate').value = getTodayISO();
+}
+
 function initializeAdmin() {
   populateTeamSelect();
   populateDeductionMonthSelect();
@@ -539,16 +598,18 @@ function initializeAdmin() {
   watchWorkers();
   watchInventory();
   loadVehicles();
+  loadReports();
   if (currentUserRole === 'owner' || currentUserRole === 'admin') loadUsersList();
   document.querySelectorAll('.tab').forEach(tab => {
     tab.onclick = () => {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
-      ['overview','daily','workers','deductions','inventory','vehicles','permissions'].forEach(t => {
+      ['overview','daily','reports','workers','deductions','inventory','vehicles','permissions'].forEach(t => {
         const el = document.getElementById('tab-' + t);
         if (el) el.style.display = tab.dataset.tab === t ? 'block' : 'none';
       });
       if (tab.dataset.tab === 'deductions') loadDeductions();
+      if (tab.dataset.tab === 'reports') loadReports();
     };
   });
 }
@@ -573,7 +634,125 @@ function populateDeductionMonthSelect() {
   document.getElementById('deductionMonthSelect').innerHTML = o;
 }
 
-// حضور
+// ============ التقارير اليومية ============
+async function saveReport() {
+  const date = document.getElementById('reportDate').value;
+  const workerName = document.getElementById('reportWorkerName').value.trim();
+  const location = document.getElementById('reportLocation').value.trim();
+  const text = document.getElementById('reportText').value.trim();
+  
+  if (!date || !workerName || !text) {
+    alert('أدخل التاريخ والاسم ونص التقرير');
+    return;
+  }
+  
+  await db.collection('dailyReports').add({
+    date,
+    workerName,
+    location,
+    text,
+    photos: reportPhotosArray,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    createdTime: getNowTime()
+  });
+  
+  // تنظيف
+  document.getElementById('reportWorkerName').value = '';
+  document.getElementById('reportLocation').value = '';
+  document.getElementById('reportText').value = '';
+  reportPhotosArray = [];
+  document.getElementById('reportPhotosPreview').innerHTML = '';
+  document.getElementById('reportPhotosInput').value = '';
+  
+  alert('✅ تم حفظ التقرير');
+  loadReports();
+}
+
+function loadReports() {
+  db.collection('dailyReports').orderBy('createdAt', 'desc').limit(20).onSnapshot(sn => {
+    const c = document.getElementById('savedReportsList');
+    if (sn.empty) {
+      c.innerHTML = '<p style="text-align:center;color:#888;">لا توجد تقارير</p>';
+      return;
+    }
+    c.innerHTML = sn.docs.map(doc => {
+      const r = doc.data();
+      const photos = (r.photos || []).slice(0, 3).map(p => `<img src="${p}" style="width:50px;height:50px;object-fit:cover;border-radius:6px;margin:2px;">`).join('');
+      return `
+        <div class="user-card">
+          <div style="display:flex;justify-content:space-between;">
+            <strong>${r.workerName}</strong>
+            <span style="font-size:11px;">${r.date} - ${r.createdTime || ''}</span>
+          </div>
+          ${r.location ? `<div style="font-size:11px;color:rgba(255,255,255,0.7);">📍 ${r.location}</div>` : ''}
+          <div style="font-size:12px;margin-top:5px;">${r.text.substring(0, 100)}${r.text.length > 100 ? '...' : ''}</div>
+          ${photos ? `<div style="display:flex;margin-top:5px;">${photos}</div>` : ''}
+          <div style="display:flex;gap:5px;margin-top:8px;">
+            <button class="word-btn" onclick="exportReportWord('${doc.id}')" style="width:auto;padding:5px 10px;font-size:11px;margin:0;">📄 Word</button>
+            <button class="del-btn" onclick="deleteReport('${doc.id}')" style="width:auto;padding:5px 10px;font-size:11px;margin:0;">حذف</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  });
+}
+
+function exportReportWord(reportId) {
+  db.collection('dailyReports').doc(reportId).get().then(doc => {
+    const r = doc.data();
+    
+    let htmlContent = `
+      <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" dir="rtl">
+      <head>
+        <meta charset="UTF-8">
+        <style>
+          body { font-family: Arial, sans-serif; direction: rtl; }
+          h1 { text-align: center; }
+          .info { margin: 20px 0; }
+          .photos img { max-width: 300px; margin: 10px; }
+        </style>
+      </head>
+      <body>
+        <h1>📋 تقرير يومي</h1>
+        <hr>
+        <div class="info">
+          <p><strong>📅 التاريخ:</strong> ${r.date}</p>
+          <p><strong>⏰ الوقت:</strong> ${r.createdTime || ''}</p>
+          <p><strong>👷 كاتب التقرير:</strong> ${r.workerName}</p>
+          ${r.location ? `<p><strong>📍 الموقع:</strong> ${r.location}</p>` : ''}
+        </div>
+        <hr>
+        <h2>📝 نص التقرير:</h2>
+        <p>${r.text.replace(/\n/g, '<br>')}</p>
+        ${r.photos && r.photos.length ? `
+          <hr>
+          <h2>📸 الصور:</h2>
+          <div class="photos">
+            ${r.photos.map(p => `<img src="${p}" alt="صورة">`).join('')}
+          </div>
+        ` : ''}
+      </body>
+      </html>
+    `;
+    
+    const blob = new Blob(['\ufeff' + htmlContent], { type: 'application/msword' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `تقرير-${r.date}-${r.workerName}.doc`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+}
+
+async function deleteReport(reportId) {
+  if (!confirm('حذف التقرير؟')) return;
+  await db.collection('dailyReports').doc(reportId).delete();
+}
+
+// ============ حضور ============
 function checkIn() {
   const sd = document.getElementById('status');
   sd.textContent = '⏳...'; sd.style.display = 'block'; sd.style.background = 'rgba(255,167,38,0.35)';
@@ -584,22 +763,22 @@ function checkIn() {
     await db.collection('attendance').add({
       workerId: currentUser.id, workerName: currentUser.name,
       timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-      date: getTodayISO(), status, shift: selectedShift, hasDeduction: false
+      date: getTodayISO(), time: getNowTime(), status, shift: selectedShift, hasDeduction: false
     });
     sd.textContent = '✅ تم'; sd.style.background = 'rgba(76,175,80,0.35)';
   });
 }
 
 async function markAbsent() {
-  await db.collection('attendance').add({ workerId: currentUser.id, workerName: currentUser.name, timestamp: firebase.firestore.FieldValue.serverTimestamp(), date: getTodayISO(), status: 'absent', shift: selectedShift, hasDeduction: true });
+  await db.collection('attendance').add({ workerId: currentUser.id, workerName: currentUser.name, timestamp: firebase.firestore.FieldValue.serverTimestamp(), date: getTodayISO(), time: getNowTime(), status: 'absent', shift: selectedShift, hasDeduction: true });
   const d = document.getElementById('status'); d.textContent = '✗ غائب'; d.style.display = 'block'; d.style.background = 'rgba(239,83,80,0.35)';
 }
 async function markLeave() {
-  await db.collection('attendance').add({ workerId: currentUser.id, workerName: currentUser.name, timestamp: firebase.firestore.FieldValue.serverTimestamp(), date: getTodayISO(), status: 'leave', shift: selectedShift, hasDeduction: false });
+  await db.collection('attendance').add({ workerId: currentUser.id, workerName: currentUser.name, timestamp: firebase.firestore.FieldValue.serverTimestamp(), date: getTodayISO(), time: getNowTime(), status: 'leave', shift: selectedShift, hasDeduction: false });
   const d = document.getElementById('status'); d.textContent = '📝 إذن'; d.style.display = 'block'; d.style.background = 'rgba(103,58,183,0.35)';
 }
 async function markSick() {
-  await db.collection('attendance').add({ workerId: currentUser.id, workerName: currentUser.name, timestamp: firebase.firestore.FieldValue.serverTimestamp(), date: getTodayISO(), status: 'sick', shift: selectedShift, hasDeduction: false });
+  await db.collection('attendance').add({ workerId: currentUser.id, workerName: currentUser.name, timestamp: firebase.firestore.FieldValue.serverTimestamp(), date: getTodayISO(), time: getNowTime(), status: 'sick', shift: selectedShift, hasDeduction: false });
   const d = document.getElementById('status'); d.textContent = '🤒 مريض'; d.style.display = 'block'; d.style.background = 'rgba(173,20,87,0.35)';
 }
 
@@ -615,9 +794,8 @@ function watchAttendance() {
     if (!recs.length) { ld.innerHTML = '<p style="text-align:center;color:#888;">لا يوجد</p>'; return; }
     const meta = { present:{c:'#2e7d32',l:'حاضر'}, late:{c:'#ef6c00',l:'متأخر'}, leave:{c:'#673ab7',l:'إذن'}, sick:{c:'#ad1457',l:'مريض'}, absent:{c:'#c62828',l:'غائب'} };
     ld.innerHTML = recs.map(r => {
-      const time = r.timestamp ? new Date(r.timestamp.seconds*1000).toLocaleTimeString('ar-LY') : '--';
       const m = meta[r.status] || {c:'#607d8b',l:r.status};
-      return `<div class="row"><div><div>${r.workerName}</div><div style="font-size:11px;">${time} ${r.shift==='morning'?'🌅':'🌙'}</div></div><span class="badge" style="background:${m.c};margin-right:auto;">${m.l}</span></div>`;
+      return `<div class="row"><div><div>${r.workerName}</div><div style="font-size:11px;">${r.time || '--'} ${r.shift==='morning'?'🌅':'🌙'}</div></div><span class="badge" style="background:${m.c};margin-right:auto;">${m.l}</span></div>`;
     }).join('');
   });
 }
@@ -631,7 +809,7 @@ function watchWorkers() {
         <img src="${w.photo||''}" onerror="this.style.visibility='hidden'">
         <span class="name">${w.name}</span>
         <span style="font-size:10px;">${teamLabel(w.team)}</span>
-        <button class="edit-btn" onclick="toggleEditForm('${w.id}')">✏️ تعديل</button>
+        <button class="edit-btn" onclick="toggleEditForm('${w.id}')">✏️</button>
         <button class="del-btn" onclick="deleteWorker('${w.id}','${w.name}')">حذف</button>
         <div id="editForm-${w.id}" class="edit-form"></div>
       </div>
@@ -662,36 +840,35 @@ function toggleEditForm(workerId) {
   const w = allWorkers.find(x => x.id === workerId);
   form.innerHTML = `
     <input id="editName-${workerId}" value="${w.name}" placeholder="الاسم">
-    <select id="editTeam-${workerId}">
-      ${TEAMS.map(t => `<option value="${t.id}" ${t.id === w.team ? 'selected' : ''}>${t.label}</option>`).join('')}
-    </select>
+    <select id="editTeam-${workerId}">${TEAMS.map(t => `<option value="${t.id}" ${t.id === w.team ? 'selected' : ''}>${t.label}</option>`).join('')}</select>
     <select id="editShift-${workerId}">
       <option value="morning" ${w.shift === 'morning' ? 'selected' : ''}>🌅 صباح</option>
       <option value="night" ${w.shift === 'night' ? 'selected' : ''}>🌙 ليل</option>
       <option value="both" ${w.shift === 'both' ? 'selected' : ''}>🔄 كلاهما</option>
     </select>
     <input id="editAccount-${workerId}" value="${w.accountNumber || ''}" placeholder="رقم الحساب">
-    <input id="editBank-${workerId}" value="${w.bankName || ''}" placeholder="اسم المصرف">
-    <input id="editLicense-${workerId}" value="${w.licenseGrade || ''}" placeholder="درجة الرخصة">
+    <input id="editBank-${workerId}" value="${w.bankName || ''}" placeholder="المصرف">
+    <input id="editLicense-${workerId}" value="${w.licenseGrade || ''}" placeholder="الرخصة">
     <button onclick="saveEdit('${workerId}')">💾 حفظ</button>
   `;
   form.style.display = 'block';
 }
 
 async function saveEdit(workerId) {
-  const name = document.getElementById(`editName-${workerId}`).value;
-  const team = document.getElementById(`editTeam-${workerId}`).value;
-  const shift = document.getElementById(`editShift-${workerId}`).value;
-  const accountNumber = document.getElementById(`editAccount-${workerId}`).value;
-  const bankName = document.getElementById(`editBank-${workerId}`).value;
-  const licenseGrade = document.getElementById(`editLicense-${workerId}`).value;
-  
-  await db.collection('workers').doc(workerId).update({ name, team, shift, accountNumber, bankName, licenseGrade });
+  const data = {
+    name: document.getElementById(`editName-${workerId}`).value,
+    team: document.getElementById(`editTeam-${workerId}`).value,
+    shift: document.getElementById(`editShift-${workerId}`).value,
+    accountNumber: document.getElementById(`editAccount-${workerId}`).value,
+    bankName: document.getElementById(`editBank-${workerId}`).value,
+    licenseGrade: document.getElementById(`editLicense-${workerId}`).value
+  };
+  await db.collection('workers').doc(workerId).update(data);
   document.getElementById('editForm-' + workerId).style.display = 'none';
 }
 
 async function manualMark(workerId, workerName, status) {
-  await db.collection('attendance').add({ workerId, workerName, timestamp: firebase.firestore.FieldValue.serverTimestamp(), date: getTodayISO(), status, shift: adminSelectedShift, hasDeduction: status === 'absent' });
+  await db.collection('attendance').add({ workerId, workerName, timestamp: firebase.firestore.FieldValue.serverTimestamp(), date: getTodayISO(), time: getNowTime(), status, shift: adminSelectedShift, hasDeduction: status === 'absent' });
 }
 
 async function addWorker() {
@@ -701,15 +878,13 @@ async function addWorker() {
   const accountNumber = document.getElementById('newWorkerAccount').value.trim();
   const bankName = document.getElementById('newWorkerBank').value;
   const licenseGrade = document.getElementById('newWorkerLicense').value;
-  
   if (!name) { alert('اكتب الاسم'); return; }
-  
   await db.collection('workers').add({
     name, team, shift, accountNumber, bankName, licenseGrade,
     photo: workerPhotoBase64, pin: '0000',
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    createdDate: getTodayISO(), createdTime: getNowTime()
   });
-  
   document.getElementById('newWorkerName').value = '';
   document.getElementById('newWorkerAccount').value = '';
   document.getElementById('newWorkerBank').value = '';
@@ -793,7 +968,7 @@ async function addUser() {
   const role = document.getElementById('newUserRole').value;
   if (!name || !pin || pin.length < 4) { alert('اسم ورقم'); return; }
   let permissions = {}, viewOnly = false;
-  if (role === 'admin') { permissions = { viewOverview:true, manageAttendance:true, manageWorkers:true, viewDeductions:true, manageInventory:true, manageVehicles:true }; }
+  if (role === 'admin') { permissions = { viewOverview:true, manageAttendance:true, manageWorkers:true, viewDeductions:true, manageInventory:true, manageVehicles:true, manageReports:true }; }
   else {
     permissions = {
       viewOverview: document.getElementById('perm-overview').checked,
@@ -801,7 +976,8 @@ async function addUser() {
       manageWorkers: document.getElementById('perm-workers').checked,
       viewDeductions: document.getElementById('perm-deductions').checked,
       manageInventory: document.getElementById('perm-inventory').checked,
-      manageVehicles: document.getElementById('perm-vehicles').checked
+      manageVehicles: document.getElementById('perm-vehicles').checked,
+      manageReports: document.getElementById('perm-reports').checked
     };
     viewOnly = document.getElementById('perm-viewonly').checked;
   }
@@ -824,15 +1000,15 @@ function deleteUser(id, name) { if (confirm(`حذف ${name}؟`)) db.collection('
 function exportAttendanceExcel() {
   if (!latestAttendanceRecords.length) { alert('لا يوجد'); return; }
   const sl = { present:'حاضر', late:'متأخر', leave:'إذن', sick:'مريض', absent:'غائب' };
-  const rows = latestAttendanceRecords.map(r => [r.workerName, r.shift==='morning'?'صباح':'ليل', sl[r.status]||r.status, r.date]);
-  const ws = XLSX.utils.aoa_to_sheet([['الاسم','الوردية','الحالة','التاريخ'], ...rows]);
+  const rows = latestAttendanceRecords.map(r => [r.workerName, r.shift==='morning'?'صباح':'ليل', sl[r.status]||r.status, r.date, r.time || '--']);
+  const ws = XLSX.utils.aoa_to_sheet([['الاسم','الوردية','الحالة','التاريخ','الوقت'], ...rows]);
   const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'الحضور');
   XLSX.writeFile(wb, `حضور-${getTodayISO()}.xlsx`);
 }
 function exportWorkersExcel() {
   if (!allWorkers.length) { alert('لا يوجد'); return; }
-  const rows = allWorkers.map(w => [w.name, teamLabel(w.team), w.shift==='both'?'كلاهما':w.shift==='night'?'ليل':'صباح', w.accountNumber||'', w.bankName||'', w.licenseGrade||'']);
-  const ws = XLSX.utils.aoa_to_sheet([['الاسم','الفريق','الوردية','رقم الحساب','المصرف','الرخصة'], ...rows]);
+  const rows = allWorkers.map(w => [w.name, teamLabel(w.team), w.shift==='both'?'كلاهما':w.shift==='night'?'ليل':'صباح', w.accountNumber||'', w.bankName||'', w.licenseGrade||'', w.createdDate || '', w.createdTime || '']);
+  const ws = XLSX.utils.aoa_to_sheet([['الاسم','الفريق','الوردية','رقم الحساب','المصرف','الرخصة','تاريخ الإضافة','وقت الإضافة'], ...rows]);
   const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'العمال');
   XLSX.writeFile(wb, 'عمال.xlsx');
 }

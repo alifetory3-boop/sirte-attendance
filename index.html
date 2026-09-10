@@ -77,6 +77,8 @@
   button.camera-btn { background: rgba(255,152,0,0.5); }
   button.edit-btn { background: rgba(255,152,0,0.5); width: auto; padding: 5px 10px; font-size: 12px; margin: 0; }
   button.word-btn { background: rgba(76,175,80,0.5); }
+  button.view-btn { background: rgba(33,150,243,0.5); }
+  button.print-btn { background: rgba(156,39,176,0.5); }
   label { font-size: 13px; color: rgba(255,255,255,0.85); margin-bottom: 5px; display: block; }
   input, textarea {
     width: 100%; padding: 12px; border-radius: 10px;
@@ -528,14 +530,13 @@ document.getElementById('vehiclePhotoInput').addEventListener('change', async (e
   preview.style.display = 'block';
 });
 
-// ✅✅✅ صور التقرير (مصلح)
+// صور التقرير
 document.getElementById('reportPhotosInput').addEventListener('change', function(e) {
   const files = e.target.files;
   reportPhotosArray = [];
   const preview = document.getElementById('reportPhotosPreview');
   preview.innerHTML = '';
   
-  let loaded = 0;
   for (let i = 0; i < files.length; i++) {
     const file = files[i];
     const reader = new FileReader();
@@ -545,137 +546,11 @@ document.getElementById('reportPhotosInput').addEventListener('change', function
       const img = document.createElement('img');
       img.src = event.target.result;
       preview.appendChild(img);
-      loaded++;
     };
     
     reader.readAsDataURL(file);
   }
 });
-
-// ✅✅✅ حفظ التقرير (مصلح)
-async function saveReport() {
-  const date = document.getElementById('reportDate').value;
-  const workerName = document.getElementById('reportWorkerName').value.trim();
-  const location = document.getElementById('reportLocation').value.trim();
-  const text = document.getElementById('reportText').value.trim();
-  
-  if (!date || !workerName || !text) {
-    alert('⚠️ أدخل التاريخ والاسم ونص التقرير');
-    return;
-  }
-  
-  try {
-    await db.collection('dailyReports').add({
-      date: date,
-      workerName: workerName,
-      location: location,
-      text: text,
-      photos: reportPhotosArray,
-      createdTime: getNowTime(),
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    
-    alert('✅ تم حفظ التقرير بنجاح');
-    
-    document.getElementById('reportWorkerName').value = '';
-    document.getElementById('reportLocation').value = '';
-    document.getElementById('reportText').value = '';
-    reportPhotosArray = [];
-    document.getElementById('reportPhotosPreview').innerHTML = '';
-    document.getElementById('reportPhotosInput').value = '';
-    
-    loadReports();
-  } catch (err) {
-    alert('❌ خطأ في الحفظ: ' + err.message);
-    console.error(err);
-  }
-}
-
-// تحميل التقارير
-function loadReports() {
-  db.collection('dailyReports').orderBy('createdAt', 'desc').limit(20).onSnapshot(sn => {
-    const c = document.getElementById('savedReportsList');
-    if (sn.empty) {
-      c.innerHTML = '<p style="text-align:center;color:#888;">لا توجد تقارير</p>';
-      return;
-    }
-    c.innerHTML = sn.docs.map(doc => {
-      const r = doc.data();
-      const photos = (r.photos || []).slice(0, 3).map(p => `<img src="${p}" style="width:50px;height:50px;object-fit:cover;border-radius:6px;margin:2px;">`).join('');
-      return `
-        <div class="user-card">
-          <div style="display:flex;justify-content:space-between;flex-wrap:wrap;">
-            <strong>${r.workerName}</strong>
-            <span style="font-size:11px;">${r.date} - ${r.createdTime || ''}</span>
-          </div>
-          ${r.location ? `<div style="font-size:11px;color:rgba(255,255,255,0.7);">📍 ${r.location}</div>` : ''}
-          <div style="font-size:12px;margin-top:5px;">${r.text.substring(0, 100)}${r.text.length > 100 ? '...' : ''}</div>
-          ${photos ? `<div style="display:flex;margin-top:5px;">${photos}</div>` : ''}
-          <div style="display:flex;gap:5px;margin-top:8px;">
-            <button class="word-btn" onclick="exportReportWord('${doc.id}')" style="width:auto;padding:5px 10px;font-size:11px;margin:0;">📄 Word</button>
-            <button class="del-btn" onclick="deleteReport('${doc.id}')" style="width:auto;padding:5px 10px;font-size:11px;margin:0;">حذف</button>
-          </div>
-        </div>
-      `;
-    }).join('');
-  });
-}
-
-// ✅✅✅ تصدير Word (مصلح)
-function exportReportWord(reportId) {
-  db.collection('dailyReports').doc(reportId).get().then(doc => {
-    if (!doc.exists) {
-      alert('التقرير غير موجود');
-      return;
-    }
-    const r = doc.data();
-    
-    let htmlContent = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" dir="rtl">';
-    htmlContent += '<head><meta charset="UTF-8">';
-    htmlContent += '<style>body { font-family: Arial, sans-serif; direction: rtl; }';
-    htmlContent += 'h1 { text-align: center; color: #0f766e; }';
-    htmlContent += '.info { margin: 20px 0; }';
-    htmlContent += '.info p { margin: 5px 0; }';
-    htmlContent += '.photos img { max-width: 300px; margin: 10px; }';
-    htmlContent += 'hr { border: 1px solid #0f766e; }</style></head><body>';
-    htmlContent += '<h1>📋 تقرير يومي</h1><hr>';
-    htmlContent += '<div class="info">';
-    htmlContent += '<p><strong>📅 التاريخ:</strong> ' + r.date + '</p>';
-    htmlContent += '<p><strong>⏰ الوقت:</strong> ' + (r.createdTime || '') + '</p>';
-    htmlContent += '<p><strong>👷 كاتب التقرير:</strong> ' + r.workerName + '</p>';
-    if (r.location) htmlContent += '<p><strong>📍 الموقع:</strong> ' + r.location + '</p>';
-    htmlContent += '</div><hr>';
-    htmlContent += '<h2>📝 نص التقرير:</h2>';
-    htmlContent += '<p>' + r.text.replace(/\n/g, '<br>') + '</p>';
-    
-    if (r.photos && r.photos.length > 0) {
-      htmlContent += '<hr><h2>📸 الصور:</h2><div class="photos">';
-      for (let i = 0; i < r.photos.length; i++) {
-        htmlContent += '<img src="' + r.photos[i] + '" alt="صورة">';
-      }
-      htmlContent += '</div>';
-    }
-    
-    htmlContent += '</body></html>';
-    
-    const blob = new Blob(['\ufeff' + htmlContent], { type: 'application/msword' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'تقرير-' + r.date + '-' + r.workerName + '.doc';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }).catch(err => {
-    alert('خطأ: ' + err.message);
-  });
-}
-
-async function deleteReport(reportId) {
-  if (!confirm('حذف التقرير؟')) return;
-  await db.collection('dailyReports').doc(reportId).delete();
-}
 
 // تسجيل الدخول
 async function login() {
@@ -1059,6 +934,333 @@ function deleteWorker(id, name) {
   if (confirm(`حذف ${name}؟`)) db.collection('workers').doc(id).delete();
 }
 
+// ============ التقارير ============
+async function saveReport() {
+  const date = document.getElementById('reportDate').value;
+  const workerName = document.getElementById('reportWorkerName').value.trim();
+  const location = document.getElementById('reportLocation').value.trim();
+  const text = document.getElementById('reportText').value.trim();
+  
+  if (!date || !workerName || !text) {
+    alert('⚠️ أدخل التاريخ والاسم ونص التقرير');
+    return;
+  }
+  
+  try {
+    await db.collection('dailyReports').add({
+      date: date,
+      workerName: workerName,
+      location: location,
+      text: text,
+      photos: reportPhotosArray,
+      createdTime: getNowTime(),
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    
+    alert('✅ تم حفظ التقرير بنجاح');
+    
+    document.getElementById('reportWorkerName').value = '';
+    document.getElementById('reportLocation').value = '';
+    document.getElementById('reportText').value = '';
+    reportPhotosArray = [];
+    document.getElementById('reportPhotosPreview').innerHTML = '';
+    document.getElementById('reportPhotosInput').value = '';
+    
+    loadReports();
+  } catch (err) {
+    alert('❌ خطأ في الحفظ: ' + err.message);
+    console.error(err);
+  }
+}
+
+function loadReports() {
+  db.collection('dailyReports').orderBy('createdAt', 'desc').limit(20).onSnapshot(sn => {
+    const c = document.getElementById('savedReportsList');
+    if (sn.empty) {
+      c.innerHTML = '<p style="text-align:center;color:#888;">لا توجد تقارير</p>';
+      return;
+    }
+    c.innerHTML = sn.docs.map(doc => {
+      const r = doc.data();
+      const photos = (r.photos || []).slice(0, 3).map(p => `<img src="${p}" style="width:50px;height:50px;object-fit:cover;border-radius:6px;margin:2px;">`).join('');
+      return `
+        <div class="user-card">
+          <div style="display:flex;justify-content:space-between;flex-wrap:wrap;">
+            <strong>${r.workerName}</strong>
+            <span style="font-size:11px;">${r.date} - ${r.createdTime || ''}</span>
+          </div>
+          ${r.location ? `<div style="font-size:11px;color:rgba(255,255,255,0.7);">📍 ${r.location}</div>` : ''}
+          <div style="font-size:12px;margin-top:5px;">${r.text.substring(0, 100)}${r.text.length > 100 ? '...' : ''}</div>
+          ${photos ? `<div style="display:flex;margin-top:5px;">${photos}</div>` : ''}
+          <div style="display:flex;gap:5px;margin-top:8px;flex-wrap:wrap;">
+            <button class="view-btn" onclick="viewReport('${doc.id}')" style="width:auto;padding:5px 10px;font-size:11px;margin:0;">👁️ عرض</button>
+            <button class="word-btn" onclick="exportReportWord('${doc.id}')" style="width:auto;padding:5px 10px;font-size:11px;margin:0;">📄 Word</button>
+            <button class="print-btn" onclick="printReport('${doc.id}')" style="width:auto;padding:5px 10px;font-size:11px;margin:0;">🖨️ طباعة</button>
+            <button class="del-btn" onclick="deleteReport('${doc.id}')" style="width:auto;padding:5px 10px;font-size:11px;margin:0;">حذف</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  });
+}
+
+// عرض التقرير على الشاشة
+function viewReport(reportId) {
+  db.collection('dailyReports').doc(reportId).get().then(doc => {
+    if (!doc.exists) {
+      alert('التقرير غير موجود');
+      return;
+    }
+    const r = doc.data();
+    const photosHTML = (r.photos || []).map(p => 
+      `<img src="${p}" style="width:100%;max-width:300px;border-radius:8px;margin:5px;border:1px solid #ddd;">`
+    ).join('');
+    
+    const modal = document.createElement('div');
+    modal.id = 'reportModal';
+    modal.style.cssText = `
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-y: auto;
+    `;
+    
+    modal.innerHTML = `
+      <div style="
+        background: #fff;
+        color: #000;
+        max-width: 700px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+        border-radius: 16px;
+        padding: 24px;
+        direction: rtl;
+        font-family: Arial, sans-serif;
+        position: relative;
+      ">
+        <button onclick="closeReportModal()" style="
+          position: absolute;
+          top: 10px;
+          left: 10px;
+          width: 35px;
+          height: 35px;
+          border-radius: 50%;
+          background: #f44336;
+          color: #fff;
+          border: none;
+          font-size: 20px;
+          cursor: pointer;
+          font-weight: bold;
+        ">×</button>
+        
+        <h1 style="text-align:center;color:#0f766e;margin-bottom:20px;">📋 تقرير يومي</h1>
+        <hr style="border:1px solid #0f766e;">
+        
+        <div style="margin:20px 0;padding:15px;background:#f5f5f5;border-radius:10px;">
+          <p style="margin:8px 0;"><strong>📅 التاريخ:</strong> ${r.date}</p>
+          <p style="margin:8px 0;"><strong>⏰ الوقت:</strong> ${r.createdTime || ''}</p>
+          <p style="margin:8px 0;"><strong>👷 كاتب التقرير:</strong> ${r.workerName}</p>
+          ${r.location ? `<p style="margin:8px 0;"><strong>📍 الموقع:</strong> ${r.location}</p>` : ''}
+        </div>
+        
+        <hr style="border:1px solid #ddd;">
+        
+        <h2 style="color:#0f766e;">📝 نص التقرير:</h2>
+        <div style="
+          padding: 15px;
+          background: #fafafa;
+          border-right: 4px solid #0f766e;
+          border-radius: 8px;
+          line-height: 1.8;
+          white-space: pre-wrap;
+        ">${r.text}</div>
+        
+        ${photosHTML ? `
+          <hr style="border:1px solid #ddd;margin-top:20px;">
+          <h2 style="color:#0f766e;">📸 الصور:</h2>
+          <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;">
+            ${photosHTML}
+          </div>
+        ` : ''}
+        
+        <div style="display:flex;gap:10px;margin-top:20px;justify-content:center;flex-wrap:wrap;">
+          <button onclick="printReport('${reportId}')" style="
+            padding: 12px 24px;
+            background: #9c27b0;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+          ">🖨️ طباعة</button>
+          <button onclick="exportReportWord('${reportId}')" style="
+            padding: 12px 24px;
+            background: #4caf50;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+          ">📄 Word</button>
+          <button onclick="closeReportModal()" style="
+            padding: 12px 24px;
+            background: #607d8b;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+          ">إغلاق</button>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(modal);
+  });
+}
+
+function closeReportModal() {
+  const modal = document.getElementById('reportModal');
+  if (modal) modal.remove();
+}
+
+// طباعة التقرير
+function printReport(reportId) {
+  db.collection('dailyReports').doc(reportId).get().then(doc => {
+    if (!doc.exists) return;
+    const r = doc.data();
+    
+    const photosHTML = (r.photos || []).map(p => 
+      `<img src="${p}" style="max-width:400px;display:block;margin:15px auto;border-radius:8px;">`
+    ).join('');
+    
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html dir="rtl">
+      <head>
+        <meta charset="UTF-8">
+        <title>تقرير - ${r.date}</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            direction: rtl;
+            padding: 20px;
+            color: #000;
+          }
+          h1 { text-align: center; color: #0f766e; }
+          hr { border: 1px solid #0f766e; }
+          .info { margin: 20px 0; padding: 15px; background: #f5f5f5; border-radius: 10px; }
+          .info p { margin: 8px 0; }
+          .text-content {
+            padding: 15px;
+            background: #fafafa;
+            border-right: 4px solid #0f766e;
+            border-radius: 8px;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            margin: 15px 0;
+          }
+          .photos { text-align: center; }
+          .photos img { max-width: 400px; display: block; margin: 15px auto; }
+          @media print {
+            body { padding: 0; }
+          }
+        </style>
+      </head>
+      <body>
+        <h1>📋 تقرير يومي</h1>
+        <hr>
+        <div class="info">
+          <p><strong>📅 التاريخ:</strong> ${r.date}</p>
+          <p><strong>⏰ الوقت:</strong> ${r.createdTime || ''}</p>
+          <p><strong>👷 كاتب التقرير:</strong> ${r.workerName}</p>
+          ${r.location ? `<p><strong>📍 الموقع:</strong> ${r.location}</p>` : ''}
+        </div>
+        <hr>
+        <h2>📝 نص التقرير:</h2>
+        <div class="text-content">${r.text}</div>
+        ${photosHTML ? `<hr><h2>📸 الصور:</h2><div class="photos">${photosHTML}</div>` : ''}
+        <script>
+          window.onload = function() {
+            setTimeout(function() {
+              window.print();
+            }, 500);
+          };
+        <\/script>
+      </body>
+      </html>
+    `);
+    printWindow.document.close();
+  });
+}
+
+// تصدير Word
+function exportReportWord(reportId) {
+  db.collection('dailyReports').doc(reportId).get().then(doc => {
+    if (!doc.exists) {
+      alert('التقرير غير موجود');
+      return;
+    }
+    const r = doc.data();
+    
+    let htmlContent = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" dir="rtl">';
+    htmlContent += '<head><meta charset="UTF-8">';
+    htmlContent += '<style>body { font-family: Arial, sans-serif; direction: rtl; }';
+    htmlContent += 'h1 { text-align: center; color: #0f766e; }';
+    htmlContent += '.info { margin: 20px 0; }';
+    htmlContent += '.info p { margin: 5px 0; }';
+    htmlContent += '.photos img { max-width: 300px; margin: 10px; }';
+    htmlContent += 'hr { border: 1px solid #0f766e; }</style></head><body>';
+    htmlContent += '<h1>📋 تقرير يومي</h1><hr>';
+    htmlContent += '<div class="info">';
+    htmlContent += '<p><strong>📅 التاريخ:</strong> ' + r.date + '</p>';
+    htmlContent += '<p><strong>⏰ الوقت:</strong> ' + (r.createdTime || '') + '</p>';
+    htmlContent += '<p><strong>👷 كاتب التقرير:</strong> ' + r.workerName + '</p>';
+    if (r.location) htmlContent += '<p><strong>📍 الموقع:</strong> ' + r.location + '</p>';
+    htmlContent += '</div><hr>';
+    htmlContent += '<h2>📝 نص التقرير:</h2>';
+    htmlContent += '<p>' + r.text.replace(/\n/g, '<br>') + '</p>';
+    
+    if (r.photos && r.photos.length > 0) {
+      htmlContent += '<hr><h2>📸 الصور:</h2><div class="photos">';
+      for (let i = 0; i < r.photos.length; i++) {
+        htmlContent += '<img src="' + r.photos[i] + '" alt="صورة">';
+      }
+      htmlContent += '</div>';
+    }
+    
+    htmlContent += '</body></html>';
+    
+    const blob = new Blob(['\ufeff' + htmlContent], { type: 'application/msword' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'تقرير-' + r.date + '-' + r.workerName + '.doc';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }).catch(err => {
+    alert('خطأ: ' + err.message);
+  });
+}
+
+async function deleteReport(reportId) {
+  if (!confirm('حذف التقرير؟')) return;
+  await db.collection('dailyReports').doc(reportId).delete();
+}
+
+// الخصومات
 async function loadDeductionSettings() {
   try {
     const d = await db.collection('settings').doc('deductions').get();
@@ -1101,6 +1303,7 @@ async function loadDeductions() {
   }).join('') + `<div style="margin-top:10px;text-align:center;font-weight:bold;color:#fff;">الإجمالي: ${total} دينار</div>`;
 }
 
+// المخزن
 function watchInventory() {
   db.collection('inventory').orderBy('name').onSnapshot(sn => {
     allInventory = sn.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -1129,6 +1332,7 @@ function deleteItem(id, name) {
   if (confirm(`حذف ${name}؟`)) db.collection('inventory').doc(id).delete();
 }
 
+// الآليات
 function loadVehicles() {
   db.collection('vehicles').onSnapshot(sn => {
     document.getElementById('vehiclesList').innerHTML = sn.empty ? '<p style="text-align:center;">لا توجد آليات</p>' : sn.docs.map(doc => {
@@ -1156,6 +1360,7 @@ function deleteVehicle(id, number) {
   if (confirm(`حذف ${number}؟`)) db.collection('vehicles').doc(id).delete();
 }
 
+// المستخدمين
 async function addUser() {
   const name = document.getElementById('newUserName').value.trim();
   const pin = document.getElementById('newUserPin').value.trim();
@@ -1206,6 +1411,7 @@ function deleteUser(id, name) {
   if (confirm(`حذف ${name}؟`)) db.collection('systemUsers').doc(id).delete();
 }
 
+// تصدير Excel
 function exportAttendanceExcel() {
   if (!latestAttendanceRecords.length) {
     alert('لا يوجد حضور اليوم');

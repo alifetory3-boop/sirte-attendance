@@ -182,11 +182,12 @@
     width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,0.4);
   }
   .driver-info {
-    font-size: 11px; color: rgba(255,255,255,0.8); line-height: 1.6;
+    font-size: 11px; color: rgba(255,255,255,0.8); line-height: 1.8;
   }
   .check-photo {
     width: 100%; max-height: 200px; object-fit: cover;
     border-radius: 8px; margin-top: 8px; border: 1px solid rgba(255,255,255,0.4);
+    cursor: pointer;
   }
   .info-tag {
     display: inline-block;
@@ -388,7 +389,7 @@
         <select id="newDriverBank">
           <option value="">— اختر —</option>
           <option value="الجمهورية">مصرف الجمهورية</option>
-          <option value="مصرف التجارة والتنمية">امصرف التجارة والتنمية</option>
+          <option value="التجاري">مصرف التجارة والتنمية</option>
           <option value="الوحدة">مصرف الوحدة</option>
           <option value="الصحاري">مصرف الصحاري</option>
           <option value="التجاري الوطني">المصرف التجاري الوطني</option>
@@ -602,7 +603,6 @@ function calculateWorkDuration(startDate) {
   return result.trim() || 'اليوم';
 }
 
-// ضغط الصور
 function compressImage(file, maxWidth = 300, quality = 0.4) {
   return new Promise((resolve) => {
     const reader = new FileReader();
@@ -688,7 +688,7 @@ document.getElementById('reportPhotosInput').addEventListener('change', function
   }
 });
 
-// ✅✅✅ رفع الصورة إلى ImgBB
+// رفع الصورة إلى ImgBB
 async function uploadPhoto(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -773,8 +773,8 @@ async function login() {
   try {
     const ds = await db.collection('drivers').where('name','==',name).get();
     if (!ds.empty) {
-      ds.forEach(d => { currentUser = { id: d.id, ...d.data(), role: 'worker' }; });
-      currentUserRole = 'worker';
+      ds.forEach(d => { currentUser = { id: d.id, ...d.data(), role: 'driver' }; });
+      currentUserRole = 'driver';
       enterWorker();
       return;
     }
@@ -788,7 +788,12 @@ function enterWorker() {
   document.getElementById('mainApp').style.display = 'block';
   document.getElementById('workerView').style.display = 'block';
   document.getElementById('adminView').style.display = 'none';
-  document.getElementById('workerInfo').innerHTML = '<span class="role-badge role-worker">👷</span> ' + currentUser.name;
+  
+  if (currentUserRole === 'driver') {
+    document.getElementById('workerInfo').innerHTML = '<span class="role-badge role-driver">🚗 سائق</span> ' + currentUser.name;
+  } else {
+    document.getElementById('workerInfo').innerHTML = '<span class="role-badge role-worker">👷</span> ' + currentUser.name;
+  }
   document.getElementById('workerDateDisplay').textContent = '📅 ' + getTodayDate();
   clearLogin();
 }
@@ -913,7 +918,7 @@ function populateDeductionMonthSelect() {
   document.getElementById('deductionMonthSelect').innerHTML = o;
 }
 
-// ============ حضور ============
+// حضور
 function checkIn() {
   const sd = document.getElementById('status');
   sd.textContent = '⏳ جاري تحديد موقعك...';
@@ -930,7 +935,6 @@ function checkIn() {
     const now = new Date();
     const cut = new Date(now); cut.setHours(8,0,0,0);
     const status = now > cut ? 'late' : 'present';
-    const coll = currentUserRole === 'driver' ? 'drivers' : 'workers';
     await db.collection('attendance').add({
       workerId: currentUser.id,
       workerName: currentUser.name,
@@ -1009,12 +1013,13 @@ function watchAttendance() {
       
       ld.innerHTML = recs.map(r => {
         const m = meta[r.status] || { c: '#607d8b', l: r.status };
-        return `<div class="row"><div><div>${r.workerName}</div><div style="font-size:11px;color:rgba(255,255,255,0.7);">${r.time || '--'} ${r.shift==='morning'?'🌅':'🌙'}</div></div><span class="badge" style="background:${m.c};margin-right:auto;">${m.l}</span></div>`;
+        const icon = r.personType === 'driver' ? '🚗 ' : '👷 ';
+        return `<div class="row"><div><div>${icon}${r.workerName}</div><div style="font-size:11px;color:rgba(255,255,255,0.7);">${r.time || '--'} ${r.shift==='morning'?'🌅':'🌙'}</div></div><span class="badge" style="background:${m.c};margin-right:auto;">${m.l}</span></div>`;
       }).join('');
     });
 }
 
-// ============ العمال ============
+// العمال
 function watchWorkers() {
   db.collection('workers').orderBy('name').onSnapshot(sn => {
     allWorkers = sn.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -1034,19 +1039,23 @@ function watchWorkers() {
       </div>`;
     }).join('') : '<p style="text-align:center;">لا يوجد عمال</p>';
     
-    const c2 = document.getElementById('dailyMarkList');
-    const allPeople = [...allWorkers.map(w => ({...w, type: 'worker'})), ...allDrivers.map(d => ({...d, type: 'driver'}))];
-    c2.innerHTML = allPeople.length ? allPeople.map(w => `
-      <div class="worker-row">
-        <img src="${w.photo||''}" onerror="this.style.visibility='hidden'">
-        <span class="name">${w.type === 'driver' ? '🚗 ' : '👷 '}${w.name}</span>
-        <button onclick="manualMark('${w.id}','${w.name}','present')" style="width:auto;padding:5px;margin:0;background:rgba(46,125,50,0.4);">✅</button>
-        <button onclick="manualMark('${w.id}','${w.name}','absent')" style="width:auto;padding:5px;margin:0;background:rgba(198,40,40,0.4);">✗</button>
-        <button onclick="manualMark('${w.id}','${w.name}','leave')" style="width:auto;padding:5px;margin:0;background:rgba(103,58,183,0.4);">📝</button>
-        <button onclick="manualMark('${w.id}','${w.name}','sick')" style="width:auto;padding:5px;margin:0;background:rgba(173,20,87,0.4);">🤒</button>
-      </div>
-    `).join('') : '<p style="text-align:center;">لا يوجد أشخاص</p>';
+    updateDailyMarkList();
   });
+}
+
+function updateDailyMarkList() {
+  const c2 = document.getElementById('dailyMarkList');
+  const allPeople = [...allWorkers.map(w => ({...w, type: 'worker'})), ...allDrivers.map(d => ({...d, type: 'driver'}))];
+  c2.innerHTML = allPeople.length ? allPeople.map(w => `
+    <div class="worker-row">
+      <img src="${w.photo||''}" onerror="this.style.visibility='hidden'">
+      <span class="name">${w.type === 'driver' ? '🚗 ' : '👷 '}${w.name}</span>
+      <button onclick="manualMark('${w.id}','${w.name}','present')" style="width:auto;padding:5px;margin:0;background:rgba(46,125,50,0.4);">✅</button>
+      <button onclick="manualMark('${w.id}','${w.name}','absent')" style="width:auto;padding:5px;margin:0;background:rgba(198,40,40,0.4);">✗</button>
+      <button onclick="manualMark('${w.id}','${w.name}','leave')" style="width:auto;padding:5px;margin:0;background:rgba(103,58,183,0.4);">📝</button>
+      <button onclick="manualMark('${w.id}','${w.name}','sick')" style="width:auto;padding:5px;margin:0;background:rgba(173,20,87,0.4);">🤒</button>
+    </div>
+  `).join('') : '<p style="text-align:center;">لا يوجد أشخاص</p>';
 }
 
 function toggleEditWorkerForm(workerId) {
@@ -1067,7 +1076,8 @@ function toggleEditWorkerForm(workerId) {
       <option value="night" ${w.shift === 'night' ? 'selected' : ''}>🌙 ليل</option>
       <option value="both" ${w.shift === 'both' ? 'selected' : ''}>🔄 كلاهما</option>
     </select>
-    <input id="editStartDate-${workerId}" type="date" value="${w.startDate || ''}" placeholder="تاريخ المباشرة">
+    <label>📅 تاريخ المباشرة</label>
+    <input id="editStartDate-${workerId}" type="date" value="${w.startDate || ''}">
     <button onclick="saveEditWorker('${workerId}')">💾 حفظ التعديل</button>
   `;
   form.style.display = 'block';
@@ -1122,11 +1132,12 @@ function deleteWorker(id, name) {
   if (confirm(`حذف ${name}؟`)) db.collection('workers').doc(id).delete();
 }
 
-// ============ السائقين ============
+// السائقين
 function watchDrivers() {
   db.collection('drivers').orderBy('name').onSnapshot(sn => {
     allDrivers = sn.docs.map(d => ({ id: d.id, ...d.data() }));
     renderDriversList();
+    updateDailyMarkList();
   });
 }
 
@@ -1255,7 +1266,7 @@ function deleteDriver(id, name) {
   if (confirm(`حذف السائق ${name}؟`)) db.collection('drivers').doc(id).delete();
 }
 
-// ============ التقارير ============
+// التقارير
 async function saveReport() {
   const date = document.getElementById('reportDate').value;
   const workerName = document.getElementById('reportWorkerName').value.trim();
@@ -1484,7 +1495,7 @@ async function deleteReport(reportId) {
   alert('✅ تم حذف التقرير');
 }
 
-// ============ الخصومات ============
+// الخصومات
 async function loadDeductionSettings() {
   try {
     const d = await db.collection('settings').doc('deductions').get();
@@ -1527,7 +1538,7 @@ async function loadDeductions() {
   }).join('') + `<div style="margin-top:10px;text-align:center;font-weight:bold;color:#fff;">الإجمالي: ${total} دينار</div>`;
 }
 
-// ============ المخزن ============
+// المخزن
 function watchInventory() {
   db.collection('inventory').orderBy('name').onSnapshot(sn => {
     allInventory = sn.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -1556,7 +1567,7 @@ function deleteItem(id, name) {
   if (confirm(`حذف ${name}؟`)) db.collection('inventory').doc(id).delete();
 }
 
-// ============ الآليات ============
+// الآليات
 function loadVehicles() {
   db.collection('vehicles').onSnapshot(sn => {
     document.getElementById('vehiclesList').innerHTML = sn.empty ? '<p style="text-align:center;">لا توجد آليات</p>' : sn.docs.map(doc => {
@@ -1584,7 +1595,7 @@ function deleteVehicle(id, number) {
   if (confirm(`حذف ${number}؟`)) db.collection('vehicles').doc(id).delete();
 }
 
-// ============ المستخدمين ============
+// المستخدمين
 async function addUser() {
   const name = document.getElementById('newUserName').value.trim();
   const pin = document.getElementById('newUserPin').value.trim();
@@ -1624,7 +1635,7 @@ function loadUsersList() {
   db.collection('systemUsers').onSnapshot(sn => {
     document.getElementById('usersList').innerHTML = sn.empty ? '<p style="text-align:center;">لا يوجد مستخدمين</p>' : sn.docs.map(doc => {
       const u = doc.data();
-      return `<div class="user-card"><strong>${u.name}</strong> <span style="font-size:11px;">🔢${u.pin}</span> ${u.viewOnly ? '<span class="view-only-badge">👁️</span>' : ''}<button class="del-btn" onclick="deleteUser('${doc.id}','${u.name}')">حذف</button></div>`;
+      return `<div class="user-card"><strong>${u.name}</strong> <span style="font-size:11px;">🔢${u.pin}</span> ${u.viewOnly ? '<span class="view-only-badge">👁️</span>' : ''}<button class="del-btn" onclick="deleteUser('.${doc.id}','${u.name}')">حذف</button></div>`;
     }).join('');
   });
 }
@@ -1633,12 +1644,12 @@ function deleteUser(id, name) {
   if (confirm(`حذف ${name}؟`)) db.collection('systemUsers').doc(id).delete();
 }
 
-// ============ تصدير Excel ============
+// تصدير Excel
 function exportAttendanceExcel() {
   if (!latestAttendanceRecords.length) { alert('لا يوجد حضور اليوم'); return; }
   const sl = { present:'حاضر', late:'متأخر', leave:'إذن', sick:'مريض', absent:'غائب' };
-  const rows = latestAttendanceRecords.map(r => [r.workerName, r.shift==='morning'?'صباح':'ليل', sl[r.status]||r.status, r.date, r.time || '--']);
-  const ws = XLSX.utils.aoa_to_sheet([['الاسم','الوردية','الحالة','التاريخ','الوقت'], ...rows]);
+  const rows = latestAttendanceRecords.map(r => [r.workerName, r.personType === 'driver' ? 'سائق' : 'عامل', r.shift==='morning'?'صباح':'ليل', sl[r.status]||r.status, r.date, r.time || '--']);
+  const ws = XLSX.utils.aoa_to_sheet([['الاسم','النوع','الوردية','الحالة','التاريخ','الوقت'], ...rows]);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'الحضور');
   XLSX.writeFile(wb, `حضور-${getTodayISO()}.xlsx`);
@@ -1671,7 +1682,7 @@ function exportDriversExcel() {
     calculateWorkDuration(d.startDate),
     d.accountNumber || '',
     d.bankName || '',
- تش    d.licenseGrade || '',
+    d.licenseGrade || '',
     d.createdDate || '',
     d.createdTime || ''
   ]);
@@ -1688,7 +1699,7 @@ function exportDeductionsExcel() { loadDeductions(); }
 
 function exportInventoryExcel() {
   if (!allInventory.length) { alert('المخزن فارغ'); return; }
-  const rows = allInventory.map(i => [i.name, i.quantity, i.unit||'']);
+  const rows = allInventory.map(i => [i.name, i.quantity, iunit||'']);
   const ws = XLSX.utils.aoa_to_sheet([['الاسم','الكمية','الوحدة'], ...rows]);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'المخزن');

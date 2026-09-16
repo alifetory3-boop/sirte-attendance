@@ -259,7 +259,6 @@
       <div class="tab" data-tab="permissions">🔑 صلاحيات</div>
     </div>
 
-    <!-- نظرة عامة -->
     <div id="tab-overview">
       <div class="card">
         <h1>حضور اليوم</h1>
@@ -278,7 +277,6 @@
       </div>
     </div>
 
-    <!-- حضور يدوي -->
     <div id="tab-daily" style="display:none;">
       <div class="card">
         <h2>✅ تسجيل يدوي</h2>
@@ -291,7 +289,6 @@
       </div>
     </div>
 
-    <!-- تقارير -->
     <div id="tab-reports" style="display:none;">
       <div class="card">
         <h2>📋 تقرير يومي</h2>
@@ -317,7 +314,6 @@
       </div>
     </div>
 
-    <!-- عمال -->
     <div id="tab-workers" style="display:none;">
       <div class="card">
         <h2>➕ إضافة عامل</h2>
@@ -348,7 +344,6 @@
       </div>
     </div>
 
-    <!-- سائقين -->
     <div id="tab-drivers" style="display:none;">
       <div class="card">
         <h2>➕ إضافة سائق</h2>
@@ -426,7 +421,6 @@
       </div>
     </div>
 
-    <!-- خصومات -->
     <div id="tab-deductions" style="display:none;">
       <div class="card">
         <h2>💰 الخصومات</h2>
@@ -441,7 +435,6 @@
       </div>
     </div>
 
-    <!-- مخزن -->
     <div id="tab-inventory" style="display:none;">
       <div class="card">
         <h2>➕ إضافة صنف</h2>
@@ -457,7 +450,6 @@
       </div>
     </div>
 
-    <!-- آليات -->
     <div id="tab-vehicles" style="display:none;">
       <div class="card">
         <h2>➕ إضافة آلية</h2>
@@ -487,7 +479,6 @@
       </div>
     </div>
 
-    <!-- صلاحيات -->
     <div id="tab-permissions" style="display:none;">
       <div class="card">
         <h2>👥 إضافة مستخدم</h2>
@@ -529,7 +520,6 @@
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// ✅ ImgBB API Key
 const IMGBB_API_KEY = 'eda920fc86851acbc414c5d058bf2b28';
 
 const OWNER_NAME = 'المدير';
@@ -574,7 +564,6 @@ function getTodayDate() {
 function getTodayISO() { return new Date().toISOString().slice(0, 10); }
 function getNowTime() { return new Date().toLocaleTimeString('ar-LY'); }
 
-// ✅ حساب مدة العمل تلقائياً
 function calculateWorkDuration(startDate) {
   if (!startDate) return '—';
   const start = new Date(startDate);
@@ -628,6 +617,183 @@ function teamLabel(id) {
   return t ? t.label : '';
 }
 
+// ============ ✅ نظام الإشعار الرسمي ============
+function showWorkNotification(data) {
+  const today = new Date().toLocaleDateString('ar-LY', { year: 'numeric', month: 'long', day: 'numeric' });
+  
+  const modal = document.createElement('div');
+  modal.id = 'notificationModal';
+  modal.style.cssText = `
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.85); z-index: 99999;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px; overflow-y: auto;
+  `;
+  
+  modal.innerHTML = `
+    <div style="background: #fff; color: #000; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; border-radius: 16px; padding: 30px; direction: rtl; font-family: Arial, sans-serif; position: relative;">
+      <button onclick="closeNotificationModal()" style="position: absolute; top: 10px; left: 10px; width: 35px; height: 35px; border-radius: 50%; background: #f44336; color: #fff; border: none; font-size: 20px; cursor: pointer; font-weight: bold;">×</button>
+      
+      <div id="printableNotification">
+        <div style="text-align:center; margin-bottom:20px;">
+          <h1 style="color:#0f766e; margin-bottom:5px; font-size:24px;">🏢 شركة سرت للنظافة</h1>
+          <h2 style="color:#333; margin-top:0; font-size:18px;">📋 إشعار مباشرة عمل</h2>
+        </div>
+        
+        <hr style="border: 2px solid #0f766e; margin: 20px 0;">
+        
+        <div style="padding: 15px; background: #f9f9f9; border-radius: 10px; margin-bottom: 20px;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 15px;">
+            <tr>
+              <td style="padding: 10px; font-weight: bold; width: 40%; border-bottom: 1px solid #ddd;">👤 الاسم:</td>
+              <td style="padding: 10px; border-bottom: 1px solid #ddd;">${data.name}</td>
+            </tr>
+            <tr>
+              <td style="padding: 10px; font-weight: bold; border-bottom: 1px solid #ddd;">🚗 الوظيفة:</td>
+              <td style="padding: 10px; border-bottom: 1px solid #ddd;">${data.jobTitle}</td>
+            </tr>
+            <tr>
+              <td style="padding: 10px; font-weight: bold; border-bottom: 1px solid #ddd;">📅 تاريخ المباشرة:</td>
+              <td style="padding: 10px; border-bottom: 1px solid #ddd;">${data.startDate}</td>
+            </tr>
+            ${data.accountNumber ? `
+            <tr>
+              <td style="padding: 10px; font-weight: bold; border-bottom: 1px solid #ddd;">🏦 رقم الحساب:</td>
+              <td style="padding: 10px; border-bottom: 1px solid #ddd;">${data.accountNumber}</td>
+            </tr>
+            ` : ''}
+            ${data.bankName ? `
+            <tr>
+              <td style="padding: 10px; font-weight: bold; border-bottom: 1px solid #ddd;">🏛️ المصرف:</td>
+              <td style="padding: 10px; border-bottom: 1px solid #ddd;">${data.bankName}</td>
+            </tr>
+            ` : ''}
+            ${data.licenseGrade ? `
+            <tr>
+              <td style="padding: 10px; font-weight: bold; border-bottom: 1px solid #ddd;">🚗 الرخصة:</td>
+              <td style="padding: 10px; border-bottom: 1px solid #ddd;">${data.licenseGrade}</td>
+            </tr>
+            ` : ''}
+            ${data.shiftLabel && data.shiftLabel !== '—' ? `
+            <tr>
+              <td style="padding: 10px; font-weight: bold; border-bottom: 1px solid #ddd;">🔄 الوردية:</td>
+              <td style="padding: 10px; border-bottom: 1px solid #ddd;">${data.shiftLabel}</td>
+            </tr>
+            ` : ''}
+          </table>
+        </div>
+        
+        <hr style="border: 1px solid #999; margin: 30px 0;">
+        
+        <div style="display: flex; justify-content: space-between; margin: 40px 0 20px; font-size: 14px;">
+          <div style="text-align: center; flex: 1;">
+            <div style="font-weight: bold; margin-bottom: 50px;">✍️ توقيع الموظف</div>
+            <div style="border-top: 1px solid #000; padding-top: 5px;">__________________</div>
+          </div>
+          <div style="text-align: center; flex: 1;">
+            <div style="font-weight: bold; margin-bottom: 50px;">✍️ توقيع المدير</div>
+            <div style="border-top: 1px solid #000; padding-top: 5px;">__________________</div>
+          </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px; font-size: 13px; color: #666;">
+          📅 التاريخ: ${today}
+        </div>
+      </div>
+      
+      <div style="display: flex; gap: 8px; margin-top: 25px; justify-content: center; flex-wrap: wrap;">
+        <button onclick="printNotification()" style="padding: 12px 20px; background: #9c27b0; color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer;">🖨️ طباعة</button>
+        <button onclick="saveNotificationPDF()" style="padding: 12px 20px; background: #f44336; color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer;">📄 PDF</button>
+        <button onclick="saveNotificationWord()" style="padding: 12px 20px; background: #4caf50; color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer;">💾 Word</button>
+        <button onclick="closeNotificationModal()" style="padding: 12px 20px; background: #607d8b; color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer;">إغلاق</button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+}
+
+function closeNotificationModal() {
+  const modal = document.getElementById('notificationModal');
+  if (modal) modal.remove();
+}
+
+function printNotification() {
+  const content = document.getElementById('printableNotification').innerHTML;
+  const printWindow = window.open('', '_blank');
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html dir="rtl">
+    <head>
+      <meta charset="UTF-8">
+      <title>إشعار مباشرة عمل</title>
+      <style>
+        body { font-family: Arial, sans-serif; direction: rtl; padding: 20px; }
+        h1 { color: #0f766e; text-align: center; }
+        h2 { color: #333; text-align: center; }
+        table { width: 100%; border-collapse: collapse; }
+        td { padding: 8px; border-bottom: 1px solid #ddd; }
+      </style>
+    </head>
+    <body>${content}
+    <script>window.onload = function() { setTimeout(function() { window.print(); }, 500); };<\/script>
+    </body></html>
+  `);
+  printWindow.document.close();
+}
+
+function saveNotificationPDF() {
+  const content = document.getElementById('printableNotification').innerText;
+  const today = new Date().toISOString().slice(0,10);
+  
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF('p', 'mm', 'a4');
+  pdf.setR2L(true);
+  
+  pdf.setFontSize(20);
+  pdf.text('🏢 شركة سرت للنظافة', 105, 20, { align: 'center' });
+  pdf.setFontSize(16);
+  pdf.text('📋 إشعار مباشرة عمل', 105, 30, { align: 'center' });
+  
+  pdf.setLineWidth(0.5);
+  pdf.line(20, 38, 190, 38);
+  
+  const lines = content.split('\n').filter(l => l.trim());
+  let yPos = 50;
+  pdf.setFontSize(12);
+  
+  lines.forEach(line => {
+    if (yPos > 270) {
+      pdf.addPage();
+      yPos = 20;
+    }
+    pdf.text(line, 20, yPos, { align: 'right' });
+    yPos += 8;
+  });
+  
+  pdf.save(`اشعار-مباشرة-${today}.pdf`);
+}
+
+function saveNotificationWord() {
+  const content = document.getElementById('printableNotification').innerHTML;
+  const today = new Date().toISOString().slice(0,10);
+  
+  let htmlContent = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" dir="rtl">
+    <head><meta charset="UTF-8"><title>إشعار مباشرة عمل</title></head>
+    <body style="font-family: Arial, sans-serif; direction: rtl;">${content}</body>
+    </html>`;
+  
+  const blob = new Blob(['\ufeff' + htmlContent], { type: 'application/msword' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `اشعار-مباشرة-${today}.doc`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 // صور العمال
 document.getElementById('workerPhotoInput').addEventListener('change', async (e) => {
   const file = e.target.files[0];
@@ -638,7 +804,6 @@ document.getElementById('workerPhotoInput').addEventListener('change', async (e)
   preview.style.display = 'block';
 });
 
-// صور السائق
 document.getElementById('driverPhotoInput').addEventListener('change', async (e) => {
   const file = e.target.files[0];
   if (!file) return;
@@ -648,7 +813,6 @@ document.getElementById('driverPhotoInput').addEventListener('change', async (e)
   preview.style.display = 'block';
 });
 
-// صورة الصك
 document.getElementById('driverCheckInput').addEventListener('change', async (e) => {
   const file = e.target.files[0];
   if (!file) return;
@@ -658,7 +822,6 @@ document.getElementById('driverCheckInput').addEventListener('change', async (e)
   preview.style.display = 'block';
 });
 
-// صور الآليات
 document.getElementById('vehiclePhotoInput').addEventListener('change', async (e) => {
   const file = e.target.files[0];
   if (!file) return;
@@ -668,7 +831,6 @@ document.getElementById('vehiclePhotoInput').addEventListener('change', async (e
   preview.style.display = 'block';
 });
 
-// صور التقرير
 document.getElementById('reportPhotosInput').addEventListener('change', function(e) {
   const files = e.target.files;
   reportPhotoFiles = [];
@@ -688,7 +850,6 @@ document.getElementById('reportPhotosInput').addEventListener('change', function
   }
 });
 
-// رفع الصورة إلى ImgBB
 async function uploadPhoto(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -717,7 +878,7 @@ async function uploadPhoto(file) {
           if (data.success) {
             resolve(data.data.url);
           } else {
-            reject(new Error('فشل الرفع: ' + (data.error?.message || 'خطأ')));
+            reject(new Error('فشل الرفع'));
           }
         } catch (err) {
           reject(err);
@@ -730,7 +891,6 @@ async function uploadPhoto(file) {
   });
 }
 
-// تسجيل الدخول
 async function login() {
   const name = document.getElementById('loginName').value.trim();
   const pin = document.getElementById('loginPin').value.trim();
@@ -918,7 +1078,6 @@ function populateDeductionMonthSelect() {
   document.getElementById('deductionMonthSelect').innerHTML = o;
 }
 
-// حضور
 function checkIn() {
   const sd = document.getElementById('status');
   sd.textContent = '⏳ جاري تحديد موقعك...';
@@ -1019,7 +1178,6 @@ function watchAttendance() {
     });
 }
 
-// العمال
 function watchWorkers() {
   db.collection('workers').orderBy('name').onSnapshot(sn => {
     allWorkers = sn.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -1111,6 +1269,7 @@ async function addWorker() {
   const startDate = document.getElementById('newWorkerStartDate').value;
   
   if (!name) { alert('اكتب اسم العامل'); return; }
+  if (!startDate) { alert('اختر تاريخ مباشرة العمل'); return; }
   
   await db.collection('workers').add({
     name, team, shift, startDate,
@@ -1121,18 +1280,25 @@ async function addWorker() {
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   });
   
+  // ✅ إظهار إشعار مباشرة العمل
+  const shiftLabel = shift === 'morning' ? '🌅 صباح' : shift === 'night' ? '🌙 ليل' : '🔄 كلاهما';
+  showWorkNotification({
+    name: name,
+    jobTitle: '👷 ' + teamLabel(team),
+    startDate: startDate,
+    shiftLabel: shiftLabel
+  });
+  
   document.getElementById('newWorkerName').value = '';
   workerPhotoBase64 = '';
   document.getElementById('workerPhotoPreview').style.display = 'none';
   document.getElementById('workerPhotoInput').value = '';
-  alert('✅ تمت إضافة العامل');
 }
 
 function deleteWorker(id, name) {
   if (confirm(`حذف ${name}؟`)) db.collection('workers').doc(id).delete();
 }
 
-// السائقين
 function watchDrivers() {
   db.collection('drivers').orderBy('name').onSnapshot(sn => {
     allDrivers = sn.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -1172,7 +1338,8 @@ function renderDriversList() {
           ${d.shift ? `<span class="info-tag">${d.shift === 'morning' ? '🌅 صباح' : d.shift === 'night' ? '🌙 ليل' : '🔄 كلاهما'}</span>` : ''}
         </div>
         ${d.checkPhoto ? `<img src="${d.checkPhoto}" class="check-photo" onclick="window.open('${d.checkPhoto}')">` : ''}
-        <div style="display:flex;gap:5px;margin-top:8px;">
+        <div style="display:flex;gap:5px;margin-top:8px;flex-wrap:wrap;">
+          <button class="view-btn" onclick="showWorkNotification({name:'${d.name}',jobTitle:'${typeLabel}',startDate:'${d.startDate}',accountNumber:'${d.accountNumber||''}',bankName:'${d.bankName||''}',licenseGrade:'${d.licenseGrade||''}',shiftLabel:'${d.shift === 'morning' ? '🌅 صباح' : d.shift === 'night' ? '🌙 ليل' : '🔄 كلاهما'}')" style="width:auto;padding:5px 10px;font-size:11px;margin:0;">📋 إشعار</button>
           <button class="edit-btn" onclick="toggleEditDriverForm('${d.id}')">✏️ تعديل</button>
           <button class="del-btn" onclick="deleteDriver('${d.id}','${d.name}')">حذف</button>
         </div>
@@ -1249,6 +1416,18 @@ async function addDriver() {
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   });
   
+  // ✅ إظهار إشعار مباشرة العمل
+  const shiftLabel = shift === 'morning' ? '🌅 صباح' : shift === 'night' ? '🌙 ليل' : '🔄 كلاهما';
+  showWorkNotification({
+    name: name,
+    jobTitle: DRIVER_TYPES[driverType] || '🚗 سائق',
+    startDate: startDate,
+    accountNumber: accountNumber,
+    bankName: bankName,
+    licenseGrade: licenseGrade,
+    shiftLabel: shiftLabel
+  });
+  
   document.getElementById('newDriverName').value = '';
   document.getElementById('newDriverAccount').value = '';
   document.getElementById('newDriverBank').value = '';
@@ -1259,14 +1438,12 @@ async function addDriver() {
   document.getElementById('driverCheckPreview').style.display = 'none';
   document.getElementById('driverPhotoInput').value = '';
   document.getElementById('driverCheckInput').value = '';
-  alert('✅ تمت إضافة السائق');
 }
 
 function deleteDriver(id, name) {
   if (confirm(`حذف السائق ${name}؟`)) db.collection('drivers').doc(id).delete();
 }
 
-// التقارير
 async function saveReport() {
   const date = document.getElementById('reportDate').value;
   const workerName = document.getElementById('reportWorkerName').value.trim();
@@ -1304,9 +1481,7 @@ async function saveReport() {
       try {
         const url = await uploadPhoto(reportPhotoFiles[i]);
         photoURLs.push(url);
-      } catch (err) {
-        console.error('خطأ في صورة', i + 1, err);
-      }
+      } catch (err) {}
       const percent = 10 + Math.round(((i + 1) / totalPhotos) * 85);
       progressFill.style.width = percent + '%';
     }
@@ -1339,7 +1514,6 @@ async function saveReport() {
     loadReports();
   } catch (err) {
     alert('❌ خطأ في الحفظ: ' + err.message);
-    progressText.textContent = '❌ فشل: ' + err.message;
     progressBar.style.display = 'none';
   }
 }
@@ -1378,7 +1552,7 @@ function loadReports() {
 
 function viewReport(reportId) {
   db.collection('dailyReports').doc(reportId).get().then(doc => {
-    if (!doc.exists) { alert('التقرير غير موجود'); return; }
+    if (!doc.exists) return;
     const r = doc.data();
     const photosHTML = (r.photos || []).map(p => 
       `<img src="${p}" style="width:100%;max-width:300px;border-radius:8px;margin:5px;border:1px solid #ddd;">`
@@ -1459,7 +1633,7 @@ function printReport(reportId) {
 
 function exportReportWord(reportId) {
   db.collection('dailyReports').doc(reportId).get().then(doc => {
-    if (!doc.exists) { alert('التقرير غير موجود'); return; }
+    if (!doc.exists) return;
     const r = doc.data();
     
     let htmlContent = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" dir="rtl">';
@@ -1486,7 +1660,7 @@ function exportReportWord(reportId) {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-  }).catch(err => { alert('خطأ: ' + err.message); });
+  });
 }
 
 async function deleteReport(reportId) {
@@ -1495,7 +1669,6 @@ async function deleteReport(reportId) {
   alert('✅ تم حذف التقرير');
 }
 
-// الخصومات
 async function loadDeductionSettings() {
   try {
     const d = await db.collection('settings').doc('deductions').get();
@@ -1538,7 +1711,6 @@ async function loadDeductions() {
   }).join('') + `<div style="margin-top:10px;text-align:center;font-weight:bold;color:#fff;">الإجمالي: ${total} دينار</div>`;
 }
 
-// المخزن
 function watchInventory() {
   db.collection('inventory').orderBy('name').onSnapshot(sn => {
     allInventory = sn.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -1567,7 +1739,6 @@ function deleteItem(id, name) {
   if (confirm(`حذف ${name}؟`)) db.collection('inventory').doc(id).delete();
 }
 
-// الآليات
 function loadVehicles() {
   db.collection('vehicles').onSnapshot(sn => {
     document.getElementById('vehiclesList').innerHTML = sn.empty ? '<p style="text-align:center;">لا توجد آليات</p>' : sn.docs.map(doc => {
@@ -1595,7 +1766,6 @@ function deleteVehicle(id, number) {
   if (confirm(`حذف ${number}؟`)) db.collection('vehicles').doc(id).delete();
 }
 
-// المستخدمين
 async function addUser() {
   const name = document.getElementById('newUserName').value.trim();
   const pin = document.getElementById('newUserPin').value.trim();
@@ -1626,6 +1796,14 @@ async function addUser() {
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   });
   
+  // ✅ إظهار إشعار مباشرة للمشرف الجديد
+  showWorkNotification({
+    name: name,
+    jobTitle: role === 'admin' ? '👤 مدير' : '👤 مشرف',
+    startDate: getTodayISO(),
+    shiftLabel: '—'
+  });
+  
   document.getElementById('newUserName').value = '';
   document.getElementById('newUserPin').value = '';
   loadUsersList();
@@ -1635,7 +1813,7 @@ function loadUsersList() {
   db.collection('systemUsers').onSnapshot(sn => {
     document.getElementById('usersList').innerHTML = sn.empty ? '<p style="text-align:center;">لا يوجد مستخدمين</p>' : sn.docs.map(doc => {
       const u = doc.data();
-      return `<div class="user-card"><strong>${u.name}</strong> <span style="font-size:11px;">🔢${u.pin}</span> ${u.viewOnly ? '<span class="view-only-badge">👁️</span>' : ''}<button class="del-btn" onclick="deleteUser('.${doc.id}','${u.name}')">حذف</button></div>`;
+      return `<div class="user-card"><strong>${u.name}</strong> <span style="font-size:11px;">🔢${u.pin}</span> ${u.viewOnly ? '<span class="view-only-badge">👁️</span>' : ''}<button class="del-btn" onclick="deleteUser('${doc.id}','${u.name}')">حذف</button></div>`;
     }).join('');
   });
 }
@@ -1644,7 +1822,6 @@ function deleteUser(id, name) {
   if (confirm(`حذف ${name}؟`)) db.collection('systemUsers').doc(id).delete();
 }
 
-// تصدير Excel
 function exportAttendanceExcel() {
   if (!latestAttendanceRecords.length) { alert('لا يوجد حضور اليوم'); return; }
   const sl = { present:'حاضر', late:'متأخر', leave:'إذن', sick:'مريض', absent:'غائب' };
@@ -1699,7 +1876,7 @@ function exportDeductionsExcel() { loadDeductions(); }
 
 function exportInventoryExcel() {
   if (!allInventory.length) { alert('المخزن فارغ'); return; }
-  const rows = allInventory.map(i => [i.name, i.quantity, iunit||'']);
+  const rows = allInventory.map(i => [i.name, i.quantity, i.unit||'']);
   const ws = XLSX.utils.aoa_to_sheet([['الاسم','الكمية','الوحدة'], ...rows]);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'المخزن');

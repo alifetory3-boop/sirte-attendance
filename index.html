@@ -129,6 +129,7 @@
   .view-only-badge { background: rgba(255,193,7,0.5); color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 10px; }
   .deduction-badge { background: rgba(244,67,54,0.6); color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 10px; }
   .duration-badge { background: rgba(76,175,80,0.5); color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 10px; }
+  .salary-badge { background: rgba(156,39,176,0.6); color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: bold; }
   .date-display {
     text-align: center; color: #ffc107; font-size: 14px; font-weight: bold;
     margin-bottom: 12px; padding: 8px; background: rgba(0,0,0,0.2); border-radius: 8px;
@@ -252,13 +253,14 @@
       <div class="tab" data-tab="daily">✅ حضور</div>
       <div class="tab" data-tab="reports">📋 تقارير</div>
       <div class="tab" data-tab="workers">👷 عمال</div>
-      <div class="tab" data-tab="drivers">🚗 سائقين</div>
+      <div class="tab" data-tab="drivers">🚗 السائقين والمشرفين</div>
       <div class="tab" data-tab="deductions">💰 خصومات</div>
       <div class="tab" data-tab="inventory">📦 مخزن</div>
       <div class="tab" data-tab="vehicles">🚛 آليات</div>
       <div class="tab" data-tab="permissions">🔑 صلاحيات</div>
     </div>
 
+    <!-- نظرة عامة -->
     <div id="tab-overview">
       <div class="card">
         <h1>حضور اليوم</h1>
@@ -277,6 +279,7 @@
       </div>
     </div>
 
+    <!-- حضور يدوي -->
     <div id="tab-daily" style="display:none;">
       <div class="card">
         <h2>✅ تسجيل يدوي</h2>
@@ -289,6 +292,7 @@
       </div>
     </div>
 
+    <!-- تقارير -->
     <div id="tab-reports" style="display:none;">
       <div class="card">
         <h2>📋 تقرير يومي</h2>
@@ -314,6 +318,7 @@
       </div>
     </div>
 
+    <!-- عمال -->
     <div id="tab-workers" style="display:none;">
       <div class="card">
         <h2>➕ إضافة عامل</h2>
@@ -344,11 +349,12 @@
       </div>
     </div>
 
+    <!-- السائقين والمشرفين -->
     <div id="tab-drivers" style="display:none;">
       <div class="card">
-        <h2>➕ إضافة سائق</h2>
+        <h2>➕ إضافة سائق / مشرف</h2>
         
-        <label>📸 صورة السائق</label>
+        <label>📸 الصورة</label>
         <div class="camera-container">
           <img id="driverPhotoPreview" class="photo-preview">
           <input type="file" id="driverPhotoInput" accept="image/*" capture="user" style="display:none;">
@@ -356,15 +362,16 @@
         </div>
         
         <label>👤 الاسم</label>
-        <input id="newDriverName" placeholder="اسم السائق">
+        <input id="newDriverName" placeholder="اسم الموظف">
         
-        <label>🚙 نوع السيارة</label>
+        <label>🚙 نوع السائق / الوظيفة</label>
         <select id="newDriverType">
-          <option value="dump_truck">دنبر</option>
-          <option value="container">صندوق كنتر</option>
-          <option value="small_box">صندوق صغير</option>
-          <option value="large_compactor">كباسة كبيرة</option>
-          <option value="small_compactor">كباسة صغيرة</option>
+          <option value="dump_truck">🚛 سائق دنبر</option>
+          <option value="container">📦 سائق صندوق كنتر</option>
+          <option value="small_box">📦 سائق صندوق صغير</option>
+          <option value="large_compactor">🚜 سائق كباسة كبيرة</option>
+          <option value="small_compactor">🚜 سائق كباسة صغيرة</option>
+          <option value="cleaning_supervisor">👷 مشرف نظافة</option>
         </select>
         
         <label>🔄 الوردية</label>
@@ -377,6 +384,9 @@
         <label>📅 تاريخ مباشرة العمل</label>
         <input type="date" id="newDriverStartDate">
         
+        <label>💰 المرتب الشهري (دينار)</label>
+        <input id="newDriverSalary" type="number" placeholder="مثال: 1500" min="0">
+        
         <label>🏦 رقم الحساب</label>
         <input id="newDriverAccount" placeholder="رقم الحساب البنكي">
         
@@ -384,7 +394,7 @@
         <select id="newDriverBank">
           <option value="">— اختر —</option>
           <option value="الجمهورية">مصرف الجمهورية</option>
-          <option value="التجاري">مصرف التجارة والتنمية</option>
+          <option value="التجارة والتنمية">مصرف التجارة والتنمية</option>
           <option value="الوحدة">مصرف الوحدة</option>
           <option value="الصحاري">مصرف الصحاري</option>
           <option value="التجاري الوطني">المصرف التجاري الوطني</option>
@@ -392,7 +402,7 @@
           <option value="أخرى">أخرى</option>
         </select>
         
-        <label>🚗 درجة الرخصة</label>
+        <label>🚗 درجة الرخصة (للسائقين فقط)</label>
         <select id="newDriverLicense">
           <option value="">— اختر —</option>
           <option value="خاصة">رخصة خاصة</option>
@@ -410,17 +420,18 @@
           <button class="camera-btn" onclick="document.getElementById('driverCheckInput').click()">📷 صورة الصك</button>
         </div>
         
-        <button onclick="addDriver()">✅ تسجيل السائق</button>
+        <button onclick="addDriver()">✅ تسجيل الموظف</button>
       </div>
       
       <div class="card">
-        <h2>🚗 السائقين</h2>
-        <input id="driversSearch" placeholder="🔍 ابحث باسم السائق">
+        <h2>🚗 السائقين والمشرفين</h2>
+        <input id="driversSearch" placeholder="🔍 ابحث بالاسم">
         <button class="export-btn" onclick="exportDriversExcel()">📊 Excel</button>
         <div id="driversList">جاري التحميل...</div>
       </div>
     </div>
 
+    <!-- خصومات -->
     <div id="tab-deductions" style="display:none;">
       <div class="card">
         <h2>💰 الخصومات</h2>
@@ -435,6 +446,7 @@
       </div>
     </div>
 
+    <!-- مخزن -->
     <div id="tab-inventory" style="display:none;">
       <div class="card">
         <h2>➕ إضافة صنف</h2>
@@ -450,6 +462,7 @@
       </div>
     </div>
 
+    <!-- آليات -->
     <div id="tab-vehicles" style="display:none;">
       <div class="card">
         <h2>➕ إضافة آلية</h2>
@@ -479,6 +492,7 @@
       </div>
     </div>
 
+    <!-- صلاحيات -->
     <div id="tab-permissions" style="display:none;">
       <div class="card">
         <h2>👥 إضافة مستخدم</h2>
@@ -494,7 +508,7 @@
           <div class="permission-item"><label>✅ تسجيل الحضور</label><input type="checkbox" id="perm-attendance" checked></div>
           <div class="permission-item"><label>📋 التقارير</label><input type="checkbox" id="perm-reports"></div>
           <div class="permission-item"><label>👷 إدارة العمال</label><input type="checkbox" id="perm-workers"></div>
-          <div class="permission-item"><label>🚗 إدارة السائقين</label><input type="checkbox" id="perm-drivers"></div>
+          <div class="permission-item"><label>🚗 إدارة السائقين والمشرفين</label><input type="checkbox" id="perm-drivers"></div>
           <div class="permission-item"><label>💰 الخصومات</label><input type="checkbox" id="perm-deductions"></div>
           <div class="permission-item"><label>📦 المخزن</label><input type="checkbox" id="perm-inventory"></div>
           <div class="permission-item"><label>🚛 الآليات</label><input type="checkbox" id="perm-vehicles"></div>
@@ -546,16 +560,16 @@ const TEAMS = [
   { id: 'cleaning_workers', label: 'عمال نظافة' },
   { id: 'compactor_workers', label: 'عمال كباسات' },
   { id: 'electricians', label: 'عمال كهربائي' },
-  { id: 'cleaning_supervisors', label: 'مشرف نظافة' },
   { id: '', label: 'أخرى' },
 ];
 
 const DRIVER_TYPES = {
-  dump_truck: '🚛 دنبر',
-  container: '📦 صندوق كنتر',
-  small_box: '📦 صندوق صغير',
-  large_compactor: '🚜 كباسة كبيرة',
-  small_compactor: '🚜 كباسة صغيرة'
+  dump_truck: '🚛 سائق دنبر',
+  container: '📦 سائق صندوق كنتر',
+  small_box: '📦 سائق صندوق صغير',
+  large_compactor: '🚜 سائق كباسة كبيرة',
+  small_compactor: '🚜 سائق كباسة صغيرة',
+  cleaning_supervisor: '👷 مشرف نظافة'
 };
 
 function getTodayDate() {
@@ -617,7 +631,7 @@ function teamLabel(id) {
   return t ? t.label : '';
 }
 
-// ============ ✅ نظام الإشعار الرسمي ============
+// ============ نظام الإشعار الرسمي ============
 function showWorkNotification(data) {
   const today = new Date().toLocaleDateString('ar-LY', { year: 'numeric', month: 'long', day: 'numeric' });
   
@@ -656,6 +670,12 @@ function showWorkNotification(data) {
               <td style="padding: 10px; font-weight: bold; border-bottom: 1px solid #ddd;">📅 تاريخ المباشرة:</td>
               <td style="padding: 10px; border-bottom: 1px solid #ddd;">${data.startDate}</td>
             </tr>
+            ${data.salary ? `
+            <tr>
+              <td style="padding: 10px; font-weight: bold; border-bottom: 1px solid #ddd;">💰 المرتب الشهري:</td>
+              <td style="padding: 10px; border-bottom: 1px solid #ddd;">${data.salary} دينار</td>
+            </tr>
+            ` : ''}
             ${data.accountNumber ? `
             <tr>
               <td style="padding: 10px; font-weight: bold; border-bottom: 1px solid #ddd;">🏦 رقم الحساب:</td>
@@ -751,9 +771,9 @@ function saveNotificationPDF() {
   pdf.setR2L(true);
   
   pdf.setFontSize(20);
-  pdf.text('🏢 شركة سرت للنظافة', 105, 20, { align: 'center' });
+  pdf.text('شركة سرت للنظافة', 105, 20, { align: 'center' });
   pdf.setFontSize(16);
-  pdf.text('📋 إشعار مباشرة عمل', 105, 30, { align: 'center' });
+  pdf.text('إشعار مباشرة عمل', 105, 30, { align: 'center' });
   
   pdf.setLineWidth(0.5);
   pdf.line(20, 38, 190, 38);
@@ -794,7 +814,7 @@ function saveNotificationWord() {
   URL.revokeObjectURL(url);
 }
 
-// صور العمال
+// صور
 document.getElementById('workerPhotoInput').addEventListener('change', async (e) => {
   const file = e.target.files[0];
   if (!file) return;
@@ -875,14 +895,9 @@ async function uploadPhoto(file) {
             body: formData
           });
           const data = await response.json();
-          if (data.success) {
-            resolve(data.data.url);
-          } else {
-            reject(new Error('فشل الرفع'));
-          }
-        } catch (err) {
-          reject(err);
-        }
+          if (data.success) resolve(data.data.url);
+          else reject(new Error('فشل الرفع'));
+        } catch (err) { reject(err); }
       };
       img.src = e.target.result;
     };
@@ -950,7 +965,7 @@ function enterWorker() {
   document.getElementById('adminView').style.display = 'none';
   
   if (currentUserRole === 'driver') {
-    document.getElementById('workerInfo').innerHTML = '<span class="role-badge role-driver">🚗 سائق</span> ' + currentUser.name;
+    document.getElementById('workerInfo').innerHTML = '<span class="role-badge role-driver">🚗</span> ' + currentUser.name;
   } else {
     document.getElementById('workerInfo').innerHTML = '<span class="role-badge role-worker">👷</span> ' + currentUser.name;
   }
@@ -1280,7 +1295,6 @@ async function addWorker() {
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   });
   
-  // ✅ إظهار إشعار مباشرة العمل
   const shiftLabel = shift === 'morning' ? '🌅 صباح' : shift === 'night' ? '🌙 ليل' : '🔄 كلاهما';
   showWorkNotification({
     name: name,
@@ -1299,6 +1313,7 @@ function deleteWorker(id, name) {
   if (confirm(`حذف ${name}؟`)) db.collection('workers').doc(id).delete();
 }
 
+// السائقين والمشرفين
 function watchDrivers() {
   db.collection('drivers').orderBy('name').onSnapshot(sn => {
     allDrivers = sn.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -1313,13 +1328,13 @@ function renderDriversList() {
   const filtered = searchTerm ? allDrivers.filter(d => d.name.includes(searchTerm)) : allDrivers;
   
   if (!filtered.length) {
-    c.innerHTML = '<p style="text-align:center;">لا يوجد سائقين</p>';
+    c.innerHTML = '<p style="text-align:center;">لا يوجد سائقين أو مشرفين</p>';
     return;
   }
   
   c.innerHTML = filtered.map(d => {
     const duration = calculateWorkDuration(d.startDate);
-    const typeLabel = DRIVER_TYPES[d.driverType] || '🚗 سائق';
+    const typeLabel = DRIVER_TYPES[d.driverType] || '🚗';
     return `
       <div class="driver-card">
         <div class="driver-header">
@@ -1332,6 +1347,7 @@ function renderDriversList() {
         <div class="driver-info">
           <span class="info-tag">📅 من: ${d.startDate || '—'}</span>
           <span class="duration-badge">⏱️ ${duration}</span>
+          ${d.salary ? `<span class="salary-badge">💰 ${d.salary} دينار</span>` : ''}
           ${d.accountNumber ? `<span class="info-tag">🏦 ${d.accountNumber}</span>` : ''}
           ${d.bankName ? `<span class="info-tag">🏛️ ${d.bankName}</span>` : ''}
           ${d.licenseGrade ? `<span class="info-tag">🚗 ${d.licenseGrade}</span>` : ''}
@@ -1339,7 +1355,7 @@ function renderDriversList() {
         </div>
         ${d.checkPhoto ? `<img src="${d.checkPhoto}" class="check-photo" onclick="window.open('${d.checkPhoto}')">` : ''}
         <div style="display:flex;gap:5px;margin-top:8px;flex-wrap:wrap;">
-          <button class="view-btn" onclick="showWorkNotification({name:'${d.name}',jobTitle:'${typeLabel}',startDate:'${d.startDate}',accountNumber:'${d.accountNumber||''}',bankName:'${d.bankName||''}',licenseGrade:'${d.licenseGrade||''}',shiftLabel:'${d.shift === 'morning' ? '🌅 صباح' : d.shift === 'night' ? '🌙 ليل' : '🔄 كلاهما'}')" style="width:auto;padding:5px 10px;font-size:11px;margin:0;">📋 إشعار</button>
+          <button class="view-btn" onclick="showWorkNotification({name:'${d.name}',jobTitle:'${typeLabel}',startDate:'${d.startDate}',salary:'${d.salary||''}',accountNumber:'${d.accountNumber||''}',bankName:'${d.bankName||''}',licenseGrade:'${d.licenseGrade||''}',shiftLabel:'${d.shift === 'morning' ? '🌅 صباح' : d.shift === 'night' ? '🌙 ليل' : '🔄 كلاهما'}')" style="width:auto;padding:5px 10px;font-size:11px;margin:0;">📋 إشعار</button>
           <button class="edit-btn" onclick="toggleEditDriverForm('${d.id}')">✏️ تعديل</button>
           <button class="del-btn" onclick="deleteDriver('${d.id}','${d.name}')">حذف</button>
         </div>
@@ -1371,6 +1387,7 @@ function toggleEditDriverForm(driverId) {
     </select>
     <label>📅 تاريخ المباشرة</label>
     <input id="editDriverStartDate-${driverId}" type="date" value="${d.startDate || ''}">
+    <input id="editDriverSalary-${driverId}" type="number" value="${d.salary || ''}" placeholder="المرتب الشهري">
     <input id="editDriverAccount-${driverId}" value="${d.accountNumber || ''}" placeholder="رقم الحساب">
     <input id="editDriverBank-${driverId}" value="${d.bankName || ''}" placeholder="اسم المصرف">
     <input id="editDriverLicense-${driverId}" value="${d.licenseGrade || ''}" placeholder="درجة الرخصة">
@@ -1385,6 +1402,7 @@ async function saveEditDriver(driverId) {
     driverType: document.getElementById(`editDriverType-${driverId}`).value,
     shift: document.getElementById(`editDriverShift-${driverId}`).value,
     startDate: document.getElementById(`editDriverStartDate-${driverId}`).value,
+    salary: document.getElementById(`editDriverSalary-${driverId}`).value,
     accountNumber: document.getElementById(`editDriverAccount-${driverId}`).value,
     bankName: document.getElementById(`editDriverBank-${driverId}`).value,
     licenseGrade: document.getElementById(`editDriverLicense-${driverId}`).value
@@ -1398,15 +1416,17 @@ async function addDriver() {
   const driverType = document.getElementById('newDriverType').value;
   const shift = document.getElementById('newDriverShift').value;
   const startDate = document.getElementById('newDriverStartDate').value;
+  const salary = document.getElementById('newDriverSalary').value.trim();
   const accountNumber = document.getElementById('newDriverAccount').value.trim();
   const bankName = document.getElementById('newDriverBank').value;
   const licenseGrade = document.getElementById('newDriverLicense').value;
   
-  if (!name) { alert('اكتب اسم السائق'); return; }
+  if (!name) { alert('اكتب الاسم'); return; }
   if (!startDate) { alert('اختر تاريخ مباشرة العمل'); return; }
+  if (!salary) { alert('اكتب المرتب الشهري'); return; }
   
   await db.collection('drivers').add({
-    name, driverType, shift, startDate,
+    name, driverType, shift, startDate, salary,
     accountNumber, bankName, licenseGrade,
     photo: driverPhotoBase64,
     checkPhoto: driverCheckBase64,
@@ -1416,12 +1436,12 @@ async function addDriver() {
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   });
   
-  // ✅ إظهار إشعار مباشرة العمل
   const shiftLabel = shift === 'morning' ? '🌅 صباح' : shift === 'night' ? '🌙 ليل' : '🔄 كلاهما';
   showWorkNotification({
     name: name,
-    jobTitle: DRIVER_TYPES[driverType] || '🚗 سائق',
+    jobTitle: DRIVER_TYPES[driverType] || '🚗',
     startDate: startDate,
+    salary: salary,
     accountNumber: accountNumber,
     bankName: bankName,
     licenseGrade: licenseGrade,
@@ -1429,6 +1449,7 @@ async function addDriver() {
   });
   
   document.getElementById('newDriverName').value = '';
+  document.getElementById('newDriverSalary').value = '';
   document.getElementById('newDriverAccount').value = '';
   document.getElementById('newDriverBank').value = '';
   document.getElementById('newDriverLicense').value = '';
@@ -1441,9 +1462,10 @@ async function addDriver() {
 }
 
 function deleteDriver(id, name) {
-  if (confirm(`حذف السائق ${name}؟`)) db.collection('drivers').doc(id).delete();
+  if (confirm(`حذف ${name}؟`)) db.collection('drivers').doc(id).delete();
 }
 
+// التقارير
 async function saveReport() {
   const date = document.getElementById('reportDate').value;
   const workerName = document.getElementById('reportWorkerName').value.trim();
@@ -1796,7 +1818,6 @@ async function addUser() {
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   });
   
-  // ✅ إظهار إشعار مباشرة للمشرف الجديد
   showWorkNotification({
     name: name,
     jobTitle: role === 'admin' ? '👤 مدير' : '👤 مشرف',
@@ -1825,7 +1846,7 @@ function deleteUser(id, name) {
 function exportAttendanceExcel() {
   if (!latestAttendanceRecords.length) { alert('لا يوجد حضور اليوم'); return; }
   const sl = { present:'حاضر', late:'متأخر', leave:'إذن', sick:'مريض', absent:'غائب' };
-  const rows = latestAttendanceRecords.map(r => [r.workerName, r.personType === 'driver' ? 'سائق' : 'عامل', r.shift==='morning'?'صباح':'ليل', sl[r.status]||r.status, r.date, r.time || '--']);
+  const rows = latestAttendanceRecords.map(r => [r.workerName, r.personType === 'driver' ? 'سائق/مشرف' : 'عامل', r.shift==='morning'?'صباح':'ليل', sl[r.status]||r.status, r.date, r.time || '--']);
   const ws = XLSX.utils.aoa_to_sheet([['الاسم','النوع','الوردية','الحالة','التاريخ','الوقت'], ...rows]);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'الحضور');
@@ -1857,6 +1878,7 @@ function exportDriversExcel() {
     d.shift==='both'?'كلاهما':d.shift==='night'?'ليل':'صباح',
     d.startDate || '',
     calculateWorkDuration(d.startDate),
+    d.salary || '',
     d.accountNumber || '',
     d.bankName || '',
     d.licenseGrade || '',
@@ -1864,12 +1886,12 @@ function exportDriversExcel() {
     d.createdTime || ''
   ]);
   const ws = XLSX.utils.aoa_to_sheet([
-    ['الاسم','نوع السيارة','الوردية','تاريخ المباشرة','مدة العمل','رقم الحساب','المصرف','الرخصة','تاريخ الإضافة','وقت الإضافة'],
+    ['الاسم','الوظيفة','الوردية','تاريخ المباشرة','مدة العمل','المرتب','رقم الحساب','المصرف','الرخصة','تاريخ الإضافة','وقت الإضافة'],
     ...rows
   ]);
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'السائقين');
-  XLSX.writeFile(wb, 'سائقين.xlsx');
+  XLSX.utils.book_append_sheet(wb, ws, 'السائقين والمشرفين');
+  XLSX.writeFile(wb, 'السائقين-والمشرفين.xlsx');
 }
 
 function exportDeductionsExcel() { loadDeductions(); }

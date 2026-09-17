@@ -260,7 +260,6 @@
       <div class="tab" data-tab="permissions">🔑 صلاحيات</div>
     </div>
 
-    <!-- نظرة عامة -->
     <div id="tab-overview">
       <div class="card">
         <h1>حضور اليوم</h1>
@@ -279,7 +278,6 @@
       </div>
     </div>
 
-    <!-- حضور يدوي -->
     <div id="tab-daily" style="display:none;">
       <div class="card">
         <h2>✅ تسجيل يدوي</h2>
@@ -292,7 +290,6 @@
       </div>
     </div>
 
-    <!-- تقارير -->
     <div id="tab-reports" style="display:none;">
       <div class="card">
         <h2>📋 تقرير يومي</h2>
@@ -318,7 +315,6 @@
       </div>
     </div>
 
-    <!-- عمال -->
     <div id="tab-workers" style="display:none;">
       <div class="card">
         <h2>➕ إضافة عامل</h2>
@@ -349,7 +345,6 @@
       </div>
     </div>
 
-    <!-- السائقين والمشرفين -->
     <div id="tab-drivers" style="display:none;">
       <div class="card">
         <h2>➕ إضافة سائق / مشرف</h2>
@@ -431,7 +426,6 @@
       </div>
     </div>
 
-    <!-- خصومات -->
     <div id="tab-deductions" style="display:none;">
       <div class="card">
         <h2>💰 الخصومات</h2>
@@ -446,7 +440,6 @@
       </div>
     </div>
 
-    <!-- مخزن -->
     <div id="tab-inventory" style="display:none;">
       <div class="card">
         <h2>➕ إضافة صنف</h2>
@@ -462,7 +455,6 @@
       </div>
     </div>
 
-    <!-- آليات -->
     <div id="tab-vehicles" style="display:none;">
       <div class="card">
         <h2>➕ إضافة آلية</h2>
@@ -492,7 +484,6 @@
       </div>
     </div>
 
-    <!-- صلاحيات -->
     <div id="tab-permissions" style="display:none;">
       <div class="card">
         <h2>👥 إضافة مستخدم</h2>
@@ -553,6 +544,7 @@ let driverPhotoBase64 = '';
 let driverCheckBase64 = '';
 let vehiclePhotoBase64 = '';
 let reportPhotoFiles = [];
+let currentNotificationData = { name: '', jobTitle: '', startDate: '' };
 
 const TEAMS = [
   { id: 'guards', label: 'غفير' },
@@ -564,12 +556,12 @@ const TEAMS = [
 ];
 
 const DRIVER_TYPES = {
-  dump_truck: '🚛 سائق دنبر',
-  container: '📦 سائق صندوق كنتر',
-  small_box: '📦 سائق صندوق صغير',
-  large_compactor: '🚜 سائق كباسة كبيرة',
-  small_compactor: '🚜 سائق كباسة صغيرة',
-  cleaning_supervisor: '👷 مشرف نظافة'
+  dump_truck: 'سائق دنبر',
+  container: 'سائق صندوق كنتر',
+  small_box: 'سائق صندوق صغير',
+  large_compactor: 'سائق كباسة كبيرة',
+  small_compactor: 'سائق كباسة صغيرة',
+  cleaning_supervisor: 'مشرف نظافة'
 };
 
 function getTodayDate() {
@@ -631,9 +623,9 @@ function teamLabel(id) {
   return t ? t.label : '';
 }
 
-// ============ نظام الإشعار الرسمي ============
+// ============ نظام الإفادة الرسمية ============
 function showWorkNotification(data) {
-  const today = new Date().toLocaleDateString('ar-LY', { year: 'numeric', month: 'long', day: 'numeric' });
+  currentNotificationData = data;
   
   const modal = document.createElement('div');
   modal.id = 'notificationModal';
@@ -645,83 +637,48 @@ function showWorkNotification(data) {
   `;
   
   modal.innerHTML = `
-    <div style="background: #fff; color: #000; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; border-radius: 16px; padding: 30px; direction: rtl; font-family: Arial, sans-serif; position: relative;">
+    <div style="background: #fff; color: #000; max-width: 650px; width: 100%; max-height: 90vh; overflow-y: auto; border-radius: 16px; padding: 40px; direction: rtl; font-family: 'Times New Roman', Arial, sans-serif; position: relative;">
       <button onclick="closeNotificationModal()" style="position: absolute; top: 10px; left: 10px; width: 35px; height: 35px; border-radius: 50%; background: #f44336; color: #fff; border: none; font-size: 20px; cursor: pointer; font-weight: bold;">×</button>
       
-      <div id="printableNotification">
-        <div style="text-align:center; margin-bottom:20px;">
-          <h1 style="color:#0f766e; margin-bottom:5px; font-size:24px;">🏢 شركة سرت للنظافة</h1>
-          <h2 style="color:#333; margin-top:0; font-size:18px;">📋 إشعار مباشرة عمل</h2>
+      <div id="printableNotification" style="line-height: 2; font-size: 16px;">
+        
+        <div style="text-align: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 2px solid #000;">
+          <div style="font-size: 18px; font-weight: bold;">شركة الخدمات الخاصة سرت</div>
         </div>
         
-        <hr style="border: 2px solid #0f766e; margin: 20px 0;">
+        <h2 style="text-align: center; font-size: 22px; font-weight: bold; margin: 30px 0; text-decoration: underline;">
+          إفادة مباشرة في العمل
+        </h2>
         
-        <div style="padding: 15px; background: #f9f9f9; border-radius: 10px; margin-bottom: 20px;">
-          <table style="width: 100%; border-collapse: collapse; font-size: 15px;">
-            <tr>
-              <td style="padding: 10px; font-weight: bold; width: 40%; border-bottom: 1px solid #ddd;">👤 الاسم:</td>
-              <td style="padding: 10px; border-bottom: 1px solid #ddd;">${data.name}</td>
-            </tr>
-            <tr>
-              <td style="padding: 10px; font-weight: bold; border-bottom: 1px solid #ddd;">🚗 الوظيفة:</td>
-              <td style="padding: 10px; border-bottom: 1px solid #ddd;">${data.jobTitle}</td>
-            </tr>
-            <tr>
-              <td style="padding: 10px; font-weight: bold; border-bottom: 1px solid #ddd;">📅 تاريخ المباشرة:</td>
-              <td style="padding: 10px; border-bottom: 1px solid #ddd;">${data.startDate}</td>
-            </tr>
-            ${data.salary ? `
-            <tr>
-              <td style="padding: 10px; font-weight: bold; border-bottom: 1px solid #ddd;">💰 المرتب الشهري:</td>
-              <td style="padding: 10px; border-bottom: 1px solid #ddd;">${data.salary} دينار</td>
-            </tr>
-            ` : ''}
-            ${data.accountNumber ? `
-            <tr>
-              <td style="padding: 10px; font-weight: bold; border-bottom: 1px solid #ddd;">🏦 رقم الحساب:</td>
-              <td style="padding: 10px; border-bottom: 1px solid #ddd;">${data.accountNumber}</td>
-            </tr>
-            ` : ''}
-            ${data.bankName ? `
-            <tr>
-              <td style="padding: 10px; font-weight: bold; border-bottom: 1px solid #ddd;">🏛️ المصرف:</td>
-              <td style="padding: 10px; border-bottom: 1px solid #ddd;">${data.bankName}</td>
-            </tr>
-            ` : ''}
-            ${data.licenseGrade ? `
-            <tr>
-              <td style="padding: 10px; font-weight: bold; border-bottom: 1px solid #ddd;">🚗 الرخصة:</td>
-              <td style="padding: 10px; border-bottom: 1px solid #ddd;">${data.licenseGrade}</td>
-            </tr>
-            ` : ''}
-            ${data.shiftLabel && data.shiftLabel !== '—' ? `
-            <tr>
-              <td style="padding: 10px; font-weight: bold; border-bottom: 1px solid #ddd;">🔄 الوردية:</td>
-              <td style="padding: 10px; border-bottom: 1px solid #ddd;">${data.shiftLabel}</td>
-            </tr>
-            ` : ''}
-          </table>
+        <div style="text-align: justify; font-size: 17px; line-height: 2.2; margin: 30px 0;">
+          <p style="margin: 15px 0;">
+            نفيدكم بأن السيد/ <span style="font-weight: bold; border-bottom: 1px dotted #000; padding: 0 20px;">${data.name}</span>
+          </p>
+          <p style="margin: 15px 0;">
+            قد باشر عمله لدى شركة الخدمات الخاصة سرت اعتباراً من تاريخ
+            <span style="font-weight: bold; border-bottom: 1px dotted #000; padding: 0 10px;">${data.startDate}</span>
+            ، وذلك حسب المهام الموكلة إليه.
+          </p>
+          <p style="margin: 30px 0 40px; text-align: center; font-weight: bold;">
+            وتفضلوا بقبول فائق الاحترام.
+          </p>
         </div>
         
-        <hr style="border: 1px solid #999; margin: 30px 0;">
-        
-        <div style="display: flex; justify-content: space-between; margin: 40px 0 20px; font-size: 14px;">
-          <div style="text-align: center; flex: 1;">
-            <div style="font-weight: bold; margin-bottom: 50px;">✍️ توقيع الموظف</div>
-            <div style="border-top: 1px solid #000; padding-top: 5px;">__________________</div>
+        <div style="margin-top: 60px; border-top: 1px solid #999; padding-top: 25px;">
+          <div style="margin: 15px 0; font-size: 16px;">
+            <strong>الاسم:</strong> <span style="border-bottom: 1px dotted #000; padding: 0 30px;">${data.name}</span>
           </div>
-          <div style="text-align: center; flex: 1;">
-            <div style="font-weight: bold; margin-bottom: 50px;">✍️ توقيع المدير</div>
-            <div style="border-top: 1px solid #000; padding-top: 5px;">__________________</div>
+          <div style="margin: 15px 0; font-size: 16px;">
+            <strong>الصفة:</strong> <span style="border-bottom: 1px dotted #000; padding: 0 30px;">${data.jobTitle}</span>
+          </div>
+          <div style="margin: 15px 0; font-size: 16px;">
+            <strong>التوقيع:</strong> <span style="border-bottom: 1px dotted #000; padding: 0 60px;">&nbsp;</span>
           </div>
         </div>
         
-        <div style="text-align: center; margin-top: 30px; font-size: 13px; color: #666;">
-          📅 التاريخ: ${today}
-        </div>
       </div>
       
-      <div style="display: flex; gap: 8px; margin-top: 25px; justify-content: center; flex-wrap: wrap;">
+      <div style="display: flex; gap: 8px; margin-top: 30px; justify-content: center; flex-wrap: wrap; border-top: 1px solid #ddd; padding-top: 20px;">
         <button onclick="printNotification()" style="padding: 12px 20px; background: #9c27b0; color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer;">🖨️ طباعة</button>
         <button onclick="saveNotificationPDF()" style="padding: 12px 20px; background: #f44336; color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer;">📄 PDF</button>
         <button onclick="saveNotificationWord()" style="padding: 12px 20px; background: #4caf50; color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer;">💾 Word</button>
@@ -746,13 +703,15 @@ function printNotification() {
     <html dir="rtl">
     <head>
       <meta charset="UTF-8">
-      <title>إشعار مباشرة عمل</title>
+      <title>إفادة مباشرة في العمل</title>
       <style>
-        body { font-family: Arial, sans-serif; direction: rtl; padding: 20px; }
-        h1 { color: #0f766e; text-align: center; }
-        h2 { color: #333; text-align: center; }
-        table { width: 100%; border-collapse: collapse; }
-        td { padding: 8px; border-bottom: 1px solid #ddd; }
+        body { 
+          font-family: 'Times New Roman', Arial, sans-serif; 
+          direction: rtl; 
+          padding: 40px; 
+          line-height: 2;
+        }
+        h2 { text-decoration: underline; }
       </style>
     </head>
     <body>${content}
@@ -763,51 +722,81 @@ function printNotification() {
 }
 
 function saveNotificationPDF() {
-  const content = document.getElementById('printableNotification').innerText;
-  const today = new Date().toISOString().slice(0,10);
-  
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF('p', 'mm', 'a4');
   pdf.setR2L(true);
   
-  pdf.setFontSize(20);
-  pdf.text('شركة سرت للنظافة', 105, 20, { align: 'center' });
   pdf.setFontSize(16);
-  pdf.text('إشعار مباشرة عمل', 105, 30, { align: 'center' });
+  pdf.setFont('helvetica', 'bold');
+  pdf.text('شركة الخدمات الخاصة سرت', 105, 20, { align: 'center' });
   
   pdf.setLineWidth(0.5);
-  pdf.line(20, 38, 190, 38);
+  pdf.line(20, 25, 190, 25);
   
-  const lines = content.split('\n').filter(l => l.trim());
-  let yPos = 50;
-  pdf.setFontSize(12);
+  pdf.setFontSize(20);
+  pdf.text('إفادة مباشرة في العمل', 105, 45, { align: 'center' });
   
-  lines.forEach(line => {
-    if (yPos > 270) {
-      pdf.addPage();
-      yPos = 20;
-    }
-    pdf.text(line, 20, yPos, { align: 'right' });
-    yPos += 8;
-  });
+  pdf.setFontSize(14);
+  pdf.setFont('helvetica', 'normal');
   
-  pdf.save(`اشعار-مباشرة-${today}.pdf`);
+  let yPos = 75;
+  pdf.text('نفيدكم بأن السيد/', 190, yPos, { align: 'right' });
+  pdf.setFont('helvetica', 'bold');
+  pdf.text(currentNotificationData.name, 140, yPos, { align: 'right' });
+  pdf.setFont('helvetica', 'normal');
+  
+  yPos += 15;
+  pdf.text('قد باشر عمله لدى شركة الخدمات الخاصة سرت', 190, yPos, { align: 'right' });
+  
+  yPos += 10;
+  pdf.text('اعتباراً من تاريخ', 190, yPos, { align: 'right' });
+  pdf.setFont('helvetica', 'bold');
+  pdf.text(currentNotificationData.startDate, 140, yPos, { align: 'right' });
+  pdf.setFont('helvetica', 'normal');
+  
+  yPos += 10;
+  pdf.text('وذلك حسب المهام الموكلة إليه.', 190, yPos, { align: 'right' });
+  
+  yPos += 25;
+  pdf.setFont('helvetica', 'bold');
+  pdf.text('وتفضلوا بقبول فائق الاحترام.', 105, yPos, { align: 'center' });
+  
+  yPos += 40;
+  pdf.setLineWidth(0.3);
+  pdf.line(20, yPos, 190, yPos);
+  yPos += 15;
+  
+  pdf.setFont('helvetica', 'normal');
+  pdf.setFontSize(13);
+  pdf.text('الاسم: ' + currentNotificationData.name, 190, yPos, { align: 'right' });
+  yPos += 12;
+  pdf.text('الصفة: ' + currentNotificationData.jobTitle, 190, yPos, { align: 'right' });
+  yPos += 12;
+  pdf.text('التوقيع: ________________________', 190, yPos, { align: 'right' });
+  
+  pdf.save(`افادة-مباشرة-${currentNotificationData.name}.pdf`);
 }
 
 function saveNotificationWord() {
   const content = document.getElementById('printableNotification').innerHTML;
-  const today = new Date().toISOString().slice(0,10);
   
   let htmlContent = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" dir="rtl">
-    <head><meta charset="UTF-8"><title>إشعار مباشرة عمل</title></head>
-    <body style="font-family: Arial, sans-serif; direction: rtl;">${content}</body>
+    <head>
+      <meta charset="UTF-8">
+      <title>إفادة مباشرة في العمل</title>
+      <style>
+        body { font-family: 'Times New Roman', Arial, sans-serif; direction: rtl; line-height: 2; }
+        h2 { text-decoration: underline; text-align: center; }
+      </style>
+    </head>
+    <body>${content}</body>
     </html>`;
   
   const blob = new Blob(['\ufeff' + htmlContent], { type: 'application/msword' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `اشعار-مباشرة-${today}.doc`;
+  a.download = `افادة-مباشرة-${currentNotificationData.name}.doc`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -1295,12 +1284,10 @@ async function addWorker() {
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   });
   
-  const shiftLabel = shift === 'morning' ? '🌅 صباح' : shift === 'night' ? '🌙 ليل' : '🔄 كلاهما';
   showWorkNotification({
     name: name,
-    jobTitle: '👷 ' + teamLabel(team),
-    startDate: startDate,
-    shiftLabel: shiftLabel
+    jobTitle: teamLabel(team),
+    startDate: startDate
   });
   
   document.getElementById('newWorkerName').value = '';
@@ -1313,7 +1300,6 @@ function deleteWorker(id, name) {
   if (confirm(`حذف ${name}؟`)) db.collection('workers').doc(id).delete();
 }
 
-// السائقين والمشرفين
 function watchDrivers() {
   db.collection('drivers').orderBy('name').onSnapshot(sn => {
     allDrivers = sn.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -1334,7 +1320,7 @@ function renderDriversList() {
   
   c.innerHTML = filtered.map(d => {
     const duration = calculateWorkDuration(d.startDate);
-    const typeLabel = DRIVER_TYPES[d.driverType] || '🚗';
+    const typeLabel = DRIVER_TYPES[d.driverType] || '';
     return `
       <div class="driver-card">
         <div class="driver-header">
@@ -1355,7 +1341,7 @@ function renderDriversList() {
         </div>
         ${d.checkPhoto ? `<img src="${d.checkPhoto}" class="check-photo" onclick="window.open('${d.checkPhoto}')">` : ''}
         <div style="display:flex;gap:5px;margin-top:8px;flex-wrap:wrap;">
-          <button class="view-btn" onclick="showWorkNotification({name:'${d.name}',jobTitle:'${typeLabel}',startDate:'${d.startDate}',salary:'${d.salary||''}',accountNumber:'${d.accountNumber||''}',bankName:'${d.bankName||''}',licenseGrade:'${d.licenseGrade||''}',shiftLabel:'${d.shift === 'morning' ? '🌅 صباح' : d.shift === 'night' ? '🌙 ليل' : '🔄 كلاهما'}')" style="width:auto;padding:5px 10px;font-size:11px;margin:0;">📋 إشعار</button>
+          <button class="view-btn" onclick="showWorkNotification({name:'${d.name}',jobTitle:'${typeLabel}',startDate:'${d.startDate}'})" style="width:auto;padding:5px 10px;font-size:11px;margin:0;">📋 إفادة</button>
           <button class="edit-btn" onclick="toggleEditDriverForm('${d.id}')">✏️ تعديل</button>
           <button class="del-btn" onclick="deleteDriver('${d.id}','${d.name}')">حذف</button>
         </div>
@@ -1436,16 +1422,10 @@ async function addDriver() {
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   });
   
-  const shiftLabel = shift === 'morning' ? '🌅 صباح' : shift === 'night' ? '🌙 ليل' : '🔄 كلاهما';
   showWorkNotification({
     name: name,
-    jobTitle: DRIVER_TYPES[driverType] || '🚗',
-    startDate: startDate,
-    salary: salary,
-    accountNumber: accountNumber,
-    bankName: bankName,
-    licenseGrade: licenseGrade,
-    shiftLabel: shiftLabel
+    jobTitle: DRIVER_TYPES[driverType] || '',
+    startDate: startDate
   });
   
   document.getElementById('newDriverName').value = '';
@@ -1465,7 +1445,6 @@ function deleteDriver(id, name) {
   if (confirm(`حذف ${name}؟`)) db.collection('drivers').doc(id).delete();
 }
 
-// التقارير
 async function saveReport() {
   const date = document.getElementById('reportDate').value;
   const workerName = document.getElementById('reportWorkerName').value.trim();
@@ -1820,9 +1799,8 @@ async function addUser() {
   
   showWorkNotification({
     name: name,
-    jobTitle: role === 'admin' ? '👤 مدير' : '👤 مشرف',
-    startDate: getTodayISO(),
-    shiftLabel: '—'
+    jobTitle: role === 'admin' ? 'مدير' : 'مشرف',
+    startDate: getTodayISO()
   });
   
   document.getElementById('newUserName').value = '';

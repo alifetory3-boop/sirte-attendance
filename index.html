@@ -359,15 +359,16 @@
         <label>👤 الاسم</label>
         <input id="newDriverName" placeholder="اسم الموظف">
         
-     <label>🚙 نوع السائق / الوظيفة</label>
-<select id="newDriverType">
-  <option value="dump_truck">🚛 سائق دنبر</option>
-  <option value="container">📦 سائق صندوق كنتر</option>
-  <option value="small_box">📦 سائق صندوق صغير</option>
-  <option value="large_compactor">🚜 سائق كباسة كبيرة</option>
-  <option value="small_compactor">🚜 سائق كباسة صغيرة</option>
-  <option value="cleaning_supervisor">👷 مشرف نظافة</option>
-</select>
+        <label>🚙 نوع السائق / الوظيفة</label>
+        <select id="newDriverType">
+          <option value="general_driver">🚗 سائق</option>
+          <option value="dump_truck">🚛 سائق دنبر</option>
+          <option value="container">📦 سائق صندوق كنتر</option>
+          <option value="small_box">📦 سائق صندوق صغير</option>
+          <option value="large_compactor">🚜 سائق كباسة كبيرة</option>
+          <option value="small_compactor">🚜 سائق كباسة صغيرة</option>
+          <option value="cleaning_supervisor">👷 مشرف نظافة</option>
+        </select>
         
         <label>🔄 الوردية</label>
         <select id="newDriverShift">
@@ -556,6 +557,7 @@ const TEAMS = [
 ];
 
 const DRIVER_TYPES = {
+  general_driver: 'سائق',
   dump_truck: 'سائق دنبر',
   container: 'سائق صندوق كنتر',
   small_box: 'سائق صندوق صغير',

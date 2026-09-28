@@ -3,107 +3,520 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>تسجيل الحضور - سرت</title>
+<title>نظام حضور سرت</title>
 <link rel="manifest" href="manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
   * { box-sizing: border-box; }
   body {
     font-family: -apple-system, "Segoe UI", Tahoma, sans-serif;
-    margin: 0;
-    padding: 20px;
-    min-height: 100vh;
+    margin: 0; padding: 0; min-height: 100vh;
     background: linear-gradient(160deg, #0f766e 0%, #134e4a 45%, #0c2b28 100%);
     background-attachment: fixed;
+    display: flex; align-items: center; justify-content: center;
   }
-  .card {
-    max-width: 420px;
-    margin: 0 auto;
+  #loginScreen { width: 100%; max-width: 400px; padding: 20px; }
+  #loginScreen h1 { text-align: center; color: #fff; font-size: 22px; margin-bottom: 5px; }
+  #loginScreen .subtitle { text-align: center; color: rgba(255,255,255,0.7); font-size: 14px; margin-bottom: 25px; }
+  .login-card {
     background: rgba(255,255,255,0.14);
     -webkit-backdrop-filter: blur(18px) saturate(160%);
     backdrop-filter: blur(18px) saturate(160%);
     border: 1px solid rgba(255,255,255,0.35);
-    border-radius: 20px;
-    padding: 24px;
+    border-radius: 20px; padding: 30px 24px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.25);
   }
-  h1 { font-size: 20px; text-align: center; color: #ffffff; margin-bottom: 20px; text-shadow: 0 1px 4px rgba(0,0,0,0.3); }
-  select, button {
-    width: 100%;
-    padding: 14px;
-    border-radius: 12px;
+  .login-card label { display: block; color: rgba(255,255,255,0.85); font-size: 14px; margin-bottom: 8px; }
+  .login-card input {
+    width: 100%; padding: 14px; border-radius: 12px;
     border: 1px solid rgba(255,255,255,0.4);
-    font-size: 16px;
-    margin-bottom: 12px;
-    background: rgba(255,255,255,0.22);
-    color: #ffffff;
-    -webkit-backdrop-filter: blur(6px);
-    backdrop-filter: blur(6px);
+    font-size: 16px; margin-bottom: 18px;
+    background: rgba(255,255,255,0.2); color: #fff;
   }
-  select option, select optgroup { color: #111; }
-  button {
-    background: rgba(0,150,136,0.55);
-    color: white;
+  .login-card input::placeholder { color: rgba(255,255,255,0.5); }
+  .login-card .pin-input { letter-spacing: 10px; font-size: 24px; text-align: center; font-weight: bold; }
+  .login-card button {
+    width: 100%; padding: 16px; border-radius: 12px;
     border: 1px solid rgba(255,255,255,0.45);
-    font-weight: bold;
+    font-size: 18px; font-weight: bold;
+    background: rgba(0,150,136,0.7); color: white; cursor: pointer;
+  }
+  #loginMsg { text-align: center; margin-top: 15px; font-size: 14px; font-weight: bold; min-height: 20px; }
+  
+  #mainApp { display: none; width: 100%; padding: 20px; }
+  .card {
+    max-width: 420px; margin: 0 auto;
+    background: rgba(255,255,255,0.14);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    backdrop-filter: blur(18px) saturate(160%);
+    border: 1px solid rgba(255,255,255,0.35);
+    border-radius: 20px; padding: 24px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    margin-bottom: 16px;
+  }
+  h1 { font-size: 18px; text-align: center; color: #fff; margin-bottom: 15px; }
+  h2 { font-size: 15px; color: #fff; }
+  select, button {
+    width: 100%; padding: 12px; border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.4);
+    font-size: 15px; margin-bottom: 10px;
+    background: rgba(255,255,255,0.22); color: #fff; cursor: pointer;
+  }
+  select option { color: #111; }
+  button { background: rgba(0,150,136,0.55); font-weight: bold; }
+  button.secondary { background: rgba(198,40,40,0.35); }
+  button.export-btn { background: rgba(33,150,243,0.5); }
+  button.camera-btn { background: rgba(255,152,0,0.5); }
+  button.edit-btn { background: rgba(255,152,0,0.5); width: auto; padding: 5px 10px; font-size: 12px; margin: 0; }
+  button.word-btn { background: rgba(76,175,80,0.5); }
+  button.view-btn { background: rgba(33,150,243,0.5); }
+  button.print-btn { background: rgba(156,39,176,0.5); }
+  label { font-size: 13px; color: rgba(255,255,255,0.85); margin-bottom: 5px; display: block; }
+  input, textarea {
+    width: 100%; padding: 12px; border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.4);
+    font-size: 15px; margin-bottom: 10px;
+    background: rgba(255,255,255,0.2); color: #fff;
+  }
+  input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.5); }
+  input[type="date"] { color-scheme: dark; }
+  .tabs { display: flex; gap: 5px; margin-bottom: 15px; flex-wrap: wrap; }
+  .tab {
+    flex: 1; text-align: center; padding: 8px; border-radius: 8px;
+    background: rgba(255,255,255,0.14); color: rgba(255,255,255,0.85);
+    font-weight: bold; cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.35); font-size: 11px; min-width: 60px;
+  }
+  .tab.active { background: rgba(0,150,136,0.6); color: white; }
+  .stats { display: flex; flex-wrap: wrap; gap: 8px; }
+  .stat {
+    flex: 1; min-width: 80px; padding: 12px; border-radius: 10px;
+    text-align: center; background: rgba(255,255,255,0.14);
+    border: 1px solid rgba(255,255,255,0.3); color: #fff;
+  }
+  .stat .num { font-size: 20px; font-weight: bold; display: block; }
+  .row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.2); color: #fff; }
+  .worker-row {
+    display: flex; align-items: center; gap: 8px; padding: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.15); font-size: 13px; color: #fff; flex-wrap: wrap;
+    background: rgba(255,255,255,0.03); border-radius: 8px; margin-bottom: 4px;
+  }
+  .worker-row .name { flex: 1; }
+  .worker-row img { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.4); }
+  .badge { padding: 3px 8px; border-radius: 15px; color: white; font-size: 11px; }
+  .del-btn {
+    width: auto; padding: 5px 8px;
+    background: rgba(198,40,40,0.35); color: #ffcdd2;
+    border: 1px solid rgba(255,120,120,0.5); margin: 0; font-size: 12px;
+  }
+  .shift-selector { display: flex; gap: 8px; margin-bottom: 12px; }
+  .shift-btn {
+    flex: 1; padding: 12px; border-radius: 10px;
+    border: 2px solid rgba(255,255,255,0.4);
+    font-size: 15px; font-weight: bold; cursor: pointer; text-align: center;
+  }
+  .shift-btn.morning { background: rgba(255,193,7,0.3); color: #fff; }
+  .shift-btn.morning.active { background: rgba(255,193,7,0.7); border-color: #ffc107; }
+  .shift-btn.night { background: rgba(63,81,181,0.3); color: #fff; }
+  .shift-btn.night.active { background: rgba(63,81,181,0.7); border-color: #3f51b5; }
+  .role-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: bold; }
+  .role-owner { background: rgba(255,215,0,0.6); color: #fff; }
+  .role-admin { background: rgba(156,39,176,0.6); color: #fff; }
+  .role-supervisor { background: rgba(33,150,243,0.6); color: #fff; }
+  .role-worker { background: rgba(76,175,80,0.5); color: #fff; }
+  .role-driver { background: rgba(255,152,0,0.6); color: #fff; }
+  .view-only-badge { background: rgba(255,193,7,0.5); color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 10px; }
+  .deduction-badge { background: rgba(244,67,54,0.6); color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 10px; }
+  .duration-badge { background: rgba(76,175,80,0.5); color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 10px; }
+  .salary-badge { background: rgba(156,39,176,0.6); color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: bold; }
+  .date-display {
+    text-align: center; color: #ffc107; font-size: 14px; font-weight: bold;
+    margin-bottom: 12px; padding: 8px; background: rgba(0,0,0,0.2); border-radius: 8px;
+  }
+  .photo-preview {
+    width: 100%; max-height: 150px; object-fit: cover;
+    border-radius: 10px; margin-bottom: 10px; display: none;
+    border: 2px solid rgba(255,255,255,0.4);
+  }
+  .camera-container { text-align: center; margin-bottom: 15px; }
+  .user-card {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 10px; padding: 10px; margin-bottom: 8px;
+  }
+  .permission-box {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px; padding: 10px; margin-bottom: 10px;
+  }
+  .permission-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .permission-item:last-child { border-bottom: none; }
+  .permission-item label { flex: 1; margin: 0; font-size: 12px; cursor: pointer; }
+  .permission-item input[type="checkbox"] { width: 16px; height: 16px; margin: 0; accent-color: #4caf50; }
+  .edit-form {
+    display: none; width: 100%;
+    background: rgba(0,0,0,0.3); border-radius: 10px; padding: 12px; margin-top: 8px;
+  }
+  .report-photos-grid { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px; }
+  .report-photos-grid img {
+    width: 70px; height: 70px; object-fit: cover;
+    border-radius: 8px; border: 1px solid rgba(255,255,255,0.4);
+  }
+  .progress-bar {
+    width: 100%; height: 10px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 5px; overflow: hidden;
+    margin-bottom: 10px; display: none;
+  }
+  .progress-fill { height: 100%; background: #4caf50; width: 0%; transition: width 0.3s; }
+  .progress-text { text-align: center; font-size: 12px; color: #ffc107; margin-bottom: 10px; font-weight: bold; }
+  .driver-card {
+    background: rgba(255,152,0,0.15);
+    border: 1px solid rgba(255,152,0,0.4);
+    border-radius: 12px; padding: 12px; margin-bottom: 10px;
+  }
+  .driver-header {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
+  }
+  .driver-header img {
+    width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,0.4);
+  }
+  .driver-info {
+    font-size: 11px; color: rgba(255,255,255,0.8); line-height: 1.8;
+  }
+  .check-photo {
+    width: 100%; max-height: 200px; object-fit: cover;
+    border-radius: 8px; margin-top: 8px; border: 1px solid rgba(255,255,255,0.4);
     cursor: pointer;
   }
-  button:disabled { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.5); }
-  button.secondary {
-    background: rgba(198,40,40,0.35);
-    color: #fff;
-    border: 1px solid rgba(255,120,120,0.6);
+  .info-tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    padding: 3px 8px;
+    border-radius: 8px;
+    font-size: 10px;
+    margin: 2px;
   }
-  #preview {
-    width: 100%;
-    border-radius: 14px;
-    margin-bottom: 12px;
-    display: none;
-    border: 1px solid rgba(255,255,255,0.4);
-  }
-  #status {
-    text-align: center;
-    padding: 12px;
-    border-radius: 12px;
-    margin-top: 12px;
-    font-weight: bold;
-    display: none;
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
-  }
-  .ok { background: rgba(76,175,80,0.35); color: #ffffff; border: 1px solid rgba(76,175,80,0.6); }
-  .warn { background: rgba(255,167,38,0.35); color: #ffffff; border: 1px solid rgba(255,167,38,0.6); }
-  .err { background: rgba(239,83,80,0.35); color: #ffffff; border: 1px solid rgba(239,83,80,0.6); }
-  label { font-size: 14px; color: rgba(255,255,255,0.85); margin-bottom: 6px; display: block; }
-  .divider { text-align: center; color: rgba(255,255,255,0.6); font-size: 13px; margin: 6px 0 14px; }
 </style>
 </head>
 <body>
 
-<div class="card">
-  <img src="logo.png" alt="شعار الشركة" style="width:100%; max-width:220px; display:block; margin:0 auto 16px;">
-  <h1>📍 تسجيل الحضور - سرت</h1>
-
-  <label>اختر فريقك ثم اسمك</label>
-  <select id="workerSelect">
-    <option value="">جاري تحميل قائمة العمال...</option>
-  </select>
-
-  <label>التقط صورة وجهك</label>
-  <input type="file" id="photoInput" accept="image/*" capture="user" style="width:100%; margin-bottom:12px;">
-  <img id="preview" alt="معاينة الصورة">
-
-  <button id="checkInBtn" disabled>تسجيل الحضور الآن</button>
-
-  <div class="divider">— أو —</div>
-
-  <button id="sickBtn" class="secondary" disabled>🤒 الإبلاغ عن مرض اليوم</button>
-  <button id="leaveBtn" class="secondary" disabled>📝 أخذت إذن اليوم</button>
-
-  <div id="status"></div>
+<div id="loginScreen">
+  <h1>🔐 نظام حضور سرت</h1>
+  <p class="subtitle">أدخل اسمك والرقم السري</p>
+  <div class="login-card">
+    <label>👤 الاسم</label>
+    <input id="loginName" placeholder="اكتب اسمك هنا">
+    <label>🔢 الرقم السري</label>
+    <input id="loginPin" type="password" class="pin-input" placeholder="••••" maxlength="6" inputmode="numeric">
+    <button onclick="login()">🔓 دخول</button>
+    <div id="loginMsg"></div>
+  </div>
 </div>
 
+<div id="mainApp">
+  <div id="workerView" style="display:none;">
+    <div style="max-width:420px;margin:0 auto 10px;display:flex;gap:8px;">
+      <div style="flex:1;text-align:center;color:#fff;padding:8px;background:rgba(255,255,255,0.1);border-radius:10px;">
+        <span id="workerInfo"></span>
+      </div>
+      <button onclick="logout()" style="width:auto;background:rgba(198,40,40,0.5);">🚪</button>
+    </div>
+    <div class="card">
+      <h1>📍 تسجيل الحضور</h1>
+      <div class="date-display" id="workerDateDisplay"></div>
+      <label>الوردية</label>
+      <div class="shift-selector">
+        <div class="shift-btn morning active" onclick="selectWorkerShift('morning')">🌅 صباح</div>
+        <div class="shift-btn night" onclick="selectWorkerShift('night')">🌙 ليل</div>
+      </div>
+      <button onclick="checkIn()">✅ تسجيل حضور</button>
+      <div style="text-align:center;color:rgba(255,255,255,0.6);font-size:12px;margin:8px 0;">— أو —</div>
+      <button class="secondary" onclick="markAbsent()">✗ غائب (خصم)</button>
+      <button class="secondary" onclick="markLeave()">📝 إذن (لا خصم)</button>
+      <button class="secondary" onclick="markSick()">🤒 مريض (لا خصم)</button>
+      <div id="status" style="text-align:center;padding:10px;border-radius:10px;margin-top:10px;font-weight:bold;display:none;"></div>
+    </div>
+  </div>
+
+  <div id="adminView" style="display:none;">
+    <div style="max-width:100%;margin:0 auto 10px;display:flex;gap:8px;flex-wrap:wrap;">
+      <div style="flex:1;text-align:center;color:#fff;padding:8px;background:rgba(255,255,255,0.1);border-radius:10px;">
+        <span id="currentUserInfo"></span>
+      </div>
+      <button onclick="logout()" style="width:auto;background:rgba(198,40,40,0.5);">🚪</button>
+    </div>
+
+    <div class="tabs" id="adminTabs">
+      <div class="tab active" data-tab="overview">📊 نظرة</div>
+      <div class="tab" data-tab="daily">✅ حضور</div>
+      <div class="tab" data-tab="reports">📋 تقارير</div>
+      <div class="tab" data-tab="workers">👷 عمال</div>
+      <div class="tab" data-tab="drivers">🚗 السائقين والمشرفين</div>
+      <div class="tab" data-tab="deductions">💰 خصومات</div>
+      <div class="tab" data-tab="inventory">📦 مخزن</div>
+      <div class="tab" data-tab="vehicles">🚛 آليات</div>
+      <div class="tab" data-tab="permissions">🔑 صلاحيات</div>
+    </div>
+
+    <div id="tab-overview">
+      <div class="card">
+        <h1>حضور اليوم</h1>
+        <div class="date-display" id="adminDateDisplay"></div>
+        <div class="stats">
+          <div class="stat" style="background:rgba(76,175,80,0.3);"><span class="num" id="presentCount">0</span>حاضر</div>
+          <div class="stat" style="background:rgba(103,58,183,0.3);"><span class="num" id="leaveCount">0</span>إذن</div>
+          <div class="stat" style="background:rgba(173,20,87,0.3);"><span class="num" id="sickCount">0</span>مريض</div>
+          <div class="stat" style="background:rgba(244,67,54,0.3);"><span class="num" id="absentCount">0</span>غائب</div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>سجل الحضور</h2>
+        <button class="export-btn" onclick="exportAttendanceExcel()">📊 تصدير Excel</button>
+        <div id="attendanceList">جاري التحميل...</div>
+      </div>
+    </div>
+
+    <div id="tab-daily" style="display:none;">
+      <div class="card">
+        <h2>✅ تسجيل يدوي</h2>
+        <div class="date-display" id="dailyDateDisplay"></div>
+        <div class="shift-selector">
+          <div class="shift-btn morning active" onclick="selectAdminShift('morning')">🌅 صباح</div>
+          <div class="shift-btn night" onclick="selectAdminShift('night')">🌙 ليل</div>
+        </div>
+        <div id="dailyMarkList">جاري التحميل...</div>
+      </div>
+    </div>
+
+    <div id="tab-reports" style="display:none;">
+      <div class="card">
+        <h2>📋 تقرير يومي</h2>
+        <label>📅 التاريخ</label>
+        <input type="date" id="reportDate">
+        <label>👷 اسم كاتب التقرير</label>
+        <input id="reportWorkerName" placeholder="اسم العامل أو المشرف">
+        <label>📍 موقع العمل</label>
+        <input id="reportLocation" placeholder="مكان العمل">
+        <label>📝 نص التقرير</label>
+        <textarea id="reportText" rows="5" placeholder="اكتب التقرير هنا..."></textarea>
+        <label>📸 صور التقرير (بدون حد أقصى)</label>
+        <div class="report-photos-grid" id="reportPhotosPreview"></div>
+        <input type="file" id="reportPhotosInput" accept="image/*" multiple style="display:none;">
+        <button class="camera-btn" onclick="document.getElementById('reportPhotosInput').click()">📷 إضافة صور</button>
+        <div class="progress-bar" id="uploadProgress"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="progress-text" id="progressText"></div>
+        <button class="word-btn" onclick="saveReport()">💾 حفظ التقرير</button>
+      </div>
+      <div class="card">
+        <h2>📄 التقارير المحفوظة</h2>
+        <div id="savedReportsList">لا توجد تقارير</div>
+      </div>
+    </div>
+
+    <div id="tab-workers" style="display:none;">
+      <div class="card">
+        <h2>➕ إضافة عامل</h2>
+        <label>📸 صورة العامل</label>
+        <div class="camera-container">
+          <img id="workerPhotoPreview" class="photo-preview">
+          <input type="file" id="workerPhotoInput" accept="image/*" capture="user" style="display:none;">
+          <button class="camera-btn" onclick="document.getElementById('workerPhotoInput').click()">📷 التقط صورة</button>
+        </div>
+        <label>👤 الاسم</label>
+        <input id="newWorkerName" placeholder="اسم العامل">
+        <label>🏢 الفريق</label>
+        <select id="newWorkerTeam"></select>
+        <label>🔄 الوردية</label>
+        <select id="newWorkerShift">
+          <option value="morning">🌅 صباح</option>
+          <option value="night">🌙 ليل</option>
+          <option value="both">🔄 كلاهما</option>
+        </select>
+        <label>📅 تاريخ مباشرة العمل</label>
+        <input type="date" id="newWorkerStartDate">
+        <button onclick="addWorker()">✅ تسجيل العامل</button>
+      </div>
+      <div class="card">
+        <h2>👷 العمال</h2>
+        <button class="export-btn" onclick="exportWorkersExcel()">📊 Excel</button>
+        <div id="workersList">جاري التحميل...</div>
+      </div>
+    </div>
+
+    <div id="tab-drivers" style="display:none;">
+      <div class="card">
+        <h2>➕ إضافة سائق / مشرف</h2>
+        
+        <label>📸 الصورة</label>
+        <div class="camera-container">
+          <img id="driverPhotoPreview" class="photo-preview">
+          <input type="file" id="driverPhotoInput" accept="image/*" capture="user" style="display:none;">
+          <button class="camera-btn" onclick="document.getElementById('driverPhotoInput').click()">📷 التقط صورة</button>
+        </div>
+        
+        <label>👤 الاسم</label>
+        <input id="newDriverName" placeholder="اسم الموظف">
+        
+        <label>🚙 نوع السائق / الوظيفة</label>
+        <select id="newDriverType">
+          <option value="general_driver">🚗 سائق</option>
+          <option value="dump_truck">🚛 سائق دنبر</option>
+          <option value="container">📦 سائق صندوق كنتر</option>
+          <option value="small_box">📦 سائق صندوق صغير</option>
+          <option value="large_compactor">🚜 سائق كباسة كبيرة</option>
+          <option value="small_compactor">🚜 سائق كباسة صغيرة</option>
+          <option value="cleaning_supervisor">👷 مشرف نظافة</option>
+        </select>
+        
+        <label>🔄 الوردية</label>
+        <select id="newDriverShift">
+          <option value="morning">🌅 صباح</option>
+          <option value="night">🌙 ليل</option>
+          <option value="both">🔄 كلاهما</option>
+        </select>
+        
+        <label>📅 تاريخ مباشرة العمل</label>
+        <input type="date" id="newDriverStartDate">
+        
+        <label>💰 المرتب الشهري (دينار)</label>
+        <input id="newDriverSalary" type="number" placeholder="مثال: 1500" min="0">
+        
+        <label>🏦 رقم الحساب</label>
+        <input id="newDriverAccount" placeholder="رقم الحساب البنكي">
+        
+        <label>🏛️ اسم المصرف</label>
+        <select id="newDriverBank">
+          <option value="">— اختر —</option>
+          <option value="الجمهورية">مصرف الجمهورية</option>
+          <option value="التجارة والتنمية">مصرف التجارة والتنمية</option>
+          <option value="الوحدة">مصرف الوحدة</option>
+          <option value="الصحاري">مصرف الصحاري</option>
+          <option value="التجاري الوطني">المصرف التجاري الوطني</option>
+          <option value="الادخار">مصرف الادخار</option>
+          <option value="أخرى">أخرى</option>
+        </select>
+        
+        <label>🚗 درجة الرخصة (للسائقين فقط)</label>
+        <select id="newDriverLicense">
+          <option value="">— اختر —</option>
+          <option value="خاصة">رخصة خاصة</option>
+          <option value="عامة">رخصة عامة</option>
+          <option value="درجة أولى">درجة أولى</option>
+          <option value="درجة ثانية">درجة ثانية</option>
+          <option value="درجة ثالثة">درجة ثالثة</option>
+          <option value="معدات ثقيلة">معدات ثقيلة</option>
+        </select>
+        
+        <label>📄 صورة الصك</label>
+        <div class="camera-container">
+          <img id="driverCheckPreview" class="photo-preview">
+          <input type="file" id="driverCheckInput" accept="image/*" capture="environment" style="display:none;">
+          <button class="camera-btn" onclick="document.getElementById('driverCheckInput').click()">📷 صورة الصك</button>
+        </div>
+        
+        <button onclick="addDriver()">✅ تسجيل الموظف</button>
+      </div>
+      
+      <div class="card">
+        <h2>🚗 السائقين والمشرفين</h2>
+        <input id="driversSearch" placeholder="🔍 ابحث بالاسم">
+        <button class="export-btn" onclick="exportDriversExcel()">📊 Excel</button>
+        <div id="driversList">جاري التحميل...</div>
+      </div>
+    </div>
+
+    <div id="tab-deductions" style="display:none;">
+      <div class="card">
+        <h2>💰 الخصومات</h2>
+        <select id="deductionMonthSelect"></select>
+        <button class="export-btn" onclick="exportDeductionsExcel()">📊 Excel</button>
+        <div id="deductionsList">جاري التحميل...</div>
+      </div>
+      <div class="card">
+        <h2>⚙️ قيمة الخصم اليومي</h2>
+        <input id="deductionAmount" type="number" value="50" min="0">
+        <button onclick="saveDeductionSettings()">💾 حفظ</button>
+      </div>
+    </div>
+
+    <div id="tab-inventory" style="display:none;">
+      <div class="card">
+        <h2>➕ إضافة صنف</h2>
+        <input id="newItemName" placeholder="اسم الصنف">
+        <input id="newItemQty" type="number" placeholder="الكمية">
+        <input id="newItemUnit" placeholder="الوحدة">
+        <button onclick="addItem()">➕ إضافة</button>
+      </div>
+      <div class="card">
+        <h2>📦 المخزن</h2>
+        <button class="export-btn" onclick="exportInventoryExcel()">📊 Excel</button>
+        <div id="inventoryList">جاري التحميل...</div>
+      </div>
+    </div>
+
+    <div id="tab-vehicles" style="display:none;">
+      <div class="card">
+        <h2>➕ إضافة آلية</h2>
+        <select id="vehicleType">
+          <option value="small_compactor">كبس صغير</option>
+          <option value="large_compactor">كبس كبير</option>
+          <option value="small_garbage_truck">صندوق قمامة صغير</option>
+          <option value="large_garbage_truck">صندوق قمامة كبير</option>
+          <option value="dump_truck">قلاب</option>
+        </select>
+        <input id="vehicleNumber" placeholder="رقم الآلية">
+        <select id="vehicleStatus">
+          <option value="working">✅ تعمل</option>
+          <option value="maintenance">🔧 صيانة</option>
+          <option value="broken">❌ معطلة</option>
+        </select>
+        <label>📸 صورة الآلية</label>
+        <img id="vehiclePhotoPreview" class="photo-preview">
+        <input type="file" id="vehiclePhotoInput" accept="image/*" capture="environment" style="display:none;">
+        <button class="camera-btn" onclick="document.getElementById('vehiclePhotoInput').click()">📷 صورة</button>
+        <button onclick="saveVehicle()">💾 حفظ</button>
+      </div>
+      <div class="card">
+        <h2>🚛 الآليات</h2>
+        <button class="export-btn" onclick="exportVehiclesExcel()">📊 Excel</button>
+        <div id="vehiclesList">جاري التحميل...</div>
+      </div>
+    </div>
+
+    <div id="tab-permissions" style="display:none;">
+      <div class="card">
+        <h2>👥 إضافة مستخدم</h2>
+        <input id="newUserName" placeholder="اسم المستخدم">
+        <input id="newUserPin" type="password" placeholder="الرقم السري (4-6)" maxlength="6" style="text-align:center;letter-spacing:10px;">
+        <select id="newUserRole" onchange="togglePermissionsBox()">
+          <option value="supervisor">👤 مشرف (صلاحيات مخصصة)</option>
+          <option value="admin">👤 مدير (كل الصلاحيات)</option>
+        </select>
+        <div id="permissionsBox" class="permission-box">
+          <h3 style="margin:0 0 10px;font-size:14px;">حدد الصلاحيات:</h3>
+          <div class="permission-item"><label>📊 نظرة عامة</label><input type="checkbox" id="perm-overview" checked></div>
+          <div class="permission-item"><label>✅ تسجيل الحضور</label><input type="checkbox" id="perm-attendance" checked></div>
+          <div class="permission-item"><label>📋 التقارير</label><input type="checkbox" id="perm-reports"></div>
+          <div class="permission-item"><label>👷 إدارة العمال</label><input type="checkbox" id="perm-workers"></div>
+          <div class="permission-item"><label>🚗 إدارة السائقين والمشرفين</label><input type="checkbox" id="perm-drivers"></div>
+          <div class="permission-item"><label>💰 الخصومات</label><input type="checkbox" id="perm-deductions"></div>
+          <div class="permission-item"><label>📦 المخزن</label><input type="checkbox" id="perm-inventory"></div>
+          <div class="permission-item"><label>🚛 الآليات</label><input type="checkbox" id="perm-vehicles"></div>
+          <div class="permission-item"><label>👁️ مشاهدة فقط</label><input type="checkbox" id="perm-viewonly"></div>
+        </div>
+        <button onclick="addUser()">➕ إضافة</button>
+      </div>
+      <div class="card">
+        <h2>📋 المستخدمين</h2>
+        <div id="usersList">جاري التحميل...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
@@ -111,208 +524,1395 @@
 
 <script>
 firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
 const db = firebase.firestore();
 
+const IMGBB_API_KEY = 'eda920fc86851acbc414c5d058bf2b28';
+
+const OWNER_NAME = 'المدير';
+const OWNER_PIN = '1234';
+let deductionAmountValue = 50;
+let currentUser = null;
+let currentUserRole = '';
+let currentUserPermissions = {};
+let selectedShift = 'morning';
+let adminSelectedShift = 'morning';
+let allWorkers = [];
+let allDrivers = [];
+let allInventory = [];
+let latestAttendanceRecords = [];
+let workerPhotoBase64 = '';
+let driverPhotoBase64 = '';
+let driverCheckBase64 = '';
+let vehiclePhotoBase64 = '';
+let reportPhotoFiles = [];
+let currentNotificationData = { name: '', jobTitle: '', startDate: '', photo: '' };
+
 const TEAMS = [
-  { id: 'dump_truck_drivers',      label: 'سائقين شاحنة دنبر' },
-  { id: 'container_drivers',       label: 'سائقين صندوق كنتر' },
-  { id: 'large_compactor_drivers', label: 'سائقين كباسة كبيرة' },
-  { id: 'small_compactor_drivers', label: 'سائقين كباسة صغيرة' },
-  { id: 'guards',                  label: 'غفير' },
-  { id: 'gardens_workers',         label: 'عمال حدائق' },
-  { id: 'cleaning_workers',        label: 'عمال نظافة' },
-  { id: 'compactor_workers',       label: 'عمال كباسات' },
-  { id: 'electricians',           label: 'عمال كهربائي' },
-  { id: 'cleaning_supervisors',    label: 'مشرف نظافة' },
-  { id: '',                        label: 'أخرى / غير مصنّف' },
+  { id: 'guards', label: 'غفير' },
+  { id: 'gardens_workers', label: 'عمال حدائق' },
+  { id: 'cleaning_workers', label: 'عمال نظافة' },
+  { id: 'compactor_workers', label: 'عمال كباسات' },
+  { id: 'electricians', label: 'عمال كهربائي' },
+  { id: '', label: 'أخرى' },
 ];
 
-function compressImageToBase64(file, maxWidth = 480, quality = 0.6) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
+const DRIVER_TYPES = {
+  general_driver: 'سائق',
+  dump_truck: 'سائق دنبر',
+  container: 'سائق صندوق كنتر',
+  small_box: 'سائق صندوق صغير',
+  large_compactor: 'سائق كباسة كبيرة',
+  small_compactor: 'سائق كباسة صغيرة',
+  cleaning_supervisor: 'مشرف نظافة'
+};
+
+function getTodayDate() {
+  return new Date().toLocaleDateString('ar-LY', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+}
+function getTodayISO() { return new Date().toISOString().slice(0, 10); }
+function getNowTime() { return new Date().toLocaleTimeString('ar-LY'); }
+
+function calculateWorkDuration(startDate) {
+  if (!startDate) return '—';
+  const start = new Date(startDate);
+  const today = new Date();
+  
+  let years = today.getFullYear() - start.getFullYear();
+  let months = today.getMonth() - start.getMonth();
+  let days = today.getDate() - start.getDate();
+  
+  if (days < 0) {
+    months--;
+    const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+    days += lastMonth.getDate();
+  }
+  
+  if (months < 0) {
+    years--;
+    months += 12;
+  }
+  
+  let result = '';
+  if (years > 0) result += `${years} سنة `;
+  if (months > 0) result += `${months} شهر `;
+  if (days > 0 || result === '') result += `${days} يوم`;
+  
+  return result.trim() || 'اليوم';
+}
+
+function compressImage(file, maxWidth = 300, quality = 0.4) {
+  return new Promise((resolve) => {
     const reader = new FileReader();
-    reader.onload = (e) => { img.src = e.target.result; };
-    reader.onerror = reject;
-    img.onload = () => {
-      const scale = Math.min(1, maxWidth / img.width);
-      const canvas = document.createElement('canvas');
-      canvas.width = img.width * scale;
-      canvas.height = img.height * scale;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      resolve(canvas.toDataURL('image/jpeg', quality));
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const scale = Math.min(1, maxWidth / img.width);
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.src = e.target.result;
     };
-    img.onerror = reject;
     reader.readAsDataURL(file);
   });
 }
 
-const workerSelect = document.getElementById('workerSelect');
-const photoInput = document.getElementById('photoInput');
-const preview = document.getElementById('preview');
-const checkInBtn = document.getElementById('checkInBtn');
-const sickBtn = document.getElementById('sickBtn');
-const leaveBtn = document.getElementById('leaveBtn');
-const statusDiv = document.getElementById('status');
-
-let selectedFile = null;
-
-function showStatus(msg, type) {
-  statusDiv.textContent = msg;
-  statusDiv.className = type;
-  statusDiv.style.display = 'block';
+function teamLabel(id) {
+  const t = TEAMS.find(t => t.id === id);
+  return t ? t.label : '';
 }
 
-function updateButtonState() {
-  checkInBtn.disabled = !(workerSelect.value && selectedFile);
-  sickBtn.disabled = !workerSelect.value;
-  leaveBtn.disabled = !workerSelect.value;
+// ============ نظام الإفادة الرسمية مع الصورة ============
+function showWorkNotification(data) {
+  currentNotificationData = data;
+  
+  const modal = document.createElement('div');
+  modal.id = 'notificationModal';
+  modal.style.cssText = `
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.85); z-index: 99999;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px; overflow-y: auto;
+  `;
+  
+  modal.innerHTML = `
+    <div style="background: #fff; color: #000; max-width: 650px; width: 100%; max-height: 90vh; overflow-y: auto; border-radius: 16px; padding: 40px; direction: rtl; font-family: 'Times New Roman', Arial, sans-serif; position: relative;">
+      <button onclick="closeNotificationModal()" style="position: absolute; top: 10px; left: 10px; width: 35px; height: 35px; border-radius: 50%; background: #f44336; color: #fff; border: none; font-size: 20px; cursor: pointer; font-weight: bold;">×</button>
+      
+      <div id="printableNotification" style="line-height: 2; font-size: 16px;">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 2px solid #000;">
+          <div style="font-size: 18px; font-weight: bold;">شركة الخدمات الخاصة سرت</div>
+          ${data.photo ? `<img src="${data.photo}" style="width: 90px; height: 90px; object-fit: cover; border-radius: 8px; border: 2px solid #0f766e;">` : ''}
+        </div>
+        
+        <h2 style="text-align: center; font-size: 22px; font-weight: bold; margin: 30px 0; text-decoration: underline;">
+          إفادة مباشرة في العمل
+        </h2>
+        
+        <div style="text-align: justify; font-size: 17px; line-height: 2.2; margin: 30px 0;">
+          <p style="margin: 15px 0;">
+            نفيدكم بأن السيد/ <span style="font-weight: bold; border-bottom: 1px dotted #000; padding: 0 20px;">${data.name}</span>
+          </p>
+          <p style="margin: 15px 0;">
+            قد باشر عمله لدى شركة الخدمات الخاصة سرت اعتباراً من تاريخ
+            <span style="font-weight: bold; border-bottom: 1px dotted #000; padding: 0 10px;">${data.startDate}</span>
+            ، وذلك حسب المهام الموكلة إليه.
+          </p>
+          <p style="margin: 30px 0 40px; text-align: center; font-weight: bold;">
+            وتفضلوا بقبول فائق الاحترام.
+          </p>
+        </div>
+        
+        <div style="margin-top: 60px; border-top: 1px solid #999; padding-top: 25px;">
+          <div style="margin: 15px 0; font-size: 16px;">
+            <strong>الاسم:</strong> <span style="border-bottom: 1px dotted #000; padding: 0 30px;">${data.name}</span>
+          </div>
+          <div style="margin: 15px 0; font-size: 16px;">
+            <strong>الصفة:</strong> <span style="border-bottom: 1px dotted #000; padding: 0 30px;">${data.jobTitle}</span>
+          </div>
+          <div style="margin: 15px 0; font-size: 16px;">
+            <strong>التوقيع:</strong> <span style="border-bottom: 1px dotted #000; padding: 0 60px;">&nbsp;</span>
+          </div>
+        </div>
+        
+      </div>
+      
+      <div style="display: flex; gap: 8px; margin-top: 30px; justify-content: center; flex-wrap: wrap; border-top: 1px solid #ddd; padding-top: 20px;">
+        <button onclick="printNotification()" style="padding: 12px 20px; background: #9c27b0; color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer;">🖨️ طباعة</button>
+        <button onclick="saveNotificationPDF()" style="padding: 12px 20px; background: #f44336; color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer;">📄 PDF</button>
+        <button onclick="saveNotificationWord()" style="padding: 12px 20px; background: #4caf50; color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer;">💾 Word</button>
+        <button onclick="closeNotificationModal()" style="padding: 12px 20px; background: #607d8b; color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer;">إغلاق</button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
 }
 
-auth.signInAnonymously().catch(err => {
-  showStatus('خطأ في الاتصال: ' + err.message, 'err');
-});
+function closeNotificationModal() {
+  const modal = document.getElementById('notificationModal');
+  if (modal) modal.remove();
+}
 
-db.collection('workers').orderBy('name').get().then(snapshot => {
-  if (snapshot.empty) {
-    workerSelect.innerHTML = '<option value="">لا يوجد عمال مسجلين بعد - راجع الإدارة</option>';
-    return;
-  }
+function printNotification() {
+  const content = document.getElementById('printableNotification').innerHTML;
+  const printWindow = window.open('', '_blank');
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html dir="rtl">
+    <head>
+      <meta charset="UTF-8">
+      <title>إفادة مباشرة في العمل</title>
+      <style>
+        body { 
+          font-family: 'Times New Roman', Arial, sans-serif; 
+          direction: rtl; 
+          padding: 40px; 
+          line-height: 2;
+        }
+        h2 { text-decoration: underline; }
+        img { max-width: 100px; }
+      </style>
+    </head>
+    <body>${content}
+    <script>window.onload = function() { setTimeout(function() { window.print(); }, 800); };<\/script>
+    </body></html>
+  `);
+  printWindow.document.close();
+}
 
-  const byTeam = {};
-  TEAMS.forEach(t => byTeam[t.id] = []);
-
-  snapshot.forEach(doc => {
-    const data = doc.data();
-    const teamId = TEAMS.some(t => t.id === (data.team || '')) ? (data.team || '') : '';
-    byTeam[teamId].push({ id: doc.id, name: data.name || doc.id });
-  });
-
-  workerSelect.innerHTML = '<option value="">-- اختر اسمك --</option>';
-  TEAMS.forEach(team => {
-    const members = byTeam[team.id];
-    if (!members.length) return;
-    const group = document.createElement('optgroup');
-    group.label = team.label;
-    members.forEach(w => {
-      const opt = document.createElement('option');
-      opt.value = w.id;
-      opt.textContent = w.name;
-      group.appendChild(opt);
-    });
-    workerSelect.appendChild(group);
-  });
-}).catch(err => {
-  showStatus('تعذر تحميل قائمة العمال: ' + err.message, 'err');
-});
-
-workerSelect.addEventListener('change', updateButtonState);
-
-photoInput.addEventListener('change', () => {
-  selectedFile = photoInput.files[0] || null;
-  if (selectedFile) {
-    preview.src = URL.createObjectURL(selectedFile);
-    preview.style.display = 'block';
-  }
-  updateButtonState();
-});
-
-checkInBtn.addEventListener('click', async () => {
-  checkInBtn.disabled = true;
-  showStatus('جاري تحديد موقعك...', 'warn');
-
-  if (!navigator.geolocation) {
-    showStatus('المتصفح لا يدعم تحديد الموقع', 'err');
-    checkInBtn.disabled = false;
-    return;
-  }
-
-  navigator.geolocation.getCurrentPosition(async (position) => {
+function saveNotificationPDF() {
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF('p', 'mm', 'a4');
+  pdf.setR2L(true);
+  
+  pdf.setFontSize(16);
+  pdf.setFont('helvetica', 'bold');
+  pdf.text('شركة الخدمات الخاصة سرت', 105, 20, { align: 'center' });
+  
+  pdf.setLineWidth(0.5);
+  pdf.line(20, 25, 190, 25);
+  
+  if (currentNotificationData.photo) {
     try {
-      const accuracy = Math.round(position.coords.accuracy || 0);
+      pdf.addImage(currentNotificationData.photo, 'JPEG', 155, 30, 30, 30);
+    } catch(e) {}
+  }
+  
+  pdf.setFontSize(20);
+  pdf.text('إفادة مباشرة في العمل', 105, 50, { align: 'center' });
+  
+  pdf.setFontSize(14);
+  pdf.setFont('helvetica', 'normal');
+  
+  let yPos = 80;
+  pdf.text('نفيدكم بأن السيد/', 190, yPos, { align: 'right' });
+  pdf.setFont('helvetica', 'bold');
+  pdf.text(currentNotificationData.name, 140, yPos, { align: 'right' });
+  pdf.setFont('helvetica', 'normal');
+  
+  yPos += 15;
+  pdf.text('قد باشر عمله لدى شركة الخدمات الخاصة سرت', 190, yPos, { align: 'right' });
+  
+  yPos += 10;
+  pdf.text('اعتباراً من تاريخ', 190, yPos, { align: 'right' });
+  pdf.setFont('helvetica', 'bold');
+  pdf.text(currentNotificationData.startDate, 140, yPos, { align: 'right' });
+  pdf.setFont('helvetica', 'normal');
+  
+  yPos += 10;
+  pdf.text('وذلك حسب المهام الموكلة إليه.', 190, yPos, { align: 'right' });
+  
+  yPos += 25;
+  pdf.setFont('helvetica', 'bold');
+  pdf.text('وتفضلوا بقبول فائق الاحترام.', 105, yPos, { align: 'center' });
+  
+  yPos += 40;
+  pdf.setLineWidth(0.3);
+  pdf.line(20, yPos, 190, yPos);
+  yPos += 15;
+  
+  pdf.setFont('helvetica', 'normal');
+  pdf.setFontSize(13);
+  pdf.text('الاسم: ' + currentNotificationData.name, 190, yPos, { align: 'right' });
+  yPos += 12;
+  pdf.text('الصفة: ' + currentNotificationData.jobTitle, 190, yPos, { align: 'right' });
+  yPos += 12;
+  pdf.text('التوقيع: ________________________', 190, yPos, { align: 'right' });
+  
+  pdf.save(`افادة-مباشرة-${currentNotificationData.name}.pdf`);
+}
 
-      if (accuracy > 150) {
-        showStatus(`⚠️ دقة الموقع ضعيفة (${accuracy} م) - حاول في مكان مفتوح`, 'warn');
-        checkInBtn.disabled = false;
+function saveNotificationWord() {
+  const content = document.getElementById('printableNotification').innerHTML;
+  
+  let htmlContent = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" dir="rtl">
+    <head>
+      <meta charset="UTF-8">
+      <title>إفادة مباشرة في العمل</title>
+      <style>
+        body { font-family: 'Times New Roman', Arial, sans-serif; direction: rtl; line-height: 2; }
+        h2 { text-decoration: underline; text-align: center; }
+        img { max-width: 100px; }
+      </style>
+    </head>
+    <body>${content}</body>
+    </html>`;
+  
+  const blob = new Blob(['\ufeff' + htmlContent], { type: 'application/msword' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `افادة-مباشرة-${currentNotificationData.name}.doc`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// صور
+document.getElementById('workerPhotoInput').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  workerPhotoBase64 = await compressImage(file);
+  const preview = document.getElementById('workerPhotoPreview');
+  preview.src = workerPhotoBase64;
+  preview.style.display = 'block';
+});
+
+document.getElementById('driverPhotoInput').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  driverPhotoBase64 = await compressImage(file);
+  const preview = document.getElementById('driverPhotoPreview');
+  preview.src = driverPhotoBase64;
+  preview.style.display = 'block';
+});
+
+document.getElementById('driverCheckInput').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  driverCheckBase64 = await compressImage(file, 600, 0.5);
+  const preview = document.getElementById('driverCheckPreview');
+  preview.src = driverCheckBase64;
+  preview.style.display = 'block';
+});
+
+document.getElementById('vehiclePhotoInput').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  vehiclePhotoBase64 = await compressImage(file);
+  const preview = document.getElementById('vehiclePhotoPreview');
+  preview.src = vehiclePhotoBase64;
+  preview.style.display = 'block';
+});
+
+document.getElementById('reportPhotosInput').addEventListener('change', function(e) {
+  const files = e.target.files;
+  reportPhotoFiles = [];
+  const preview = document.getElementById('reportPhotosPreview');
+  preview.innerHTML = '';
+  
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    reportPhotoFiles.push(file);
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      const img = document.createElement('img');
+      img.src = event.target.result;
+      preview.appendChild(img);
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+async function uploadPhoto(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const img = new Image();
+      img.onload = async () => {
+        const canvas = document.createElement('canvas');
+        const maxWidth = 800;
+        const scale = Math.min(1, maxWidth / img.width);
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const base64 = canvas.toDataURL('image/jpeg', 0.6).split(',')[1];
+        
+        const formData = new FormData();
+        formData.append('key', IMGBB_API_KEY);
+        formData.append('image', base64);
+        
+        try {
+          const response = await fetch('https://api.imgbb.com/1/upload', {
+            method: 'POST',
+            body: formData
+          });
+          const data = await response.json();
+          if (data.success) resolve(data.data.url);
+          else reject(new Error('فشل الرفع'));
+        } catch (err) { reject(err); }
+      };
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function login() {
+  const name = document.getElementById('loginName').value.trim();
+  const pin = document.getElementById('loginPin').value.trim();
+  const msg = document.getElementById('loginMsg');
+
+  if (!name || !pin) {
+    msg.innerHTML = '<p style="color:#ffcdd2;">⚠️ أدخل اسمك والرقم السري</p>';
+    return;
+  }
+
+  if (name === OWNER_NAME && pin === OWNER_PIN) {
+    currentUser = { name: OWNER_NAME, role: 'owner' };
+    currentUserRole = 'owner';
+    currentUserPermissions = { all: true };
+    enterAdmin();
+    return;
+  }
+
+  try {
+    const us = await db.collection('systemUsers').where('name','==',name).where('pin','==',pin).get();
+    if (!us.empty) {
+      us.forEach(d => { currentUser = { id: d.id, ...d.data() }; });
+      currentUserRole = currentUser.role || 'supervisor';
+      currentUserPermissions = currentUser.permissions || {};
+      enterAdmin();
+      return;
+    }
+  } catch (err) {}
+
+  try {
+    const ws = await db.collection('workers').where('name','==',name).get();
+    if (!ws.empty) {
+      ws.forEach(d => { currentUser = { id: d.id, ...d.data(), role: 'worker' }; });
+      currentUserRole = 'worker';
+      enterWorker();
+      return;
+    }
+  } catch (err) {}
+
+  try {
+    const ds = await db.collection('drivers').where('name','==',name).get();
+    if (!ds.empty) {
+      ds.forEach(d => { currentUser = { id: d.id, ...d.data(), role: 'driver' }; });
+      currentUserRole = 'driver';
+      enterWorker();
+      return;
+    }
+  } catch (err) {}
+
+  msg.innerHTML = '<p style="color:#ffcdd2;">❌ الاسم أو الرقم السري غير صحيح</p>';
+}
+
+function enterWorker() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('mainApp').style.display = 'block';
+  document.getElementById('workerView').style.display = 'block';
+  document.getElementById('adminView').style.display = 'none';
+  
+  if (currentUserRole === 'driver') {
+    document.getElementById('workerInfo').innerHTML = '<span class="role-badge role-driver">🚗</span> ' + currentUser.name;
+  } else {
+    document.getElementById('workerInfo').innerHTML = '<span class="role-badge role-worker">👷</span> ' + currentUser.name;
+  }
+  document.getElementById('workerDateDisplay').textContent = '📅 ' + getTodayDate();
+  clearLogin();
+}
+
+function enterAdmin() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('mainApp').style.display = 'block';
+  document.getElementById('workerView').style.display = 'none';
+  document.getElementById('adminView').style.display = 'block';
+  
+  const ui = document.getElementById('currentUserInfo');
+  if (currentUserRole === 'owner') ui.innerHTML = '<span class="role-badge role-owner">👑 صاحب النظام</span> ' + currentUser.name;
+  else if (currentUserRole === 'admin') ui.innerHTML = '<span class="role-badge role-admin">👤 مدير</span> ' + currentUser.name;
+  else ui.innerHTML = '<span class="role-badge role-supervisor">👤 مشرف</span> ' + currentUser.name;
+  if (currentUser.viewOnly) ui.innerHTML += ' <span class="view-only-badge">👁️ مشاهدة فقط</span>';
+  
+  clearLogin();
+  initializeAdmin();
+}
+
+function clearLogin() {
+  document.getElementById('loginName').value = '';
+  document.getElementById('loginPin').value = '';
+  document.getElementById('loginMsg').innerHTML = '';
+}
+
+function logout() {
+  currentUser = null;
+  document.getElementById('mainApp').style.display = 'none';
+  document.getElementById('workerView').style.display = 'none';
+  document.getElementById('adminView').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'block';
+}
+
+function togglePermissionsBox() {
+  document.getElementById('permissionsBox').style.display = 
+    document.getElementById('newUserRole').value === 'supervisor' ? 'block' : 'none';
+}
+
+function applyPermissionsToTabs() {
+  if (currentUserRole === 'owner') return;
+  const tabs = document.querySelectorAll('#adminTabs .tab');
+  tabs.forEach(tab => {
+    const tabName = tab.dataset.tab;
+    let show = false;
+    switch(tabName) {
+      case 'overview': show = currentUserPermissions.viewOverview !== false; break;
+      case 'daily': show = currentUserPermissions.manageAttendance === true; break;
+      case 'reports': show = currentUserPermissions.manageReports === true; break;
+      case 'workers': show = currentUserPermissions.manageWorkers === true; break;
+      case 'drivers': show = currentUserPermissions.manageDrivers === true; break;
+      case 'deductions': show = currentUserPermissions.viewDeductions === true; break;
+      case 'inventory': show = currentUserPermissions.manageInventory === true; break;
+      case 'vehicles': show = currentUserPermissions.manageVehicles === true; break;
+      case 'permissions': show = currentUserRole === 'admin'; break;
+    }
+    tab.style.display = show ? 'block' : 'none';
+  });
+}
+
+function selectWorkerShift(s) { selectedShift = s; updateShiftButtons('#workerView', s); }
+function selectAdminShift(s) { adminSelectedShift = s; updateShiftButtons('#tab-daily', s); }
+function updateShiftButtons(container, s) {
+  document.querySelectorAll(container + ' .shift-btn').forEach(btn => {
+    btn.classList.remove('active');
+    if ((s === 'morning' && btn.classList.contains('morning')) || (s === 'night' && btn.classList.contains('night'))) btn.classList.add('active');
+  });
+}
+
+function initializeAdmin() {
+  populateTeamSelect();
+  populateDeductionMonthSelect();
+  displayDates();
+  setDefaultDates();
+  loadDeductionSettings();
+  watchAttendance();
+  watchWorkers();
+  watchDrivers();
+  watchInventory();
+  loadVehicles();
+  loadReports();
+  if (currentUserRole === 'owner' || currentUserRole === 'admin') loadUsersList();
+  applyPermissionsToTabs();
+  
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.onclick = () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      ['overview','daily','reports','workers','drivers','deductions','inventory','vehicles','permissions'].forEach(t => {
+        const el = document.getElementById('tab-' + t);
+        if (el) el.style.display = tab.dataset.tab === t ? 'block' : 'none';
+      });
+      if (tab.dataset.tab === 'deductions') loadDeductions();
+      if (tab.dataset.tab === 'reports') loadReports();
+    };
+  });
+}
+
+function displayDates() {
+  const ts = getTodayDate();
+  document.getElementById('adminDateDisplay').textContent = '📅 ' + ts;
+  document.getElementById('dailyDateDisplay').textContent = '📅 ' + ts;
+}
+
+function setDefaultDates() {
+  document.getElementById('reportDate').value = getTodayISO();
+  document.getElementById('newWorkerStartDate').value = getTodayISO();
+  document.getElementById('newDriverStartDate').value = getTodayISO();
+}
+
+function populateTeamSelect() {
+  document.getElementById('newWorkerTeam').innerHTML = TEAMS.map(t => `<option value="${t.id}">${t.label}</option>`).join('');
+}
+
+function populateDeductionMonthSelect() {
+  const now = new Date();
+  let o = '';
+  for (let i = 0; i < 6; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    o += `<option value="${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}">${d.toLocaleDateString('ar-LY',{year:'numeric',month:'long'})}</option>`;
+  }
+  document.getElementById('deductionMonthSelect').innerHTML = o;
+}
+
+function checkIn() {
+  const sd = document.getElementById('status');
+  sd.textContent = '⏳ جاري تحديد موقعك...';
+  sd.style.display = 'block';
+  sd.style.background = 'rgba(255,167,38,0.35)';
+  
+  if (!navigator.geolocation) {
+    sd.textContent = '❌ المتصفح لا يدعم الموقع';
+    sd.style.background = 'rgba(239,83,80,0.35)';
+    return;
+  }
+  
+  navigator.geolocation.getCurrentPosition(async (pos) => {
+    const now = new Date();
+    const cut = new Date(now); cut.setHours(8,0,0,0);
+    const status = now > cut ? 'late' : 'present';
+    await db.collection('attendance').add({
+      workerId: currentUser.id,
+      workerName: currentUser.name,
+      personType: currentUserRole === 'driver' ? 'driver' : 'worker',
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      date: getTodayISO(), time: getNowTime(),
+      status, shift: selectedShift, hasDeduction: false
+    });
+    sd.textContent = '✅ تم تسجيل حضورك';
+    sd.style.background = 'rgba(76,175,80,0.35)';
+  });
+}
+
+async function markAbsent() {
+  await db.collection('attendance').add({
+    workerId: currentUser.id, workerName: currentUser.name,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    date: getTodayISO(), time: getNowTime(),
+    status: 'absent', shift: selectedShift, hasDeduction: true
+  });
+  const d = document.getElementById('status');
+  d.textContent = '✗ تم تسجيل غيابك (سيتم الخصم)';
+  d.style.display = 'block'; d.style.background = 'rgba(239,83,80,0.35)';
+}
+
+async function markLeave() {
+  await db.collection('attendance').add({
+    workerId: currentUser.id, workerName: currentUser.name,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    date: getTodayISO(), time: getNowTime(),
+    status: 'leave', shift: selectedShift, hasDeduction: false
+  });
+  const d = document.getElementById('status');
+  d.textContent = '📝 تم تسجيل إذنك (لا خصم)';
+  d.style.display = 'block'; d.style.background = 'rgba(103,58,183,0.35)';
+}
+
+async function markSick() {
+  await db.collection('attendance').add({
+    workerId: currentUser.id, workerName: currentUser.name,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    date: getTodayISO(), time: getNowTime(),
+    status: 'sick', shift: selectedShift, hasDeduction: false
+  });
+  const d = document.getElementById('status');
+  d.textContent = '🤒 تم تسجيل مرضك (لا خصم)';
+  d.style.display = 'block'; d.style.background = 'rgba(173,20,87,0.35)';
+}
+
+function watchAttendance() {
+  db.collection('attendance')
+    .where('date','==',getTodayISO())
+    .orderBy('timestamp','desc')
+    .onSnapshot(sn => {
+      const recs = sn.docs.map(d => ({ id: d.id, ...d.data() }));
+      latestAttendanceRecords = recs;
+      
+      document.getElementById('presentCount').textContent = recs.filter(r => r.status === 'present' || r.status === 'late').length;
+      document.getElementById('leaveCount').textContent = recs.filter(r => r.status === 'leave').length;
+      document.getElementById('sickCount').textContent = recs.filter(r => r.status === 'sick').length;
+      document.getElementById('absentCount').textContent = recs.filter(r => r.status === 'absent').length;
+      
+      const ld = document.getElementById('attendanceList');
+      if (!recs.length) {
+        ld.innerHTML = '<p style="text-align:center;color:#888;">لا يوجد حضور اليوم</p>';
         return;
       }
+      
+      const meta = {
+        present: { c: '#2e7d32', l: 'حاضر' },
+        late: { c: '#ef6c00', l: 'متأخر' },
+        leave: { c: '#673ab7', l: 'إذن' },
+        sick: { c: '#ad1457', l: 'مريض' },
+        absent: { c: '#c62828', l: 'غائب (خصم)' }
+      };
+      
+      ld.innerHTML = recs.map(r => {
+        const m = meta[r.status] || { c: '#607d8b', l: r.status };
+        const icon = r.personType === 'driver' ? '🚗 ' : '👷 ';
+        return `<div class="row"><div><div>${icon}${r.workerName}</div><div style="font-size:11px;color:rgba(255,255,255,0.7);">${r.time || '--'} ${r.shift==='morning'?'🌅':'🌙'}</div></div><span class="badge" style="background:${m.c};margin-right:auto;">${m.l}</span></div>`;
+      }).join('');
+    });
+}
 
-      showStatus(`جاري تجهيز الصورة... (دقة الموقع ${accuracy} م)`, 'warn');
-      const workerId = workerSelect.value;
-      const photoBase64 = await compressImageToBase64(selectedFile);
+function watchWorkers() {
+  db.collection('workers').orderBy('name').onSnapshot(sn => {
+    allWorkers = sn.docs.map(d => ({ id: d.id, ...d.data() }));
+    
+    const c1 = document.getElementById('workersList');
+    c1.innerHTML = allWorkers.length ? allWorkers.map(w => {
+      const duration = calculateWorkDuration(w.startDate);
+      return `
+      <div class="worker-row">
+        <img src="${w.photo||''}" onerror="this.style.visibility='hidden'">
+        <span class="name">${w.name}</span>
+        <span style="font-size:10px;">${teamLabel(w.team)}</span>
+        <span class="duration-badge">${duration}</span>
+        <button class="edit-btn" onclick="toggleEditWorkerForm('${w.id}')">✏️</button>
+        <button class="del-btn" onclick="deleteWorker('${w.id}','${w.name}')">حذف</button>
+        <div id="editForm-${w.id}" class="edit-form"></div>
+      </div>`;
+    }).join('') : '<p style="text-align:center;">لا يوجد عمال</p>';
+    
+    updateDailyMarkList();
+  });
+}
 
-      showStatus('جاري حفظ سجل الحضور...', 'warn');
+function updateDailyMarkList() {
+  const c2 = document.getElementById('dailyMarkList');
+  const allPeople = [...allWorkers.map(w => ({...w, type: 'worker'})), ...allDrivers.map(d => ({...d, type: 'driver'}))];
+  c2.innerHTML = allPeople.length ? allPeople.map(w => `
+    <div class="worker-row">
+      <img src="${w.photo||''}" onerror="this.style.visibility='hidden'">
+      <span class="name">${w.type === 'driver' ? '🚗 ' : '👷 '}${w.name}</span>
+      <button onclick="manualMark('${w.id}','${w.name}','present')" style="width:auto;padding:5px;margin:0;background:rgba(46,125,50,0.4);">✅</button>
+      <button onclick="manualMark('${w.id}','${w.name}','absent')" style="width:auto;padding:5px;margin:0;background:rgba(198,40,40,0.4);">✗</button>
+      <button onclick="manualMark('${w.id}','${w.name}','leave')" style="width:auto;padding:5px;margin:0;background:rgba(103,58,183,0.4);">📝</button>
+      <button onclick="manualMark('${w.id}','${w.name}','sick')" style="width:auto;padding:5px;margin:0;background:rgba(173,20,87,0.4);">🤒</button>
+    </div>
+  `).join('') : '<p style="text-align:center;">لا يوجد أشخاص</p>';
+}
 
-      const now = new Date();
-      const cutoff = new Date(now);
-      cutoff.setHours(8, 0, 0, 0);
-      const status = now > cutoff ? 'late' : 'present';
+function toggleEditWorkerForm(workerId) {
+  const form = document.getElementById('editForm-' + workerId);
+  if (form.style.display === 'block') {
+    form.style.display = 'none';
+    form.innerHTML = '';
+    return;
+  }
+  const w = allWorkers.find(x => x.id === workerId);
+  form.innerHTML = `
+    <input id="editName-${workerId}" value="${w.name}" placeholder="الاسم">
+    <select id="editTeam-${workerId}">
+      ${TEAMS.map(t => `<option value="${t.id}" ${t.id === w.team ? 'selected' : ''}>${t.label}</option>`).join('')}
+    </select>
+    <select id="editShift-${workerId}">
+      <option value="morning" ${w.shift === 'morning' ? 'selected' : ''}>🌅 صباح</option>
+      <option value="night" ${w.shift === 'night' ? 'selected' : ''}>🌙 ليل</option>
+      <option value="both" ${w.shift === 'both' ? 'selected' : ''}>🔄 كلاهما</option>
+    </select>
+    <label>📅 تاريخ المباشرة</label>
+    <input id="editStartDate-${workerId}" type="date" value="${w.startDate || ''}">
+    <button onclick="saveEditWorker('${workerId}')">💾 حفظ التعديل</button>
+  `;
+  form.style.display = 'block';
+}
 
-      await db.collection('attendance').add({
-        workerId: workerId,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-        lat: position.coords.latitude,
-        lng: position.coords.longitude,
-        accuracy: accuracy,
-        photoBase64: photoBase64,
-        status: status
-      });
+async function saveEditWorker(workerId) {
+  const data = {
+    name: document.getElementById(`editName-${workerId}`).value,
+    team: document.getElementById(`editTeam-${workerId}`).value,
+    shift: document.getElementById(`editShift-${workerId}`).value,
+    startDate: document.getElementById(`editStartDate-${workerId}`).value
+  };
+  await db.collection('workers').doc(workerId).update(data);
+  document.getElementById('editForm-' + workerId).style.display = 'none';
+}
 
-      showStatus(status === 'present' ? `✅ تم تسجيل حضورك بدقة ${accuracy} م` : `⏰ تم تسجيل حضورك (متأخر) بدقة ${accuracy} م`, 'ok');
-    } catch (err) {
-      showStatus('خطأ: ' + err.message, 'err');
-    } finally {
-      checkInBtn.disabled = false;
+async function manualMark(workerId, workerName, status) {
+  await db.collection('attendance').add({
+    workerId, workerName,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    date: getTodayISO(), time: getNowTime(),
+    status, shift: adminSelectedShift,
+    hasDeduction: status === 'absent'
+  });
+}
+
+async function addWorker() {
+  const name = document.getElementById('newWorkerName').value.trim();
+  const team = document.getElementById('newWorkerTeam').value;
+  const shift = document.getElementById('newWorkerShift').value;
+  const startDate = document.getElementById('newWorkerStartDate').value;
+  
+  if (!name) { alert('اكتب اسم العامل'); return; }
+  if (!startDate) { alert('اختر تاريخ مباشرة العمل'); return; }
+  
+  await db.collection('workers').add({
+    name, team, shift, startDate,
+    photo: workerPhotoBase64,
+    pin: '0000',
+    createdDate: getTodayISO(),
+    createdTime: getNowTime(),
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+  
+  showWorkNotification({
+    name: name,
+    jobTitle: teamLabel(team),
+    startDate: startDate,
+    photo: workerPhotoBase64
+  });
+  
+  document.getElementById('newWorkerName').value = '';
+  workerPhotoBase64 = '';
+  document.getElementById('workerPhotoPreview').style.display = 'none';
+  document.getElementById('workerPhotoInput').value = '';
+}
+
+function deleteWorker(id, name) {
+  if (confirm(`حذف ${name}؟`)) db.collection('workers').doc(id).delete();
+}
+
+function watchDrivers() {
+  db.collection('drivers').orderBy('name').onSnapshot(sn => {
+    allDrivers = sn.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderDriversList();
+    updateDailyMarkList();
+  });
+}
+
+function renderDriversList() {
+  const c = document.getElementById('driversList');
+  const searchTerm = (document.getElementById('driversSearch')?.value || '').trim();
+  const filtered = searchTerm ? allDrivers.filter(d => d.name.includes(searchTerm)) : allDrivers;
+  
+  if (!filtered.length) {
+    c.innerHTML = '<p style="text-align:center;">لا يوجد سائقين أو مشرفين</p>';
+    return;
+  }
+  
+  c.innerHTML = filtered.map(d => {
+    const duration = calculateWorkDuration(d.startDate);
+    const typeLabel = DRIVER_TYPES[d.driverType] || '';
+    return `
+      <div class="driver-card">
+        <div class="driver-header">
+          <img src="${d.photo||''}" onerror="this.style.visibility='hidden'">
+          <div style="flex:1;">
+            <strong>${d.name}</strong>
+            <div style="font-size:11px;">${typeLabel}</div>
+          </div>
+        </div>
+        <div class="driver-info">
+          <span class="info-tag">📅 من: ${d.startDate || '—'}</span>
+          <span class="duration-badge">⏱️ ${duration}</span>
+          ${d.salary ? `<span class="salary-badge">💰 ${d.salary} دينار</span>` : ''}
+          ${d.accountNumber ? `<span class="info-tag">🏦 ${d.accountNumber}</span>` : ''}
+          ${d.bankName ? `<span class="info-tag">🏛️ ${d.bankName}</span>` : ''}
+          ${d.licenseGrade ? `<span class="info-tag">🚗 ${d.licenseGrade}</span>` : ''}
+          ${d.shift ? `<span class="info-tag">${d.shift === 'morning' ? '🌅 صباح' : d.shift === 'night' ? '🌙 ليل' : '🔄 كلاهما'}</span>` : ''}
+        </div>
+        ${d.checkPhoto ? `<img src="${d.checkPhoto}" class="check-photo" onclick="window.open('${d.checkPhoto}')">` : ''}
+        <div style="display:flex;gap:5px;margin-top:8px;flex-wrap:wrap;">
+          <button class="view-btn" onclick="showWorkNotification({name:'${d.name}',jobTitle:'${typeLabel}',startDate:'${d.startDate}',photo:'${d.photo||''}'})" style="width:auto;padding:5px 10px;font-size:11px;margin:0;">📋 إفادة</button>
+          <button class="edit-btn" onclick="toggleEditDriverForm('${d.id}')">✏️ تعديل</button>
+          <button class="del-btn" onclick="deleteDriver('${d.id}','${d.name}')">حذف</button>
+        </div>
+        <div id="driverEditForm-${d.id}" class="edit-form"></div>
+      </div>
+    `;
+  }).join('');
+}
+
+document.getElementById('driversSearch').addEventListener('input', renderDriversList);
+
+function toggleEditDriverForm(driverId) {
+  const form = document.getElementById('driverEditForm-' + driverId);
+  if (form.style.display === 'block') {
+    form.style.display = 'none';
+    form.innerHTML = '';
+    return;
+  }
+  const d = allDrivers.find(x => x.id === driverId);
+  form.innerHTML = `
+    <input id="editDriverName-${driverId}" value="${d.name}" placeholder="الاسم">
+    <select id="editDriverType-${driverId}">
+      ${Object.keys(DRIVER_TYPES).map(k => `<option value="${k}" ${k === d.driverType ? 'selected' : ''}>${DRIVER_TYPES[k]}</option>`).join('')}
+    </select>
+    <select id="editDriverShift-${driverId}">
+      <option value="morning" ${d.shift === 'morning' ? 'selected' : ''}>🌅 صباح</option>
+      <option value="night" ${d.shift === 'night' ? 'selected' : ''}>🌙 ليل</option>
+      <option value="both" ${d.shift === 'both' ? 'selected' : ''}>🔄 كلاهما</option>
+    </select>
+    <label>📅 تاريخ المباشرة</label>
+    <input id="editDriverStartDate-${driverId}" type="date" value="${d.startDate || ''}">
+    <input id="editDriverSalary-${driverId}" type="number" value="${d.salary || ''}" placeholder="المرتب الشهري">
+    <input id="editDriverAccount-${driverId}" value="${d.accountNumber || ''}" placeholder="رقم الحساب">
+    <input id="editDriverBank-${driverId}" value="${d.bankName || ''}" placeholder="اسم المصرف">
+    <input id="editDriverLicense-${driverId}" value="${d.licenseGrade || ''}" placeholder="درجة الرخصة">
+    <button onclick="saveEditDriver('${driverId}')">💾 حفظ التعديل</button>
+  `;
+  form.style.display = 'block';
+}
+
+async function saveEditDriver(driverId) {
+  const data = {
+    name: document.getElementById(`editDriverName-${driverId}`).value,
+    driverType: document.getElementById(`editDriverType-${driverId}`).value,
+    shift: document.getElementById(`editDriverShift-${driverId}`).value,
+    startDate: document.getElementById(`editDriverStartDate-${driverId}`).value,
+    salary: document.getElementById(`editDriverSalary-${driverId}`).value,
+    accountNumber: document.getElementById(`editDriverAccount-${driverId}`).value,
+    bankName: document.getElementById(`editDriverBank-${driverId}`).value,
+    licenseGrade: document.getElementById(`editDriverLicense-${driverId}`).value
+  };
+  await db.collection('drivers').doc(driverId).update(data);
+  document.getElementById('driverEditForm-' + driverId).style.display = 'none';
+}
+
+async function addDriver() {
+  const name = document.getElementById('newDriverName').value.trim();
+  const driverType = document.getElementById('newDriverType').value;
+  const shift = document.getElementById('newDriverShift').value;
+  const startDate = document.getElementById('newDriverStartDate').value;
+  const salary = document.getElementById('newDriverSalary').value.trim();
+  const accountNumber = document.getElementById('newDriverAccount').value.trim();
+  const bankName = document.getElementById('newDriverBank').value;
+  const licenseGrade = document.getElementById('newDriverLicense').value;
+  
+  if (!name) { alert('اكتب الاسم'); return; }
+  if (!startDate) { alert('اختر تاريخ مباشرة العمل'); return; }
+  if (!salary) { alert('اكتب المرتب الشهري'); return; }
+  
+  await db.collection('drivers').add({
+    name, driverType, shift, startDate, salary,
+    accountNumber, bankName, licenseGrade,
+    photo: driverPhotoBase64,
+    checkPhoto: driverCheckBase64,
+    pin: '0000',
+    createdDate: getTodayISO(),
+    createdTime: getNowTime(),
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+  
+  showWorkNotification({
+    name: name,
+    jobTitle: DRIVER_TYPES[driverType] || '',
+    startDate: startDate,
+    photo: driverPhotoBase64
+  });
+  
+  document.getElementById('newDriverName').value = '';
+  document.getElementById('newDriverSalary').value = '';
+  document.getElementById('newDriverAccount').value = '';
+  document.getElementById('newDriverBank').value = '';
+  document.getElementById('newDriverLicense').value = '';
+  driverPhotoBase64 = '';
+  driverCheckBase64 = '';
+  document.getElementById('driverPhotoPreview').style.display = 'none';
+  document.getElementById('driverCheckPreview').style.display = 'none';
+  document.getElementById('driverPhotoInput').value = '';
+  document.getElementById('driverCheckInput').value = '';
+}
+
+function deleteDriver(id, name) {
+  if (confirm(`حذف ${name}؟`)) db.collection('drivers').doc(id).delete();
+}
+
+async function saveReport() {
+  const date = document.getElementById('reportDate').value;
+  const workerName = document.getElementById('reportWorkerName').value.trim();
+  const location = document.getElementById('reportLocation').value.trim();
+  const text = document.getElementById('reportText').value.trim();
+  
+  if (!date || !workerName || !text) {
+    alert('⚠️ أدخل التاريخ والاسم ونص التقرير');
+    return;
+  }
+  
+  const progressBar = document.getElementById('uploadProgress');
+  const progressFill = document.getElementById('progressFill');
+  const progressText = document.getElementById('progressText');
+  progressBar.style.display = 'block';
+  
+  try {
+    progressText.textContent = 'جاري إنشاء التقرير...';
+    const reportRef = await db.collection('dailyReports').add({
+      date, workerName, location, text,
+      photos: [],
+      photosCount: 0,
+      createdTime: getNowTime(),
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    
+    const reportId = reportRef.id;
+    progressFill.style.width = '10%';
+    
+    const photoURLs = [];
+    const totalPhotos = reportPhotoFiles.length;
+    
+    for (let i = 0; i < totalPhotos; i++) {
+      progressText.textContent = `جاري رفع الصورة ${i + 1} من ${totalPhotos}...`;
+      try {
+        const url = await uploadPhoto(reportPhotoFiles[i]);
+        photoURLs.push(url);
+      } catch (err) {}
+      const percent = 10 + Math.round(((i + 1) / totalPhotos) * 85);
+      progressFill.style.width = percent + '%';
     }
-  }, (err) => {
-    showStatus('تعذر تحديد الموقع: فعّل خدمة الموقع للمتصفح من الإعدادات', 'err');
-    checkInBtn.disabled = false;
-  }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
-});
-
-sickBtn.addEventListener('click', async () => {
-  sickBtn.disabled = true;
-  showStatus('جاري تسجيل الحالة...', 'warn');
-  try {
-    const workerId = workerSelect.value;
-    await db.collection('attendance').add({
-      workerId: workerId,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-      lat: null,
-      lng: null,
-      photoBase64: '',
-      status: 'sick'
+    
+    progressText.textContent = 'جاري حفظ التقرير...';
+    progressFill.style.width = '98%';
+    await db.collection('dailyReports').doc(reportId).update({
+      photos: photoURLs,
+      photosCount: photoURLs.length
     });
-    showStatus('🤒 تم تسجيل حالتك (مريض) اليوم - سلامتك', 'ok');
+    
+    progressFill.style.width = '100%';
+    progressText.textContent = `✅ تم حفظ التقرير مع ${totalPhotos} صورة`;
+    
+    alert(`✅ تم حفظ التقرير بنجاح مع ${totalPhotos} صورة`);
+    
+    document.getElementById('reportWorkerName').value = '';
+    document.getElementById('reportLocation').value = '';
+    document.getElementById('reportText').value = '';
+    reportPhotoFiles = [];
+    document.getElementById('reportPhotosPreview').innerHTML = '';
+    document.getElementById('reportPhotosInput').value = '';
+    
+    setTimeout(() => {
+      progressBar.style.display = 'none';
+      progressText.textContent = '';
+      progressFill.style.width = '0%';
+    }, 2000);
+    
+    loadReports();
   } catch (err) {
-    showStatus('خطأ: ' + err.message, 'err');
-  } finally {
-    sickBtn.disabled = false;
+    alert('❌ خطأ في الحفظ: ' + err.message);
+    progressBar.style.display = 'none';
   }
-});
+}
 
-leaveBtn.addEventListener('click', async () => {
-  leaveBtn.disabled = true;
-  showStatus('جاري تسجيل الحالة...', 'warn');
+function loadReports() {
+  db.collection('dailyReports').orderBy('createdAt', 'desc').limit(20).onSnapshot(sn => {
+    const c = document.getElementById('savedReportsList');
+    if (sn.empty) {
+      c.innerHTML = '<p style="text-align:center;color:#888;">لا توجد تقارير</p>';
+      return;
+    }
+    c.innerHTML = sn.docs.map(doc => {
+      const r = doc.data();
+      const photos = (r.photos || []).slice(0, 3).map(p => `<img src="${p}" style="width:50px;height:50px;object-fit:cover;border-radius:6px;margin:2px;" onerror="this.style.display='none'">`).join('');
+      const count = r.photosCount || (r.photos || []).length;
+      return `
+        <div class="user-card">
+          <div style="display:flex;justify-content:space-between;flex-wrap:wrap;">
+            <strong>${r.workerName}</strong>
+            <span style="font-size:11px;">${r.date} - ${r.createdTime || ''}</span>
+          </div>
+          ${r.location ? `<div style="font-size:11px;color:rgba(255,255,255,0.7);">📍 ${r.location}</div>` : ''}
+          <div style="font-size:12px;margin-top:5px;">${r.text.substring(0, 100)}${r.text.length > 100 ? '...' : ''}</div>
+          ${photos ? `<div style="display:flex;margin-top:5px;align-items:center;">${photos}${count > 3 ? `<span style="font-size:11px;color:#ffc107;margin-left:5px;">+${count - 3} صورة</span>` : ''}</div>` : ''}
+          <div style="display:flex;gap:5px;margin-top:8px;flex-wrap:wrap;">
+            <button class="view-btn" onclick="viewReport('${doc.id}')" style="width:auto;padding:5px 10px;font-size:11px;margin:0;">👁️ عرض</button>
+            <button class="word-btn" onclick="exportReportWord('${doc.id}')" style="width:auto;padding:5px 10px;font-size:11px;margin:0;">📄 Word</button>
+            <button class="print-btn" onclick="printReport('${doc.id}')" style="width:auto;padding:5px 10px;font-size:11px;margin:0;">🖨️ طباعة</button>
+            <button class="del-btn" onclick="deleteReport('${doc.id}')" style="width:auto;padding:5px 10px;font-size:11px;margin:0;">حذف</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  });
+}
+
+function viewReport(reportId) {
+  db.collection('dailyReports').doc(reportId).get().then(doc => {
+    if (!doc.exists) return;
+    const r = doc.data();
+    const photosHTML = (r.photos || []).map(p => 
+      `<img src="${p}" style="width:100%;max-width:300px;border-radius:8px;margin:5px;border:1px solid #ddd;">`
+    ).join('');
+    
+    const modal = document.createElement('div');
+    modal.id = 'reportModal';
+    modal.style.cssText = `position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;`;
+    
+    modal.innerHTML = `
+      <div style="background:#fff;color:#000;max-width:700px;width:100%;max-height:90vh;overflow-y:auto;border-radius:16px;padding:24px;direction:rtl;font-family:Arial,sans-serif;position:relative;">
+        <button onclick="closeReportModal()" style="position:absolute;top:10px;left:10px;width:35px;height:35px;border-radius:50%;background:#f44336;color:#fff;border:none;font-size:20px;cursor:pointer;font-weight:bold;">×</button>
+        <h1 style="text-align:center;color:#0f766e;margin-bottom:20px;">📋 تقرير يومي</h1>
+        <hr style="border:1px solid #0f766e;">
+        <div style="margin:20px 0;padding:15px;background:#f5f5f5;border-radius:10px;">
+          <p style="margin:8px 0;"><strong>📅 التاريخ:</strong> ${r.date}</p>
+          <p style="margin:8px 0;"><strong>⏰ الوقت:</strong> ${r.createdTime || ''}</p>
+          <p style="margin:8px 0;"><strong>👷 كاتب التقرير:</strong> ${r.workerName}</p>
+          ${r.location ? `<p style="margin:8px 0;"><strong>📍 الموقع:</strong> ${r.location}</p>` : ''}
+        </div>
+        <hr style="border:1px solid #ddd;">
+        <h2 style="color:#0f766e;">📝 نص التقرير:</h2>
+        <div style="padding:15px;background:#fafafa;border-right:4px solid #0f766e;border-radius:8px;line-height:1.8;white-space:pre-wrap;">${r.text}</div>
+        ${photosHTML ? `<hr style="border:1px solid #ddd;margin-top:20px;"><h2 style="color:#0f766e;">📸 الصور (${r.photos.length}):</h2><div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;">${photosHTML}</div>` : ''}
+        <div style="display:flex;gap:10px;margin-top:20px;justify-content:center;flex-wrap:wrap;">
+          <button onclick="printReport('${reportId}')" style="padding:12px 24px;background:#9c27b0;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:bold;cursor:pointer;">🖨️ طباعة</button>
+          <button onclick="exportReportWord('${reportId}')" style="padding:12px 24px;background:#4caf50;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:bold;cursor:pointer;">📄 Word</button>
+          <button onclick="closeReportModal()" style="padding:12px 24px;background:#607d8b;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:bold;cursor:pointer;">إغلاق</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+  });
+}
+
+function closeReportModal() {
+  const modal = document.getElementById('reportModal');
+  if (modal) modal.remove();
+}
+
+function printReport(reportId) {
+  db.collection('dailyReports').doc(reportId).get().then(doc => {
+    if (!doc.exists) return;
+    const r = doc.data();
+    const photosHTML = (r.photos || []).map(p => 
+      `<img src="${p}" style="max-width:400px;display:block;margin:15px auto;border-radius:8px;">`
+    ).join('');
+    
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+      <!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>تقرير - ${r.date}</title>
+      <style>
+        body { font-family: Arial, sans-serif; direction: rtl; padding: 20px; color: #000; }
+        h1 { text-align: center; color: #0f766e; }
+        hr { border: 1px solid #0f766e; }
+        .info { margin: 20px 0; padding: 15px; background: #f5f5f5; border-radius: 10px; }
+        .info p { margin: 8px 0; }
+        .text-content { padding: 15px; background: #fafafa; border-right: 4px solid #0f766e; border-radius: 8px; line-height: 1.8; white-space: pre-wrap; margin: 15px 0; }
+        .photos { text-align: center; }
+        .photos img { max-width: 400px; display: block; margin: 15px auto; }
+      </style></head><body>
+      <h1>📋 تقرير يومي</h1><hr>
+      <div class="info">
+        <p><strong>📅 التاريخ:</strong> ${r.date}</p>
+        <p><strong>⏰ الوقت:</strong> ${r.createdTime || ''}</p>
+        <p><strong>👷 كاتب التقرير:</strong> ${r.workerName}</p>
+        ${r.location ? `<p><strong>📍 الموقع:</strong> ${r.location}</p>` : ''}
+      </div><hr>
+      <h2>📝 نص التقرير:</h2>
+      <div class="text-content">${r.text}</div>
+      ${photosHTML ? `<hr><h2>📸 الصور:</h2><div class="photos">${photosHTML}</div>` : ''}
+      <script>window.onload = function() { setTimeout(function() { window.print(); }, 1000); };<\/script>
+      </body></html>
+    `);
+    printWindow.document.close();
+  });
+}
+
+function exportReportWord(reportId) {
+  db.collection('dailyReports').doc(reportId).get().then(doc => {
+    if (!doc.exists) return;
+    const r = doc.data();
+    
+    let htmlContent = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" dir="rtl">';
+    htmlContent += '<head><meta charset="UTF-8"><style>body { font-family: Arial, sans-serif; direction: rtl; }h1 { text-align: center; color: #0f766e; }.info { margin: 20px 0; }.info p { margin: 5px 0; }.photos img { max-width: 300px; margin: 10px; }hr { border: 1px solid #0f766e; }</style></head><body>';
+    htmlContent += '<h1>📋 تقرير يومي</h1><hr><div class="info">';
+    htmlContent += '<p><strong>📅 التاريخ:</strong> ' + r.date + '</p>';
+    htmlContent += '<p><strong>⏰ الوقت:</strong> ' + (r.createdTime || '') + '</p>';
+    htmlContent += '<p><strong>👷 كاتب التقرير:</strong> ' + r.workerName + '</p>';
+    if (r.location) htmlContent += '<p><strong>📍 الموقع:</strong> ' + r.location + '</p>';
+    htmlContent += '</div><hr><h2>📝 نص التقرير:</h2><p>' + r.text.replace(/\n/g, '<br>') + '</p>';
+    if (r.photos && r.photos.length > 0) {
+      htmlContent += '<hr><h2>📸 الصور (' + r.photos.length + '):</h2><div class="photos">';
+      for (let i = 0; i < r.photos.length; i++) htmlContent += '<img src="' + r.photos[i] + '" alt="صورة">';
+      htmlContent += '</div>';
+    }
+    htmlContent += '</body></html>';
+    
+    const blob = new Blob(['\ufeff' + htmlContent], { type: 'application/msword' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'تقرير-' + r.date + '-' + r.workerName + '.doc';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+}
+
+async function deleteReport(reportId) {
+  if (!confirm('حذف التقرير؟')) return;
+  await db.collection('dailyReports').doc(reportId).delete();
+  alert('✅ تم حذف التقرير');
+}
+
+async function loadDeductionSettings() {
   try {
-    const workerId = workerSelect.value;
-    await db.collection('attendance').add({
-      workerId: workerId,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-      lat: null,
-      lng: null,
-      photoBase64: '',
-      status: 'leave'
-    });
-    showStatus('📝 تم تسجيل إذنك اليوم', 'ok');
-  } catch (err) {
-    showStatus('خطأ: ' + err.message, 'err');
-  } finally {
-    leaveBtn.disabled = false;
+    const d = await db.collection('settings').doc('deductions').get();
+    if (d.exists) {
+      deductionAmountValue = d.data().amount || 50;
+      document.getElementById('deductionAmount').value = deductionAmountValue;
+    }
+  } catch (err) {}
+}
+
+async function saveDeductionSettings() {
+  deductionAmountValue = Number(document.getElementById('deductionAmount').value) || 0;
+  await db.collection('settings').doc('deductions').set({ amount: deductionAmountValue });
+  alert('✅ تم الحفظ');
+}
+
+async function loadDeductions() {
+  const [y, m] = document.getElementById('deductionMonthSelect').value.split('-').map(Number);
+  const from = new Date(y, m-1, 1), to = new Date(y, m, 1);
+  const sn = await db.collection('attendance').where('timestamp','>=',from).where('timestamp','<',to).get();
+  const ded = {};
+  sn.forEach(doc => {
+    const r = doc.data();
+    if (r.status === 'absent') {
+      const k = r.workerName || r.workerId;
+      if (!ded[k]) ded[k] = 0;
+      ded[k]++;
+    }
+  });
+  const c = document.getElementById('deductionsList');
+  if (!Object.keys(ded).length) {
+    c.innerHTML = '<p style="text-align:center;">✅ لا يوجد خصومات</p>';
+    return;
   }
-});
+  let total = 0;
+  c.innerHTML = Object.keys(ded).map(name => {
+    const days = ded[name], amt = days * deductionAmountValue;
+    total += amt;
+    return `<div class="worker-row"><span class="name">${name}</span><span class="deduction-badge">${days} يوم</span><span class="deduction-badge" style="background:rgba(255,152,0,0.6);">-${amt} دينار</span></div>`;
+  }).join('') + `<div style="margin-top:10px;text-align:center;font-weight:bold;color:#fff;">الإجمالي: ${total} دينار</div>`;
+}
+
+function watchInventory() {
+  db.collection('inventory').orderBy('name').onSnapshot(sn => {
+    allInventory = sn.docs.map(d => ({ id: d.id, ...d.data() }));
+    document.getElementById('inventoryList').innerHTML = allInventory.length ? allInventory.map(i => `
+      <div class="worker-row">
+        <span class="name">${i.name}</span>
+        <span>${i.quantity} ${i.unit||''}</span>
+        <button class="del-btn" onclick="deleteItem('${i.id}','${i.name}')">حذف</button>
+      </div>
+    `).join('') : '<p style="text-align:center;">المخزن فارغ</p>';
+  });
+}
+
+async function addItem() {
+  const name = document.getElementById('newItemName').value.trim();
+  const quantity = Number(document.getElementById('newItemQty').value) || 0;
+  const unit = document.getElementById('newItemUnit').value.trim();
+  if (!name) return;
+  await db.collection('inventory').add({ name, quantity, unit });
+  document.getElementById('newItemName').value = '';
+  document.getElementById('newItemQty').value = '';
+  document.getElementById('newItemUnit').value = '';
+}
+
+function deleteItem(id, name) {
+  if (confirm(`حذف ${name}؟`)) db.collection('inventory').doc(id).delete();
+}
+
+function loadVehicles() {
+  db.collection('vehicles').onSnapshot(sn => {
+    document.getElementById('vehiclesList').innerHTML = sn.empty ? '<p style="text-align:center;">لا توجد آليات</p>' : sn.docs.map(doc => {
+      const v = doc.data();
+      return `<div class="worker-row">${v.photo ? `<img src="${v.photo}" style="width:35px;height:35px;border-radius:6px;">` : ''}<span class="name">${v.typeLabel} - ${v.number}</span><span style="font-size:11px;">${v.statusLabel}</span><button class="del-btn" onclick="deleteVehicle('${doc.id}','${v.number}')">حذف</button></div>`;
+    }).join('');
+  });
+}
+
+async function saveVehicle() {
+  const type = document.getElementById('vehicleType').value;
+  const number = document.getElementById('vehicleNumber').value.trim();
+  const status = document.getElementById('vehicleStatus').value;
+  if (!number) return;
+  const tl = { small_compactor:'كبس صغير', large_compactor:'كبس كبير', small_garbage_truck:'صندوق قمامة صغير', large_garbage_truck:'صندوق قمامة كبير', dump_truck:'قلاب' };
+  const sl = { working:'✅ تعمل', maintenance:'🔧 صيانة', broken:'❌ معطلة' };
+  await db.collection('vehicles').add({ type, typeLabel: tl[type], number, status, statusLabel: sl[status], photo: vehiclePhotoBase64 });
+  document.getElementById('vehicleNumber').value = '';
+  vehiclePhotoBase64 = '';
+  document.getElementById('vehiclePhotoPreview').style.display = 'none';
+  document.getElementById('vehiclePhotoInput').value = '';
+}
+
+function deleteVehicle(id, number) {
+  if (confirm(`حذف ${number}؟`)) db.collection('vehicles').doc(id).delete();
+}
+
+async function addUser() {
+  const name = document.getElementById('newUserName').value.trim();
+  const pin = document.getElementById('newUserPin').value.trim();
+  const role = document.getElementById('newUserRole').value;
+  
+  if (!name || !pin || pin.length < 4) { alert('أدخل اسم ورقم سري (4-6 أرقام)'); return; }
+  
+  let permissions = {}, viewOnly = false;
+  
+  if (role === 'admin') {
+    permissions = { viewOverview:true, manageAttendance:true, manageReports:true, manageWorkers:true, manageDrivers:true, viewDeductions:true, manageInventory:true, manageVehicles:true };
+  } else {
+    permissions = {
+      viewOverview: document.getElementById('perm-overview').checked,
+      manageAttendance: document.getElementById('perm-attendance').checked,
+      manageReports: document.getElementById('perm-reports').checked,
+      manageWorkers: document.getElementById('perm-workers').checked,
+      manageDrivers: document.getElementById('perm-drivers').checked,
+      viewDeductions: document.getElementById('perm-deductions').checked,
+      manageInventory: document.getElementById('perm-inventory').checked,
+      manageVehicles: document.getElementById('perm-vehicles').checked
+    };
+    viewOnly = document.getElementById('perm-viewonly').checked;
+  }
+  
+  await db.collection('systemUsers').add({
+    name, pin, role, permissions, viewOnly,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+  
+  showWorkNotification({
+    name: name,
+    jobTitle: role === 'admin' ? 'مدير' : 'مشرف',
+    startDate: getTodayISO(),
+    photo: ''
+  });
+  
+  document.getElementById('newUserName').value = '';
+  document.getElementById('newUserPin').value = '';
+  loadUsersList();
+}
+
+function loadUsersList() {
+  db.collection('systemUsers').onSnapshot(sn => {
+    document.getElementById('usersList').innerHTML = sn.empty ? '<p style="text-align:center;">لا يوجد مستخدمين</p>' : sn.docs.map(doc => {
+      const u = doc.data();
+      return `<div class="user-card"><strong>${u.name}</strong> <span style="font-size:11px;">🔢${u.pin}</span> ${u.viewOnly ? '<span class="view-only-badge">👁️</span>' : ''}<button class="del-btn" onclick="deleteUser('${doc.id}','${u.name}')">حذف</button></div>`;
+    }).join('');
+  });
+}
+
+function deleteUser(id, name) {
+  if (confirm(`حذف ${name}؟`)) db.collection('systemUsers').doc(id).delete();
+}
+
+function exportAttendanceExcel() {
+  if (!latestAttendanceRecords.length) { alert('لا يوجد حضور اليوم'); return; }
+  const sl = { present:'حاضر', late:'متأخر', leave:'إذن', sick:'مريض', absent:'غائب' };
+  const rows = latestAttendanceRecords.map(r => [r.workerName, r.personType === 'driver' ? 'سائق/مشرف' : 'عامل', r.shift==='morning'?'صباح':'ليل', sl[r.status]||r.status, r.date, r.time || '--']);
+  const ws = XLSX.utils.aoa_to_sheet([['الاسم','النوع','الوردية','الحالة','التاريخ','الوقت'], ...rows]);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'الحضور');
+  XLSX.writeFile(wb, `حضور-${getTodayISO()}.xlsx`);
+}
+
+function exportWorkersExcel() {
+  if (!allWorkers.length) { alert('لا يوجد عمال'); return; }
+  const rows = allWorkers.map(w => [
+    w.name,
+    teamLabel(w.team),
+    w.shift==='both'?'كلاهما':w.shift==='night'?'ليل':'صباح',
+    w.startDate || '',
+    calculateWorkDuration(w.startDate),
+    w.createdDate || '',
+    w.createdTime || ''
+  ]);
+  const ws = XLSX.utils.aoa_to_sheet([['الاسم','الفريق','الوردية','تاريخ المباشرة','مدة العمل','تاريخ الإضافة','وقت الإضافة'], ...rows]);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'العمال');
+  XLSX.writeFile(wb, 'عمال.xlsx');
+}
+
+function exportDriversExcel() {
+  if (!allDrivers.length) { alert('لا يوجد سائقين'); return; }
+  const rows = allDrivers.map(d => [
+    d.name,
+    DRIVER_TYPES[d.driverType] || '',
+    d.shift==='both'?'كلاهما':d.shift==='night'?'ليل':'صباح',
+    d.startDate || '',
+    calculateWorkDuration(d.startDate),
+    d.salary || '',
+    d.accountNumber || '',
+    d.bankName || '',
+    d.licenseGrade || '',
+    d.createdDate || '',
+    d.createdTime || ''
+  ]);
+  const ws = XLSX.utils.aoa_to_sheet([
+    ['الاسم','الوظيفة','الوردية','تاريخ المباشرة','مدة العمل','المرتب','رقم الحساب','المصرف','الرخصة','تاريخ الإضافة','وقت الإضافة'],
+    ...rows
+  ]);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'السائقين والمشرفين');
+  XLSX.writeFile(wb, 'السائقين-والمشرفين.xlsx');
+}
+
+function exportDeductionsExcel() { loadDeductions(); }
+
+function exportInventoryExcel() {
+  if (!allInventory.length) { alert('المخزن فارغ'); return; }
+  const rows = allInventory.map(i => [i.name, i.quantity, i.unit||'']);
+  const ws = XLSX.utils.aoa_to_sheet([['الاسم','الكمية','الوحدة'], ...rows]);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'المخزن');
+  XLSX.writeFile(wb, 'مخزن.xlsx');
+}
+
+function exportVehiclesExcel() {
+  db.collection('vehicles').get().then(s => {
+    if (s.empty) { alert('لا توجد آليات'); return; }
+    const rows = s.docs.map(d => {
+      const v = d.data();
+      return [v.typeLabel, v.number, v.statusLabel];
+    });
+    const ws = XLSX.utils.aoa_to_sheet([['النوع','الرقم','الحالة'], ...rows]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'الآليات');
+    XLSX.writeFile(wb, 'آليات.xlsx');
+  });
+}
+
+document.getElementById('loginScreen').style.display = 'block';
+document.getElementById('mainApp').style.display = 'none';
 </script>
-
 </body>
 </html>

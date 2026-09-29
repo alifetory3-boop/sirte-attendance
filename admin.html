@@ -325,7 +325,7 @@
         <input id="reportLocation" placeholder="مكان العمل">
         <label>📝 نص التقرير</label>
         <textarea id="reportText" rows="5" placeholder="اكتب التقرير هنا..."></textarea>
-        <label>📸 صور التقرير (بدون حد أقصى)</label>
+        <label>📸 صور التقرير</label>
         <div class="report-photos-grid" id="reportPhotosPreview"></div>
         <input type="file" id="reportPhotosInput" accept="image/*" multiple style="display:none;">
         <input type="file" id="reportPhotosInputCamera" accept="image/*" capture="environment" multiple style="display:none;">
@@ -1119,7 +1119,6 @@ function updateDailyMarkList() {
   c2.innerHTML = allPeople.length ? allPeople.map(w => `<div class="worker-row"><img src="${w.photo||''}" onerror="this.style.visibility='hidden'"><span class="name">${w.type === 'driver' ? '🚗 ' : '👷 '}${w.name}</span><button onclick="manualMark('${w.id}','${w.name}','present')" style="width:auto;padding:5px;margin:0;background:rgba(46,125,50,0.4);">✅</button><button onclick="manualMark('${w.id}','${w.name}','absent')" style="width:auto;padding:5px;margin:0;background:rgba(198,40,40,0.4);">✗</button><button onclick="manualMark('${w.id}','${w.name}','leave')" style="width:auto;padding:5px;margin:0;background:rgba(103,58,183,0.4);">📝</button><button onclick="manualMark('${w.id}','${w.name}','sick')" style="width:auto;padding:5px;margin:0;background:rgba(173,20,87,0.4);">🤒</button></div>`).join('') : '<p style="text-align:center;">لا يوجد أشخاص</p>';
 }
 
-// ✅ تعديل العامل - مع قسم الصور
 function toggleEditWorkerForm(workerId) {
   const form = document.getElementById('editForm-' + workerId);
   if (form.style.display === 'block') { form.style.display = 'none'; form.innerHTML = ''; return; }
@@ -1246,7 +1245,6 @@ function renderDriversList() {
 
 document.getElementById('driversSearch').addEventListener('input', renderDriversList);
 
-// ✅ تعديل السائق - مع قسمي الصور
 function toggleEditDriverForm(driverId) {
   const form = document.getElementById('driverEditForm-' + driverId);
   if (form.style.display === 'block') { form.style.display = 'none'; form.innerHTML = ''; return; }
@@ -1638,7 +1636,7 @@ function exportAttendanceExcel() {
 
 function exportWorkersExcel() {
   if (!allWorkers.length) { alert('لا يوجد عمال'); return; }
-  const rows = allWorkers.map(w => [w.name, teamLabel(w.Dateteam), w.shift==='both'?'كلاهما':w.shift==='night'?'ليل':'صباح', w.startDate || '', calculateWorkDuration(w.startDate), w.createdDate || '', w.createdTime || '']);
+  const rows = allWorkers.map(w => [w.name, teamLabel(w.team), w.shift==='both'?'كلاهما':w.shift==='night'?'ليل':'صباح', w.startDate || '', calculateWorkDuration(w.startDate), w.createdDate || '', w.createdTime || '']);
   const ws = XLSX.utils.aoa_to_sheet([['الاسم','الفريق','الوردية','تاريخ المباشرة','مدة العمل','تاريخ الإضافة','وقت الإضافة'], ...rows]);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'العمال');
@@ -1647,7 +1645,7 @@ function exportWorkersExcel() {
 
 function exportDriversExcel() {
   if (!allDrivers.length) { alert('لا يوجد سائقين'); return; }
-  const rows = allDrivers.map(d => [d.name, DRIVER_TYPES[d.driverType] || '', d.shift==='both'?'كلاهما':d.shift==='night'?'ليل':'صباح', d.startDate || '', calculateWorkDuration(d.startDate), d.salary || '', d.accountNumber || '', d.bankName || '', d.licenseGrade || '', d.created || '', d.createdTime || '']);
+  const rows = allDrivers.map(d => [d.name, DRIVER_TYPES[d.driverType] || '', d.shift==='both'?'كلاهما':d.shift==='night'?'ليل':'صباح', d.startDate || '', calculateWorkDuration(d.startDate), d.salary || '', d.accountNumber || '', d.bankName || '', d.licenseGrade || '', d.createdDate || '', d.createdTime || '']);
   const ws = XLSX.utils.aoa_to_sheet([['الاسم','الوظيفة','الوردية','تاريخ المباشرة','مدة العمل','المرتب','رقم الحساب','المصرف','الرخصة','تاريخ الإضافة','وقت الإضافة'], ...rows]);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'السائقين والمشرفين');

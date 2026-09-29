@@ -1142,7 +1142,7 @@ function toggleEditWorkerForm(workerId) {
     
     <div class="photo-section">
       <h3>📸 الصورة الشخصية</h3>
-      ${w.photo ? `<img src="${w.photo}" class="current-photo" onclick="window.open('${w.photo}')">` : '<div class="no-photo-text">لا توجد صورة</div>'}
+      ${w.photo ? `<img src="${w.photo}" class="current-photo" onclick="window.open('${w.photo}')">` : '<div class="no-photo-text">لا توجد صورة - أضف صورة</div>'}
       <input type="file" id="editWorkerPhoto-${workerId}" accept="image/*" style="display:none;">
       <input type="file" id="editWorkerPhotoCam-${workerId}" accept="image/*" capture="user" style="display:none;">
       <div class="photo-buttons">
@@ -1276,7 +1276,7 @@ function toggleEditDriverForm(driverId) {
     
     <div class="photo-section">
       <h3>📸 الصورة الشخصية</h3>
-      ${d.photo ? `<img src="${d.photo}" class="current-photo" onclick="window.open('${d.photo}')">` : '<div class="no-photo-text">لا توجد صورة</div>'}
+      ${d.photo ? `<img src="${d.photo}" class="current-photo" onclick="window.open('${d.photo}')">` : '<div class="no-photo-text">لا توجد صورة - أضف صورة</div>'}
       <input type="file" id="editDriverPhoto-${driverId}" accept="image/*" style="display:none;">
       <input type="file" id="editDriverPhotoCam-${driverId}" accept="image/*" capture="user" style="display:none;">
       <div class="photo-buttons">
@@ -1288,7 +1288,7 @@ function toggleEditDriverForm(driverId) {
     
     <div class="photo-section">
       <h3>📄 صورة الصك</h3>
-      ${d.checkPhoto ? `<img src="${d.checkPhoto}" class="current-photo" onclick="window.open('${d.checkPhoto}')">` : '<div class="no-photo-text">لا توجد صورة للصك</div>'}
+      ${d.checkPhoto ? `<img src="${d.checkPhoto}" class="current-photo" onclick="window.open('${d.checkPhoto}')">` : '<div class="no-photo-text">لا توجد صورة للصك - أضف صورة</div>'}
       <input type="file" id="editDriverCheck-${driverId}" accept="image/*" style="display:none;">
       <input type="file" id="editDriverCheckCam-${driverId}" accept="image/*" capture="environment" style="display:none;">
       <div class="photo-buttons">

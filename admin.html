@@ -73,7 +73,7 @@
   button.word-btn { background: rgba(76,175,80,0.5); }
   button.view-btn { background: rgba(33,150,243,0.5); }
   button.print-btn { background: rgba(156,39,176,0.5); }
-  button.del-btn-inline { background: rgba(198,40,40,0.5); width: 100%; padding: 12px; font-size: 15px; margin: 8px 0 0; }
+  button.del-btn-inline { background: rgba(198,40,40,0.6); width: 100%; padding: 12px; font-size: 15px; margin: 8px 0 0; border: 2px solid rgba(255,120,120,0.7); }
   label { font-size: 13px; color: rgba(255,255,255,0.85); margin-bottom: 5px; display: block; }
   input, textarea {
     width: 100%; padding: 12px; border-radius: 10px;
@@ -160,21 +160,27 @@
   .permission-item input[type="checkbox"] { width: 16px; height: 16px; margin: 0; accent-color: #4caf50; }
   .edit-form {
     display: none; width: 100%;
-    background: rgba(0,0,0,0.4); border-radius: 10px; padding: 12px; margin-top: 8px;
+    background: rgba(0,0,0,0.5); border-radius: 10px; padding: 15px; margin-top: 10px;
+    border: 2px solid rgba(255,193,7,0.5);
   }
-  .edit-form h3 { margin: 0 0 10px; font-size: 14px; color: #ffc107; }
+  .edit-form h3 { margin: 0 0 15px; font-size: 15px; color: #ffc107; text-align: center; }
   .photo-section {
-    background: rgba(0,0,0,0.3);
+    background: rgba(0,150,136,0.2);
     border-radius: 10px;
     padding: 12px;
-    margin-bottom: 12px;
-    border: 1px solid rgba(255,255,255,0.2);
+    margin: 12px 0;
+    border: 2px solid rgba(76,175,80,0.6);
   }
-  .photo-section h3 { color: #4caf50 !important; margin-bottom: 10px !important; }
+  .photo-section h3 { color: #4caf50 !important; margin: 0 0 10px 0 !important; font-size: 14px; text-align: right; }
   .current-photo {
     width: 90px; height: 90px; object-fit: cover; border-radius: 8px;
-    border: 2px solid rgba(255,255,255,0.5); margin: 5px 0;
+    border: 2px solid rgba(255,255,255,0.6); margin: 5px 0;
     cursor: pointer; display: block;
+  }
+  .no-photo-text {
+    font-size: 12px; color: #ffcdd2; padding: 8px;
+    background: rgba(0,0,0,0.2); border-radius: 6px;
+    display: inline-block; margin-bottom: 8px;
   }
   .report-photos-grid { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px; }
   .report-photos-grid img {
@@ -658,7 +664,6 @@ async function uploadImageToImgBB(base64Image) {
   } catch (err) { return null; }
 }
 
-// ============ الإفادة الرسمية ============
 function showWorkNotification(data) {
   currentNotificationData = data;
   let photoHTML = '';
@@ -667,11 +672,9 @@ function showWorkNotification(data) {
   } else {
     photoHTML = `<div style="width: 110px; height: 110px; border: 2px dashed #999; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #999; font-size: 12px; text-align: center;">لا توجد<br>صورة</div>`;
   }
-  
   const modal = document.createElement('div');
   modal.id = 'notificationModal';
   modal.style.cssText = `position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 99999; display: flex; align-items: center; justify-content: center; padding: 20px; overflow-y: auto;`;
-  
   modal.innerHTML = `
     <div style="background: #fff; color: #000; max-width: 650px; width: 100%; max-height: 90vh; overflow-y: auto; border-radius: 16px; padding: 40px; direction: rtl; font-family: 'Times New Roman', Arial, sans-serif; position: relative;">
       <button onclick="closeNotificationModal()" style="position: absolute; top: 10px; left: 10px; width: 35px; height: 35px; border-radius: 50%; background: #f44336; color: #fff; border: none; font-size: 20px; cursor: pointer; font-weight: bold;">×</button>
@@ -1140,12 +1143,12 @@ function toggleEditWorkerForm(workerId) {
     
     <div class="photo-section">
       <h3>📸 الصورة الشخصية</h3>
-      ${w.photo ? `<img src="${w.photo}" class="current-photo" onclick="window.open('${w.photo}')">` : '<p style="font-size:12px;color:#aaa;">لا توجد صورة</p>'}
+      ${w.photo ? `<img src="${w.photo}" class="current-photo" onclick="window.open('${w.photo}')">` : '<div class="no-photo-text">لا توجد صورة</div>'}
       <input type="file" id="editWorkerPhoto-${workerId}" accept="image/*" style="display:none;">
       <input type="file" id="editWorkerPhotoCam-${workerId}" accept="image/*" capture="user" style="display:none;">
       <div class="photo-buttons">
-        <button type="button" class="camera-btn" onclick="document.getElementById('editWorkerPhotoCam-${workerId}').click()" style="font-size:12px;padding:8px;">📷 كاميرا</button>
-        <button type="button" class="file-btn" onclick="document.getElementById('editWorkerPhoto-${workerId}').click()" style="font-size:12px;padding:8px;">🖼️ من الملفات</button>
+        <button type="button" class="camera-btn" onclick="document.getElementById('editWorkerPhotoCam-${workerId}').click()">📷 كاميرا</button>
+        <button type="button" class="file-btn" onclick="document.getElementById('editWorkerPhoto-${workerId}').click()">🖼️ من الملفات</button>
       </div>
       <img id="editWorkerPhotoPreview-${workerId}" style="width:100%;max-height:120px;object-fit:cover;border-radius:8px;display:none;margin-top:8px;border:2px solid #4caf50;">
     </div>
@@ -1188,7 +1191,7 @@ async function saveEditWorker(workerId) {
 }
 
 function deleteWorkerWithConfirm(id, name) {
-  if (confirm(`⚠️ هل تريد حذف "${name}" نهائياً؟\n\nسيتم حذف بياناته من النظام.`)) {
+  if (confirm(`⚠️ هل تريد حذف "${name}" نهائياً؟`)) {
     db.collection('workers').doc(id).delete().then(() => alert('✅ تم الحذف')).catch(err => alert('❌ خطأ: ' + err.message));
   }
 }
@@ -1275,24 +1278,24 @@ function toggleEditDriverForm(driverId) {
     
     <div class="photo-section">
       <h3>📸 الصورة الشخصية</h3>
-      ${d.photo ? `<img src="${d.photo}" class="current-photo" onclick="window.open('${d.photo}')">` : '<p style="font-size:12px;color:#aaa;">لا توجد صورة</p>'}
+      ${d.photo ? `<img src="${d.photo}" class="current-photo" onclick="window.open('${d.photo}')">` : '<div class="no-photo-text">لا توجد صورة</div>'}
       <input type="file" id="editDriverPhoto-${driverId}" accept="image/*" style="display:none;">
       <input type="file" id="editDriverPhotoCam-${driverId}" accept="image/*" capture="user" style="display:none;">
       <div class="photo-buttons">
-        <button type="button" class="camera-btn" onclick="document.getElementById('editDriverPhotoCam-${driverId}').click()" style="font-size:12px;padding:8px;">📷 كاميرا</button>
-        <button type="button" class="file-btn" onclick="document.getElementById('editDriverPhoto-${driverId}').click()" style="font-size:12px;padding:8px;">🖼️ من الملفات</button>
+        <button type="button" class="camera-btn" onclick="document.getElementById('editDriverPhotoCam-${driverId}').click()">📷 كاميرا</button>
+        <button type="button" class="file-btn" onclick="document.getElementById('editDriverPhoto-${driverId}').click()">🖼️ من الملفات</button>
       </div>
       <img id="editDriverPhotoPreview-${driverId}" style="width:100%;max-height:120px;object-fit:cover;border-radius:8px;display:none;margin-top:8px;border:2px solid #4caf50;">
     </div>
     
     <div class="photo-section">
       <h3>📄 صورة الصك</h3>
-      ${d.checkPhoto ? `<img src="${d.checkPhoto}" class="current-photo" onclick="window.open('${d.checkPhoto}')">` : '<p style="font-size:12px;color:#aaa;">لا توجد صورة للصك</p>'}
+      ${d.checkPhoto ? `<img src="${d.checkPhoto}" class="current-photo" onclick="window.open('${d.checkPhoto}')">` : '<div class="no-photo-text">لا توجد صورة للصك</div>'}
       <input type="file" id="editDriverCheck-${driverId}" accept="image/*" style="display:none;">
       <input type="file" id="editDriverCheckCam-${driverId}" accept="image/*" capture="environment" style="display:none;">
       <div class="photo-buttons">
-        <button type="button" class="camera-btn" onclick="document.getElementById('editDriverCheckCam-${driverId}').click()" style="font-size:12px;padding:8px;">📷 كاميرا</button>
-        <button type="button" class="file-btn" onclick="document.getElementById('editDriverCheck-${driverId}').click()" style="font-size:12px;padding:8px;">🖼️ من الملفات</button>
+        <button type="button" class="camera-btn" onclick="document.getElementById('editDriverCheckCam-${driverId}').click()">📷 كاميرا</button>
+        <button type="button" class="file-btn" onclick="document.getElementById('editDriverCheck-${driverId}').click()">🖼️ من الملفات</button>
       </div>
       <img id="editDriverCheckPreview-${driverId}" style="width:100%;max-height:120px;object-fit:cover;border-radius:8px;display:none;margin-top:8px;border:2px solid #4caf50;">
     </div>
@@ -1358,7 +1361,7 @@ async function saveEditDriver(driverId) {
 }
 
 function deleteDriverWithConfirm(id, name) {
-  if (confirm(`⚠️ هل تريد حذف "${name}" نهائياً؟\n\nسيتم حذف بياناته من النظام.`)) {
+  if (confirm(`⚠️ هل تريد حذف "${name}" نهائياً؟`)) {
     db.collection('drivers').doc(id).delete().then(() => alert('✅ تم الحذف')).catch(err => alert('❌ خطأ: ' + err.message));
   }
 }
@@ -1398,7 +1401,6 @@ function deleteDriver(id, name) {
   if (confirm(`حذف ${name}؟`)) db.collection('drivers').doc(id).delete();
 }
 
-// ============ التقارير ============
 async function saveReport() {
   const date = document.getElementById('reportDate').value;
   const workerName = document.getElementById('reportWorkerName').value.trim();
@@ -1636,7 +1638,7 @@ function exportAttendanceExcel() {
 
 function exportWorkersExcel() {
   if (!allWorkers.length) { alert('لا يوجد عمال'); return; }
-  const rows = allWorkers.map(w => [w.name, teamLabel(w.team), w.shift==='both'?'كلاهما':w.shift==='night'?'ليل':'صباح', w.startDate || '', calculateWorkDuration(w.startDate), w.createdDate || '', w.createdTime || '']);
+  const rows = allWorkers.map(w => [w.name, teamLabel(w.Dateteam), w.shift==='both'?'كلاهما':w.shift==='night'?'ليل':'صباح', w.startDate || '', calculateWorkDuration(w.startDate), w.createdDate || '', w.createdTime || '']);
   const ws = XLSX.utils.aoa_to_sheet([['الاسم','الفريق','الوردية','تاريخ المباشرة','مدة العمل','تاريخ الإضافة','وقت الإضافة'], ...rows]);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'العمال');
@@ -1645,7 +1647,7 @@ function exportWorkersExcel() {
 
 function exportDriversExcel() {
   if (!allDrivers.length) { alert('لا يوجد سائقين'); return; }
-  const rows = allDrivers.map(d => [d.name, DRIVER_TYPES[d.driverType] || '', d.shift==='both'?'كلاهما':d.shift==='night'?'ليل':'صباح', d.startDate || '', calculateWorkDuration(d.startDate), d.salary || '', d.accountNumber || '', d.bankName || '', d.licenseGrade || '', d.createdDate || '', d.createdTime || '']);
+  const rows = allDrivers.map(d => [d.name, DRIVER_TYPES[d.driverType] || '', d.shift==='both'?'كلاهما':d.shift==='night'?'ليل':'صباح', d.startDate || '', calculateWorkDuration(d.startDate), d.salary || '', d.accountNumber || '', d.bankName || '', d.licenseGrade || '', d.created || '', d.createdTime || '']);
   const ws = XLSX.utils.aoa_to_sheet([['الاسم','الوظيفة','الوردية','تاريخ المباشرة','مدة العمل','المرتب','رقم الحساب','المصرف','الرخصة','تاريخ الإضافة','وقت الإضافة'], ...rows]);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'السائقين والمشرفين');
@@ -1660,12 +1662,11 @@ function exportInventoryExcel() {
   const ws = XLSX.utils.aoa_to_sheet([['الاسم','الكمية','الوحدة'], ...rows]);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'المخزن');
-  XLS━X.writeFile(wb, 'مخزن.xlsx
-');
+  XLSX.writeFile(wb, 'مخزن.xlsx');
 }
 
 function exportVehiclesExcel() {
-  db[.collection('vehicles').get().then(s =>الصك {
+  db.collection('vehicles').get().then(s => {
     if (s.empty) { alert('لا توجد آليات'); return; }
     const rows = s.docs.map(d => { const v = d.data(); return [v.typeLabel, v.number, v.statusLabel]; });
     const ws = XLSX.utils.aoa_to_sheet([['النوع','الرقم','الحالة'], ...rows]);

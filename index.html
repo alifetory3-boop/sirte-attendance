@@ -12,7 +12,7 @@
   body {
     font-family: -apple-system, "Segoe UI", Tahoma, sans-serif;
     margin: 0; padding: 0; min-height: 100vh;
-    background-image: url('background.jpg');
+    background: linear-gradient(rgba(255,255,255,0.35), rgba(255,255,255,0.35)), url('background.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -20,13 +20,13 @@
     display: flex; align-items: center; justify-content: center;
   }
   #loginScreen { width: 100%; max-width: 400px; padding: 20px; }
-  #loginScreen h1 { text-align: center; color: #0f766e; font-size: 24px; margin-bottom: 5px; text-shadow: 0 2px 8px rgba(255,255,255,0.8); }
-  #loginScreen .subtitle { text-align: center; color: #333; font-size: 14px; margin-bottom: 25px; text-shadow: 0 1px 4px rgba(255,255,255,0.8); }
+  #loginScreen h1 { text-align: center; color: #0f766e; font-size: 24px; margin-bottom: 5px; text-shadow: 0 2px 8px rgba(255,255,255,0.9); }
+  #loginScreen .subtitle { text-align: center; color: #333; font-size: 14px; margin-bottom: 25px; text-shadow: 0 1px 4px rgba(255,255,255,0.9); }
   .login-card {
-    background: rgba(255,255,255,0.92);
+    background: rgba(255,255,255,0.95);
     -webkit-backdrop-filter: blur(20px) saturate(160%);
     backdrop-filter: blur(20px) saturate(160%);
-    border: 2px solid rgba(255,255,255,0.6);
+    border: 2px solid rgba(255,255,255,0.7);
     border-radius: 20px; padding: 30px 24px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.2);
   }
@@ -49,10 +49,10 @@
   #mainApp { display: none; width: 100%; padding: 20px; }
   .card {
     max-width: 420px; margin: 0 auto;
-    background: rgba(255,255,255,0.92);
+    background: rgba(255,255,255,0.95);
     -webkit-backdrop-filter: blur(20px) saturate(160%);
     backdrop-filter: blur(20px) saturate(160%);
-    border: 2px solid rgba(255,255,255,0.6);
+    border: 2px solid rgba(255,255,255,0.7);
     border-radius: 20px; padding: 24px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.2);
     margin-bottom: 16px;
@@ -96,7 +96,7 @@
   .stats { display: flex; flex-wrap: wrap; gap: 8px; }
   .stat {
     flex: 1; min-width: 80px; padding: 12px; border-radius: 10px;
-    text-align: center; background: rgba(255,255,255,0.9);
+    text-align: center; background: #ffffff;
     border: 2px solid #0f766e; color: #0f766e; font-weight: bold;
   }
   .stat .num { font-size: 20px; font-weight: bold; display: block; }
@@ -104,7 +104,7 @@
   .worker-row {
     display: flex; align-items: center; gap: 8px; padding: 10px;
     border-bottom: 1px solid #ddd; font-size: 13px; color: #333; flex-wrap: wrap;
-    background: rgba(255,255,255,0.7); border-radius: 8px; margin-bottom: 4px;
+    background: #ffffff; border-radius: 8px; margin-bottom: 4px;
   }
   .worker-row .name { flex: 1; color: #333; font-weight: bold; }
   .worker-row img { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 2px solid #0f766e; }
@@ -148,13 +148,13 @@
   .photo-buttons { display: flex; gap: 8px; margin-bottom: 10px; }
   .photo-buttons button { margin-bottom: 0; flex: 1; }
   .user-card {
-    background: rgba(255,255,255,0.9);
+    background: #ffffff;
     border: 2px solid #0f766e;
     border-radius: 10px; padding: 10px; margin-bottom: 8px;
     color: #333;
   }
   .permission-box {
-    background: rgba(255,255,255,0.9);
+    background: #ffffff;
     border: 2px solid #0f766e;
     border-radius: 8px; padding: 10px; margin-bottom: 10px;
   }
@@ -164,12 +164,12 @@
   .permission-item input[type="checkbox"] { width: 16px; height: 16px; margin: 0; accent-color: #0f766e; }
   .edit-form {
     display: none; width: 100%;
-    background: rgba(255,255,255,0.95); border-radius: 10px; padding: 15px; margin-top: 10px;
+    background: #ffffff; border-radius: 10px; padding: 15px; margin-top: 10px;
     border: 2px solid #f57c00;
   }
   .edit-form h3 { margin: 0 0 15px; font-size: 15px; color: #f57c00; text-align: center; font-weight: bold; }
   .photo-section {
-    background: rgba(15,118,110,0.1);
+    background: #f0fdf4;
     border-radius: 10px;
     padding: 12px;
     margin: 12px 0;
@@ -200,7 +200,7 @@
   .progress-fill { height: 100%; background: #4caf50; width: 0%; transition: width 0.3s; }
   .progress-text { text-align: center; font-size: 12px; color: #0f766e; margin-bottom: 10px; font-weight: bold; }
   .driver-card {
-    background: rgba(255,255,255,0.9);
+    background: #ffffff;
     border: 2px solid #ff9800;
     border-radius: 12px; padding: 12px; margin-bottom: 10px;
     color: #333;
@@ -247,7 +247,7 @@
 <div id="mainApp">
   <div id="workerView" style="display:none;">
     <div style="max-width:420px;margin:0 auto 10px;display:flex;gap:8px;">
-      <div style="flex:1;text-align:center;color:#0f766e;padding:8px;background:rgba(255,255,255,0.92);border-radius:10px;border:2px solid #0f766e;font-weight:bold;">
+      <div style="flex:1;text-align:center;color:#0f766e;padding:8px;background:#ffffff;border-radius:10px;border:2px solid #0f766e;font-weight:bold;">
         <span id="workerInfo"></span>
       </div>
       <button onclick="logout()" style="width:auto;background:#c62828;border-color:#c62828;">🚪</button>
@@ -271,7 +271,7 @@
 
   <div id="adminView" style="display:none;">
     <div style="max-width:100%;margin:0 auto 10px;display:flex;gap:8px;flex-wrap:wrap;">
-      <div style="flex:1;text-align:center;color:#0f766e;padding:8px;background:rgba(255,255,255,0.92);border-radius:10px;border:2px solid #0f766e;font-weight:bold;">
+      <div style="flex:1;text-align:center;color:#0f766e;padding:8px;background:#ffffff;border-radius:10px;border:2px solid #0f766e;font-weight:bold;">
         <span id="currentUserInfo"></span>
       </div>
       <button onclick="logout()" style="width:auto;background:#c62828;border-color:#c62828;">🚪</button>

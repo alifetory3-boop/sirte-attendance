@@ -10,267 +10,502 @@
 <style>
   * { box-sizing: border-box; }
   body {
-    font-family: -apple-system, "Segoe UI", Tahoma, sans-serif;
+    font-family: 'Tajawal', -apple-system, "Segoe UI", Tahoma, sans-serif;
     margin: 0; padding: 0; min-height: 100vh;
-    background: linear-gradient(rgba(255,255,255,0.15), rgba(255,255,255,0.15)), url('background.jpg');
+    background: url('background.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed;
     display: flex; align-items: center; justify-content: center;
   }
-  #loginScreen { width: 100%; max-width: 400px; padding: 20px; }
-  #loginScreen h1 { text-align: center; color: #0f766e; font-size: 22px; margin-bottom: 5px; text-shadow: 0 2px 10px rgba(255,255,255,1); }
-  #loginScreen .subtitle { text-align: center; color: #333; font-size: 13px; margin-bottom: 20px; text-shadow: 0 1px 6px rgba(255,255,255,1); }
-  .login-card {
-    background: rgba(255,255,255,0.9);
-    -webkit-backdrop-filter: blur(15px) saturate(160%);
-    backdrop-filter: blur(15px) saturate(160%);
-    border: 1.5px solid rgba(255,255,255,0.8);
-    border-radius: 18px; padding: 25px 22px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-  }
-  .login-card label { display: block; color: #0f766e; font-size: 13px; font-weight: bold; margin-bottom: 6px; }
-  .login-card input {
-    width: 100%; padding: 12px; border-radius: 10px;
-    border: 1.5px solid #0f766e;
-    font-size: 15px; margin-bottom: 15px;
-    background: #ffffff; color: #333;
-  }
-  .login-card input::placeholder { color: #999; }
-  .login-card .pin-input { letter-spacing: 10px; font-size: 22px; text-align: center; font-weight: bold; }
-  .login-card button {
-    width: 100%; padding: 14px; border-radius: 10px;
-    border: 1.5px solid #0f766e;
-    font-size: 17px; font-weight: bold;
-    background: #0f766e; color: white; cursor: pointer;
-    box-shadow: 0 4px 12px rgba(15,118,110,0.3);
-  }
-  #loginMsg { text-align: center; margin-top: 12px; font-size: 13px; font-weight: bold; min-height: 20px; }
-  #mainApp { display: none; width: 100%; padding: 15px; }
-  .card {
-    max-width: 500px; margin: 0 auto;
-    background: rgba(255,255,255,0.88);
-    -webkit-backdrop-filter: blur(15px) saturate(160%);
-    backdrop-filter: blur(15px) saturate(160%);
-    border: 1.5px solid rgba(255,255,255,0.85);
-    border-radius: 16px; padding: 18px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
-    margin-bottom: 10px;
-  }
-  h1 { font-size: 16px; text-align: center; color: #0f766e; margin: 0 0 12px 0; }
-  h2 { font-size: 14px; color: #0f766e; font-weight: bold; margin: 0 0 10px 0; }
-  select, button {
-    width: 100%; padding: 10px; border-radius: 10px;
-    border: 1.5px solid #0f766e;
-    font-size: 14px; margin-bottom: 8px;
-    background: #ffffff; color: #0f766e; font-weight: bold; cursor: pointer;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-  }
-  select option { color: #111; }
-  button { background: #0f766e; color: #ffffff; }
-  button.secondary { background: #c62828; border-color: #c62828; color: #ffffff; }
-  button.export-btn { background: #1976d2; border-color: #1976d2; color: #ffffff; }
-  button.camera-btn { background: #f57c00; border-color: #f57c00; color: #ffffff; }
-  button.file-btn { background: #388e3c; border-color: #388e3c; color: #ffffff; }
-  button.edit-btn { background: #f57c00; border-color: #f57c00; color: #ffffff; width: auto; padding: 5px 10px; font-size: 12px; margin: 0; }
-  button.word-btn { background: #388e3c; border-color: #388e3c; color: #ffffff; }
-  button.view-btn { background: #1976d2; border-color: #1976d2; color: #ffffff; }
-  button.print-btn { background: #7b1fa2; border-color: #7b1fa2; color: #ffffff; }
-  button.del-btn-inline { background: #c62828; border-color: #c62828; color: #ffffff; width: 100%; padding: 10px; font-size: 14px; margin: 6px 0 0; }
-  label { font-size: 13px; color: #0f766e; font-weight: bold; margin-bottom: 5px; display: block; }
-  input, textarea {
-    width: 100%; padding: 10px; border-radius: 10px;
-    border: 1.5px solid #0f766e;
-    font-size: 14px; margin-bottom: 8px;
-    background: #ffffff; color: #333;
-  }
-  input::placeholder, textarea::placeholder { color: #999; }
-  input[type="date"] { color: #333; }
-  .tabs-container {
-    max-width: 900px;
-    margin: 0 auto 12px;
-    padding: 0 5px;
-  }
-  .tabs { display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; }
-  .tab {
-    flex: 0 1 auto; text-align: center; padding: 7px 12px; border-radius: 10px;
-    background: rgba(255,255,255,0.92); color: #0f766e;
-    font-weight: bold; cursor: pointer;
-    border: 1.5px solid #0f766e; font-size: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    white-space: nowrap;
-  }
-  .tab.active { background: #0f766e; color: white; box-shadow: 0 3px 12px rgba(15,118,110,0.4); }
-  .stats { display: flex; flex-wrap: wrap; gap: 6px; }
-  .stat {
-    flex: 1; min-width: 70px; padding: 10px 8px;
-    border-radius: 10px;
-    text-align: center; background: #ffffff;
-    border: 1.5px solid #0f766e; color: #0f766e; font-weight: bold;
-    font-size: 11px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-  }
-  .stat .num { font-size: 20px; font-weight: bold; display: block; }
-  .row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #e0e0e0; color: #333; font-size: 13px; }
-  .worker-row {
-    display: flex; align-items: center; gap: 8px; padding: 8px;
-    border-bottom: 1px solid #e0e0e0; font-size: 13px; color: #333; flex-wrap: wrap;
-    background: #ffffff; border-radius: 8px; margin-bottom: 4px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-  }
-  .worker-row .name { flex: 1; color: #333; font-weight: bold; }
-  .worker-row img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1.5px solid #0f766e; }
-  .badge { padding: 3px 8px; border-radius: 15px; color: white; font-size: 11px; }
-  .del-btn {
-    width: auto; padding: 5px 8px;
-    background: #c62828; color: #ffffff;
-    border: 1.5px solid #c62828; margin: 0; font-size: 12px;
-  }
-  .shift-selector { display: flex; gap: 8px; margin-bottom: 10px; }
-  .shift-btn {
-    flex: 1; padding: 10px; border-radius: 10px;
-    border: 1.5px solid #0f766e;
-    font-size: 14px; font-weight: bold; cursor: pointer; text-align: center;
-    background: #ffffff; color: #0f766e;
-  }
-  .shift-btn.morning { background: #fff9c4; color: #f57f17; border-color: #fbc02d; }
-  .shift-btn.morning.active { background: #fbc02d; color: #ffffff; border-color: #f57c00; }
-  .shift-btn.night { background: #e8eaf6; color: #283593; border-color: #3f51b5; }
-  .shift-btn.night.active { background: #3f51b5; color: #ffffff; border-color: #283593; }
-  .role-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: bold; }
-  .role-owner { background: #ffc107; color: #333; }
-  .role-admin { background: #9c27b0; color: #fff; }
-  .role-supervisor { background: #2196f3; color: #fff; }
-  .role-worker { background: #4caf50; color: #fff; }
-  .role-driver { background: #ff9800; color: #fff; }
-  .view-only-badge { background: #ffc107; color: #333; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: bold; }
-  .deduction-badge { background: #f44336; color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 10px; }
-  .duration-badge { background: #4caf50; color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 10px; }
-  .salary-badge { background: #9c27b0; color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: bold; }
-  .date-display {
-    text-align: center; color: #0f766e; font-size: 12px; font-weight: bold;
-    margin-bottom: 10px; padding: 7px; background: rgba(15,118,110,0.08); border-radius: 8px;
-    border: 1.5px solid #0f766e;
-  }
-  .photo-preview {
-    width: 100%; max-height: 150px; object-fit: cover;
-    border-radius: 10px; margin-bottom: 8px; display: none;
-    border: 1.5px solid #0f766e;
-  }
-  .photo-buttons { display: flex; gap: 6px; margin-bottom: 8px; }
-  .photo-buttons button { margin-bottom: 0; flex: 1; }
-  .user-card {
-    background: #ffffff;
-    border: 1.5px solid #0f766e;
-    border-radius: 10px; padding: 8px 10px; margin-bottom: 6px;
-    color: #333; font-size: 13px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-  }
-  .permission-box {
-    background: #ffffff;
-    border: 1.5px solid #0f766e;
-    border-radius: 10px; padding: 10px; margin-bottom: 8px;
-  }
-  .permission-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #e0e0e0; }
-  .permission-item:last-child { border-bottom: none; }
-  .permission-item label { flex: 1; margin: 0; font-size: 12px; cursor: pointer; color: #0f766e; }
-  .permission-item input[type="checkbox"] { width: 18px; height: 18px; margin: 0; accent-color: #0f766e; }
-  .edit-form {
-    display: none; width: 100%;
-    background: #ffffff; border-radius: 10px; padding: 12px; margin-top: 8px;
-    border: 1.5px solid #f57c00;
-  }
-  .edit-form h3 { margin: 0 0 12px; font-size: 14px; color: #f57c00; text-align: center; font-weight: bold; }
-  .photo-section {
-    background: #f0fdf4;
-    border-radius: 10px;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1.5px solid #4caf50;
-  }
-  .photo-section h3 { color: #0f766e !important; margin: 0 0 8px 0 !important; font-size: 13px; text-align: right; font-weight: bold; }
-  .current-photo {
-    width: 80px; height: 80px; object-fit: cover; border-radius: 8px;
-    border: 1.5px solid #0f766e; margin: 5px 0;
-    cursor: pointer; display: block;
-  }
-  .no-photo-text {
-    font-size: 12px; color: #c62828; padding: 6px 8px;
-    background: rgba(198,40,40,0.1); border-radius: 6px;
-    display: inline-block; margin-bottom: 8px; font-weight: bold;
-  }
-  .report-photos-grid { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 8px; }
-  .report-photos-grid img {
-    width: 60px; height: 60px; object-fit: cover;
-    border-radius: 8px; border: 1.5px solid #0f766e;
-  }
-  .progress-bar {
-    width: 100%; height: 8px;
-    background: #e0e0e0;
-    border-radius: 5px; overflow: hidden;
-    margin-bottom: 8px; display: none;
-  }
-  .progress-fill { height: 100%; background: #4caf50; width: 0%; transition: width 0.3s; }
-  .progress-text { text-align: center; font-size: 12px; color: #0f766e; margin-bottom: 8px; font-weight: bold; }
-  .driver-card {
-    background: #ffffff;
-    border: 1.5px solid #ff9800;
-    border-radius: 10px; padding: 10px; margin-bottom: 8px;
-    color: #333;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-  }
-  .driver-header {
-    display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
-  }
-  .driver-header img {
-    width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 1.5px solid #0f766e;
-  }
-  .driver-info { font-size: 11px; color: #333; line-height: 1.7; }
-  .check-photo {
-    width: 100%; max-height: 180px; object-fit: cover;
-    border-radius: 8px; margin-top: 6px; border: 1.5px solid #0f766e;
-    cursor: pointer;
-  }
-  .info-tag {
-    display: inline-block;
-    background: rgba(15,118,110,0.12);
-    padding: 3px 7px;
-    border-radius: 8px;
-    font-size: 10px;
-    margin: 2px;
-    color: #0f766e;
-    font-weight: bold;
-  }
+  
+  /* شريط علوي شفاف */
   .user-bar {
-    max-width: 900px;
-    margin: 0 auto 10px;
-    display: flex; gap: 6px; flex-wrap: wrap;
-    padding: 0 5px;
+    max-width: 1200px;
+    margin: 20px auto 12px;
+    display: flex; gap: 10px; flex-wrap: wrap;
+    padding: 0 15px;
   }
   .user-bar .user-info {
     flex: 1;
     text-align: center;
     color: #0f766e;
-    padding: 8px 12px;
-    background: rgba(255,255,255,0.92);
-    border-radius: 10px;
-    border: 1.5px solid #0f766e;
+    padding: 12px 20px;
+    background: transparent;
+    border: none;
     font-weight: bold;
-    font-size: 13px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    font-size: 18px;
+    text-shadow: 
+      2px 2px 0 #fff,
+      -2px -2px 0 #fff,
+      2px -2px 0 #fff,
+      -2px 2px 0 #fff,
+      0 0 20px rgba(255,255,255,0.9);
+    letter-spacing: 0.5px;
   }
   .user-bar .logout-btn {
     width: auto;
-    padding: 8px 14px;
+    padding: 10px 20px;
     margin: 0;
-    background: #c62828;
-    border-color: #c62828;
-    font-size: 13px;
+    background: rgba(198,40,40,0.95);
+    border: 2px solid #fff;
+    border-radius: 12px;
+    color: #fff;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(198,40,40,0.4);
+    backdrop-filter: blur(10px);
   }
+  
+  /* تبويبات شفافة - نص فقط */
+  .tabs-container {
+    max-width: 1200px;
+    margin: 0 auto 20px;
+    padding: 0 15px;
+  }
+  .tabs { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+  .tab {
+    flex: 0 1 auto;
+    text-align: center;
+    padding: 10px 16px;
+    border-radius: 12px;
+    background: transparent;
+    color: #0f766e;
+    font-weight: 800;
+    cursor: pointer;
+    border: none;
+    font-size: 15px;
+    white-space: nowrap;
+    text-shadow: 
+      2px 2px 0 #fff,
+      -2px -2px 0 #fff,
+      2px -2px 0 #fff,
+      -2px 2px 0 #fff,
+      0 0 15px rgba(255,255,255,1);
+    transition: all 0.3s;
+    font-family: inherit;
+  }
+  .tab:hover {
+    transform: translateY(-2px);
+  }
+  .tab.active {
+    color: #c62828;
+    text-shadow: 
+      2px 2px 0 #fff,
+      -2px -2px 0 #fff,
+      2px -2px 0 #fff,
+      -2px 2px 0 #fff,
+      0 0 20px rgba(255,255,255,1),
+      0 0 30px rgba(255,255,255,0.8);
+    transform: scale(1.05);
+  }
+  
+  /* شاشة تسجيل الدخول */
+  #loginScreen { width: 100%; max-width: 420px; padding: 20px; }
+  #loginScreen h1 { 
+    text-align: center; 
+    color: #0f766e; 
+    font-size: 28px; 
+    margin: 0 0 8px 0;
+    text-shadow: 
+      3px 3px 0 #fff,
+      -3px -3px 0 #fff,
+      3px -3px 0 #fff,
+      -3px 3px 0 #fff,
+      0 0 30px rgba(255,255,255,1);
+    font-weight: 800;
+  }
+  #loginScreen .subtitle { 
+    text-align: center; 
+    color: #0f766e; 
+    font-size: 16px; 
+    margin-bottom: 30px;
+    text-shadow: 
+      2px 2px 0 #fff,
+      -2px -2px 0 #fff,
+      2px -2px 0 #fff,
+      -2px 2px 0 #fff;
+    font-weight: bold;
+  }
+  .login-card {
+    background: rgba(255,255,255,0.15);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 2px solid rgba(255,255,255,0.5);
+    border-radius: 24px;
+    padding: 35px 28px;
+    box-shadow: 
+      0 8px 32px rgba(0,0,0,0.15),
+      inset 0 1px 0 rgba(255,255,255,0.6);
+  }
+  .login-card label { 
+    display: block; 
+    color: #0f766e; 
+    font-size: 15px; 
+    font-weight: bold; 
+    margin-bottom: 8px;
+    text-shadow: 0 0 8px rgba(255,255,255,1);
+  }
+  .login-card input {
+    width: 100%; padding: 14px 16px; border-radius: 12px;
+    border: 2px solid #0f766e;
+    font-size: 16px; margin-bottom: 18px;
+    background: rgba(255,255,255,0.9); 
+    color: #333;
+    font-family: inherit;
+    transition: all 0.3s;
+  }
+  .login-card input:focus {
+    background: #ffffff;
+    box-shadow: 0 0 0 4px rgba(15,118,110,0.15);
+    outline: none;
+  }
+  .login-card input::placeholder { color: #999; }
+  .login-card .pin-input { 
+    letter-spacing: 15px; 
+    font-size: 26px; 
+    text-align: center; 
+    font-weight: bold;
+    padding-left: 20px;
+  }
+  .login-card button {
+    width: 100%; padding: 16px; border-radius: 12px;
+    border: 2px solid #0f766e;
+    font-size: 18px; font-weight: bold;
+    background: #0f766e; color: white; cursor: pointer;
+    box-shadow: 0 6px 20px rgba(15,118,110,0.4);
+    transition: all 0.3s;
+    font-family: inherit;
+  }
+  .login-card button:hover {
+    background: #0d5c55;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(15,118,110,0.5);
+  }
+  #loginMsg { text-align: center; margin-top: 15px; font-size: 14px; font-weight: bold; min-height: 22px; }
+  
+  /* النظام الرئيسي */
+  #mainApp { display: none; width: 100%; padding: 10px; }
+  
+  /* البطاقات - شفافة زجاجية */
+  .card {
+    max-width: 600px; margin: 0 auto 14px;
+    background: rgba(255,255,255,0.25);
+    -webkit-backdrop-filter: blur(15px) saturate(160%);
+    backdrop-filter: blur(15px) saturate(160%);
+    border: 2px solid rgba(255,255,255,0.55);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 
+      0 6px 25px rgba(0,0,0,0.12),
+      inset 0 1px 0 rgba(255,255,255,0.7);
+  }
+  
+  h1 { 
+    font-size: 18px; 
+    text-align: center; 
+    color: #0f766e; 
+    margin: 0 0 15px 0;
+    text-shadow: 
+      1.5px 1.5px 0 #fff,
+      -1.5px -1.5px 0 #fff,
+      1.5px -1.5px 0 #fff,
+      -1.5px 1.5px 0 #fff;
+    font-weight: 800;
+  }
+  h2 { 
+    font-size: 16px; 
+    color: #0f766e; 
+    font-weight: bold; 
+    margin: 0 0 12px 0;
+    text-shadow: 
+      1px 1px 0 #fff,
+      -1px -1px 0 #fff,
+      1px -1px 0 #fff,
+      -1px 1px 0 #fff;
+  }
+  
+  select, button {
+    width: 100%; padding: 12px 14px; border-radius: 12px;
+    border: 2px solid #0f766e;
+    font-size: 15px; margin-bottom: 10px;
+    background: rgba(255,255,255,0.9); 
+    color: #0f766e; 
+    font-weight: bold; 
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.3s;
+  }
+  select option { color: #111; }
+  button { 
+    background: #0f766e; 
+    color: #ffffff;
+    box-shadow: 0 3px 12px rgba(15,118,110,0.3);
+  }
+  button:hover {
+    background: #0d5c55;
+    transform: translateY(-1px);
+  }
+  button.secondary { background: #c62828; border-color: #c62828; }
+  button.export-btn { background: #1976d2; border-color: #1976d2; }
+  button.camera-btn { background: #f57c00; border-color: #f57c00; }
+  button.file-btn { background: #388e3c; border-color: #388e3c; }
+  button.edit-btn { background: #f57c00; border-color: #f57c00; width: auto; padding: 5px 10px; font-size: 12px; margin: 0; }
+  button.word-btn { background: #388e3c; border-color: #388e3c; }
+  button.view-btn { background: #1976d2; border-color: #1976d2; }
+  button.print-btn { background: #7b1fa2; border-color: #7b1fa2; }
+  button.del-btn-inline { background: #c62828; border-color: #c62828; width: 100%; padding: 12px; font-size: 15px; margin: 8px 0 0; }
+  
+  label { 
+    font-size: 14px; 
+    color: #0f766e; 
+    font-weight: bold; 
+    margin-bottom: 6px; 
+    display: block;
+    text-shadow: 0 0 6px rgba(255,255,255,0.9);
+  }
+  input, textarea {
+    width: 100%; padding: 12px 14px; border-radius: 12px;
+    border: 2px solid #0f766e;
+    font-size: 15px; margin-bottom: 10px;
+    background: rgba(255,255,255,0.9); 
+    color: #333;
+    font-family: inherit;
+  }
+  input::placeholder, textarea::placeholder { color: #999; }
+  input[type="date"] { color: #333; }
+  
+  /* الإحصائيات */
+  .stats { display: flex; flex-wrap: wrap; gap: 10px; }
+  .stat {
+    flex: 1; min-width: 85px; padding: 14px 10px;
+    border-radius: 14px;
+    text-align: center; 
+    background: rgba(255,255,255,0.35);
+    border: 2px solid rgba(255,255,255,0.6);
+    color: #0f766e; 
+    font-weight: bold;
+    font-size: 12px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+    backdrop-filter: blur(10px);
+  }
+  .stat .num { 
+    font-size: 24px; 
+    font-weight: 800; 
+    display: block; 
+    margin-bottom: 4px;
+    text-shadow: 0 0 10px rgba(255,255,255,0.8);
+  }
+  
+  /* صفوف العمال */
+  .row { 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    padding: 10px 0; 
+    border-bottom: 1px solid rgba(15,118,110,0.2); 
+    color: #333; 
+    font-size: 14px; 
+  }
+  .worker-row {
+    display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+    border-bottom: 1px solid rgba(15,118,110,0.15); 
+    font-size: 14px; color: #333; flex-wrap: wrap;
+    background: rgba(255,255,255,0.25);
+    border-radius: 10px; margin-bottom: 6px;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.4);
+  }
+  .worker-row .name { 
+    flex: 1; 
+    color: #0f766e; 
+    font-weight: bold; 
+    text-shadow: 0 0 6px rgba(255,255,255,0.9);
+  }
+  .worker-row img { 
+    width: 36px; height: 36px; 
+    border-radius: 50%; 
+    object-fit: cover; 
+    border: 2px solid #0f766e; 
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .badge { padding: 4px 10px; border-radius: 20px; color: white; font-size: 12px; font-weight: bold; }
+  .del-btn {
+    width: auto; padding: 6px 10px;
+    background: #c62828; color: #ffffff;
+    border: 2px solid #c62828; margin: 0; font-size: 12px;
+    border-radius: 8px;
+  }
+  
+  /* الورديات */
+  .shift-selector { display: flex; gap: 10px; margin-bottom: 12px; }
+  .shift-btn {
+    flex: 1; padding: 14px; border-radius: 12px;
+    border: 2px solid #0f766e;
+    font-size: 15px; font-weight: bold; cursor: pointer; text-align: center;
+    background: rgba(255,255,255,0.85); color: #0f766e;
+    transition: all 0.3s;
+  }
+  .shift-btn.morning { background: rgba(255,249,196,0.9); color: #f57f17; border-color: #fbc02d; }
+  .shift-btn.morning.active { background: #fbc02d; color: #ffffff; border-color: #f57c00; box-shadow: 0 4px 15px rgba(251,192,45,0.4); }
+  .shift-btn.night { background: rgba(232,234,246,0.9); color: #283593; border-color: #3f51b5; }
+  .shift-btn.night.active { background: #3f51b5; color: #ffffff; border-color: #283593; box-shadow: 0 4px 15px rgba(63,81,181,0.4); }
+  
+  /* الشارات */
+  .role-badge { 
+    display: inline-block; padding: 4px 10px; border-radius: 12px; 
+    font-size: 11px; font-weight: bold;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .role-owner { background: #ffc107; color: #333; }
+  .role-admin { background: #9c27b0; color: #fff; }
+  .role-supervisor { background: #2196f3; color: #fff; }
+  .role-worker { background: #4caf50; color: #fff; }
+  .role-driver { background: #ff9800; color: #fff; }
+  .view-only-badge { background: #ffc107; color: #333; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; }
+  .deduction-badge { background: #f44336; color: #fff; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; }
+  .duration-badge { background: #4caf50; color: #fff; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; }
+  .salary-badge { background: #9c27b0; color: #fff; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; }
+  
+  /* التاريخ */
+  .date-display {
+    text-align: center; color: #0f766e; font-size: 15px; font-weight: bold;
+    margin-bottom: 15px; padding: 10px;
+    background: rgba(255,255,255,0.35);
+    border-radius: 12px;
+    border: 2px solid rgba(255,255,255,0.6);
+    backdrop-filter: blur(10px);
+    text-shadow: 0 0 8px rgba(255,255,255,0.9);
+    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+  }
+  
+  /* الصور */
+  .photo-preview {
+    width: 100%; max-height: 150px; object-fit: cover;
+    border-radius: 12px; margin-bottom: 10px; display: none;
+    border: 2px solid #0f766e;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  }
+  .photo-buttons { display: flex; gap: 8px; margin-bottom: 10px; }
+  .photo-buttons button { margin-bottom: 0; flex: 1; }
+  
+  /* بطاقات */
+  .user-card {
+    background: rgba(255,255,255,0.85);
+    border: 2px solid #0f766e;
+    border-radius: 12px; padding: 12px; margin-bottom: 8px;
+    color: #333; font-size: 14px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+  }
+  .permission-box {
+    background: rgba(255,255,255,0.85);
+    border: 2px solid #0f766e;
+    border-radius: 12px; padding: 12px; margin-bottom: 10px;
+  }
+  .permission-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #e0e0e0; }
+  .permission-item:last-child { border-bottom: none; }
+  .permission-item label { flex: 1; margin: 0; font-size: 13px; cursor: pointer; color: #0f766e; font-weight: bold; }
+  .permission-item input[type="checkbox"] { width: 20px; height: 20px; margin: 0; accent-color: #0f766e; }
+  
+  /* نموذج التعديل */
+  .edit-form {
+    display: none; width: 100%;
+    background: rgba(255,255,255,0.95); border-radius: 12px; padding: 15px; margin-top: 10px;
+    border: 2px solid #f57c00;
+    box-shadow: 0 4px 15px rgba(245,124,0,0.2);
+  }
+  .edit-form h3 { 
+    margin: 0 0 15px; font-size: 16px; color: #f57c00; 
+    text-align: center; font-weight: 800;
+    text-shadow: 0 0 8px rgba(255,255,255,0.9);
+  }
+  .photo-section {
+    background: rgba(240,253,244,0.9);
+    border-radius: 12px;
+    padding: 12px;
+    margin: 12px 0;
+    border: 2px solid #4caf50;
+  }
+  .photo-section h3 { 
+    color: #0f766e !important; 
+    margin: 0 0 10px 0 !important; 
+    font-size: 14px; 
+    text-align: right; 
+    font-weight: bold; 
+  }
+  .current-photo {
+    width: 90px; height: 90px; object-fit: cover; border-radius: 10px;
+    border: 2px solid #0f766e; margin: 5px 0;
+    cursor: pointer; display: block;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+  }
+  .no-photo-text {
+    font-size: 12px; color: #c62828; padding: 8px 10px;
+    background: rgba(198,40,40,0.1); border-radius: 8px;
+    display: inline-block; margin-bottom: 8px; font-weight: bold;
+  }
+  
+  /* التقارير */
+  .report-photos-grid { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .report-photos-grid img {
+    width: 70px; height: 70px; object-fit: cover;
+    border-radius: 10px; border: 2px solid #0f766e;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  .progress-bar {
+    width: 100%; height: 10px;
+    background: rgba(255,255,255,0.5);
+    border-radius: 6px; overflow: hidden;
+    margin-bottom: 10px; display: none;
+  }
+  .progress-fill { height: 100%; background: #4caf50; width: 0%; transition: width 0.3s; }
+  .progress-text { text-align: center; font-size: 13px; color: #0f766e; margin-bottom: 10px; font-weight: bold; text-shadow: 0 0 6px rgba(255,255,255,0.9); }
+  
+  /* السائقين */
+  .driver-card {
+    background: rgba(255,255,255,0.85);
+    border: 2px solid #ff9800;
+    border-radius: 14px; padding: 14px; margin-bottom: 10px;
+    color: #333;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+  }
+  .driver-header {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 10px;
+  }
+  .driver-header img {
+    width: 55px; height: 55px; border-radius: 50%; object-fit: cover; 
+    border: 2px solid #0f766e;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+  }
+  .driver-info { font-size: 12px; color: #333; line-height: 1.8; }
+  .check-photo {
+    width: 100%; max-height: 180px; object-fit: cover;
+    border-radius: 10px; margin-top: 8px; border: 2px solid #0f766e;
+    cursor: pointer;
+  }
+  .info-tag {
+    display: inline-block;
+    background: rgba(15,118,110,0.15);
+    padding: 4px 10px;
+    border-radius: 10px;
+    font-size: 11px;
+    margin: 3px;
+    color: #0f766e;
+    font-weight: bold;
+  }
+  
+  /* القائمة الرئيسية */
+  #loginScreen {
+    background: transparent;
+  }
+  
+  /* ريسبونسيف */
   @media (min-width: 768px) {
-    .tab { padding: 8px 16px; font-size: 13px; }
-    .card { max-width: 550px; padding: 20px; }
+    .tab { padding: 12px 22px; font-size: 16px; }
+    .card { padding: 24px; }
+    h1 { font-size: 20px; }
   }
 </style>
 </head>
@@ -306,7 +541,7 @@
         <div class="shift-btn night" onclick="selectWorkerShift('night')">🌙 ليل</div>
       </div>
       <button onclick="checkIn()">✅ تسجيل حضور</button>
-      <div style="text-align:center;color:#666;font-size:11px;margin:6px 0;">— أو —</div>
+      <div style="text-align:center;color:#0f766e;font-size:12px;margin:8px 0;font-weight:bold;text-shadow:0 0 6px rgba(255,255,255,0.9);">— أو —</div>
       <button class="secondary" onclick="markAbsent()">✗ غائب (خصم)</button>
       <button class="secondary" onclick="markLeave()">📝 إذن (لا خصم)</button>
       <button class="secondary" onclick="markSick()">🤒 مريض (لا خصم)</button>
@@ -341,10 +576,10 @@
         <h1>حضور اليوم</h1>
         <div class="date-display" id="adminDateDisplay"></div>
         <div class="stats">
-          <div class="stat" style="background:#e8f5e9;"><span class="num" id="presentCount">0</span>حاضر</div>
-          <div class="stat" style="background:#ede7f6;"><span class="num" id="leaveCount">0</span>إذن</div>
-          <div class="stat" style="background:#fce4ec;"><span class="num" id="sickCount">0</span>مريض</div>
-          <div class="stat" style="background:#ffebee;"><span class="num" id="absentCount">0</span>غائب</div>
+          <div class="stat"><span class="num" id="presentCount">0</span>حاضر</div>
+          <div class="stat"><span class="num" id="leaveCount">0</span>إذن</div>
+          <div class="stat"><span class="num" id="sickCount">0</span>مريض</div>
+          <div class="stat"><span class="num" id="absentCount">0</span>غائب</div>
         </div>
       </div>
       <div class="card">
@@ -585,7 +820,7 @@
           <option value="admin">👤 مدير (كل الصلاحيات)</option>
         </select>
         <div id="permissionsBox" class="permission-box">
-          <h3 style="margin:0 0 10px;font-size:13px;color:#0f766e;">حدد الصلاحيات:</h3>
+          <h3 style="margin:0 0 10px;font-size:14px;color:#0f766e;">حدد الصلاحيات:</h3>
           <div class="permission-item"><label>📊 نظرة عامة</label><input type="checkbox" id="perm-overview" checked></div>
           <div class="permission-item"><label>✅ تسجيل الحضور</label><input type="checkbox" id="perm-attendance" checked></div>
           <div class="permission-item"><label>📋 التقارير</label><input type="checkbox" id="perm-reports"></div>
@@ -1141,12 +1376,12 @@ function watchAttendance() {
     document.getElementById('sickCount').textContent = recs.filter(r => r.status === 'sick').length;
     document.getElementById('absentCount').textContent = recs.filter(r => r.status === 'absent').length;
     const ld = document.getElementById('attendanceList');
-    if (!recs.length) { ld.innerHTML = '<p style="text-align:center;color:#666;font-size:12px;">لا يوجد حضور اليوم</p>'; return; }
+    if (!recs.length) { ld.innerHTML = '<p style="text-align:center;color:#666;font-size:13px;">لا يوجد حضور اليوم</p>'; return; }
     const meta = { present: { c: '#2e7d32', l: 'حاضر' }, late: { c: '#ef6c00', l: 'متأخر' }, leave: { c: '#673ab7', l: 'إذن' }, sick: { c: '#ad1457', l: 'مريض' }, absent: { c: '#c62828', l: 'غائب' } };
     ld.innerHTML = recs.map(r => {
       const m = meta[r.status] || { c: '#607d8b', l: r.status };
       const icon = r.personType === 'driver' ? '🚗 ' : '👷 ';
-      return `<div class="row"><div><div>${icon}${r.workerName}</div><div style="font-size:11px;color:#666;">${r.time || '--'} ${r.shift==='morning'?'🌅':'🌙'}</div></div><span class="badge" style="background:${m.c};margin-right:auto;">${m.l}</span></div>`;
+      return `<div class="row"><div><div>${icon}${r.workerName}</div><div style="font-size:12px;color:#666;">${r.time || '--'} ${r.shift==='morning'?'🌅':'🌙'}</div></div><span class="badge" style="background:${m.c};margin-right:auto;">${m.l}</span></div>`;
     }).join('');
   });
 }
@@ -1157,8 +1392,8 @@ function watchWorkers() {
     const c1 = document.getElementById('workersList');
     c1.innerHTML = allWorkers.length ? allWorkers.map(w => {
       const duration = calculateWorkDuration(w.startDate);
-      return `<div class="worker-row"><img src="${w.photo||''}" onerror="this.style.visibility='hidden'"><span class="name">${w.name}</span><span style="font-size:10px;color:#666;">${teamLabel(w.team)}</span><span class="duration-badge">${duration}</span><button class="edit-btn" onclick="toggleEditWorkerForm('${w.id}')">✏️</button><button class="del-btn" onclick="deleteWorker('${w.id}','${w.name}')">حذف</button><div id="editForm-${w.id}" class="edit-form"></div></div>`;
-    }).join('') : '<p style="text-align:center;color:#666;font-size:12px;">لا يوجد عمال</p>';
+      return `<div class="worker-row"><img src="${w.photo||''}" onerror="this.style.visibility='hidden'"><span class="name">${w.name}</span><span style="font-size:11px;color:#666;">${teamLabel(w.team)}</span><span class="duration-badge">${duration}</span><button class="edit-btn" onclick="toggleEditWorkerForm('${w.id}')">✏️</button><button class="del-btn" onclick="deleteWorker('${w.id}','${w.name}')">حذف</button><div id="editForm-${w.id}" class="edit-form"></div></div>`;
+    }).join('') : '<p style="text-align:center;color:#666;font-size:13px;">لا يوجد عمال</p>';
     updateDailyMarkList();
   });
 }
@@ -1166,7 +1401,7 @@ function watchWorkers() {
 function updateDailyMarkList() {
   const c2 = document.getElementById('dailyMarkList');
   const allPeople = [...allWorkers.map(w => ({...w, type: 'worker'})), ...allDrivers.map(d => ({...d, type: 'driver'}))];
-  c2.innerHTML = allPeople.length ? allPeople.map(w => `<div class="worker-row"><img src="${w.photo||''}" onerror="this.style.visibility='hidden'"><span class="name">${w.type === 'driver' ? '🚗 ' : '👷 '}${w.name}</span><button onclick="manualMark('${w.id}','${w.name}','present')" style="width:auto;padding:5px;margin:0;background:#388e3c;border-color:#388e3c;">✅</button><button onclick="manualMark('${w.id}','${w.name}','absent')" style="width:auto;padding:5px;margin:0;background:#c62828;border-color:#c62828;">✗</button><button onclick="manualMark('${w.id}','${w.name}','leave')" style="width:auto;padding:5px;margin:0;background:#7b1fa2;border-color:#7b1fa2;">📝</button><button onclick="manualMark('${w.id}','${w.name}','sick')" style="width:auto;padding:5px;margin:0;background:#ad1457;border-color:#ad1457;">🤒</button></div>`).join('') : '<p style="text-align:center;color:#666;font-size:12px;">لا يوجد أشخاص</p>';
+  c2.innerHTML = allPeople.length ? allPeople.map(w => `<div class="worker-row"><img src="${w.photo||''}" onerror="this.style.visibility='hidden'"><span class="name">${w.type === 'driver' ? '🚗 ' : '👷 '}${w.name}</span><button onclick="manualMark('${w.id}','${w.name}','present')" style="width:auto;padding:6px 10px;margin:0;background:#388e3c;border-color:#388e3c;">✅</button><button onclick="manualMark('${w.id}','${w.name}','absent')" style="width:auto;padding:6px 10px;margin:0;background:#c62828;border-color:#c62828;">✗</button><button onclick="manualMark('${w.id}','${w.name}','leave')" style="width:auto;padding:6px 10px;margin:0;background:#7b1fa2;border-color:#7b1fa2;">📝</button><button onclick="manualMark('${w.id}','${w.name}','sick')" style="width:auto;padding:6px 10px;margin:0;background:#ad1457;border-color:#ad1457;">🤒</button></div>`).join('') : '<p style="text-align:center;color:#666;font-size:13px;">لا يوجد أشخاص</p>';
 }
 
 function toggleEditWorkerForm(workerId) {
@@ -1283,12 +1518,12 @@ function renderDriversList() {
   const c = document.getElementById('driversList');
   const searchTerm = (document.getElementById('driversSearch')?.value || '').trim();
   const filtered = searchTerm ? allDrivers.filter(d => d.name.includes(searchTerm)) : allDrivers;
-  if (!filtered.length) { c.innerHTML = '<p style="text-align:center;color:#666;font-size:12px;">لا يوجد سائقين أو مشرفين</p>'; return; }
+  if (!filtered.length) { c.innerHTML = '<p style="text-align:center;color:#666;font-size:13px;">لا يوجد سائقين أو مشرفين</p>'; return; }
   c.innerHTML = filtered.map(d => {
     const duration = calculateWorkDuration(d.startDate);
     const typeLabel = DRIVER_TYPES[d.driverType] || '';
     const photoForNotif = d.photoURL || d.photo || '';
-    return `<div class="driver-card"><div class="driver-header"><img src="${d.photo||d.photoURL||''}" onerror="this.style.visibility='hidden'"><div style="flex:1;"><strong>${d.name}</strong><div style="font-size:11px;color:#666;">${typeLabel}</div></div></div><div class="driver-info"><span class="info-tag">📅 من: ${d.startDate || '—'}</span><span class="duration-badge">⏱️ ${duration}</span>${d.salary ? `<span class="salary-badge">💰 ${d.salary} دينار</span>` : ''}${d.accountNumber ? `<span class="info-tag">🏦 ${d.accountNumber}</span>` : ''}${d.bankName ? `<span class="info-tag">🏛️ ${d.bankName}</span>` : ''}${d.licenseGrade ? `<span class="info-tag">🚗 ${d.licenseGrade}</span>` : ''}${d.shift ? `<span class="info-tag">${d.shift === 'morning' ? '🌅 صباح' : d.shift === 'night' ? '🌙 ليل' : '🔄 كلاهما'}</span>` : ''}</div>${d.checkPhoto ? `<img src="${d.checkPhoto}" class="check-photo" onclick="window.open('${d.checkPhoto}')">` : ''}<div style="display:flex;gap:5px;margin-top:8px;flex-wrap:wrap;"><button class="view-btn" onclick="showWorkNotification({name:'${d.name}',jobTitle:'${typeLabel}',startDate:'${d.startDate}',photo:'${photoForNotif}'})" style="width:auto;padding:5px 10px;font-size:11px;margin:0;">📋 إفادة</button><button class="edit-btn" onclick="toggleEditDriverForm('${d.id}')">✏️ تعديل</button><button class="del-btn" onclick="deleteDriver('${d.id}','${d.name}')">حذف</button></div><div id="driverEditForm-${d.id}" class="edit-form"></div></div>`;
+    return `<div class="driver-card"><div class="driver-header"><img src="${d.photo||d.photoURL||''}" onerror="this.style.visibility='hidden'"><div style="flex:1;"><strong>${d.name}</strong><div style="font-size:12px;color:#666;">${typeLabel}</div></div></div><div class="driver-info"><span class="info-tag">📅 من: ${d.startDate || '—'}</span><span class="duration-badge">⏱️ ${duration}</span>${d.salary ? `<span class="salary-badge">💰 ${d.salary} دينار</span>` : ''}${d.accountNumber ? `<span class="info-tag">🏦 ${d.accountNumber}</span>` : ''}${d.bankName ? `<span class="info-tag">🏛️ ${d.bankName}</span>` : ''}${d.licenseGrade ? `<span class="info-tag">🚗 ${d.licenseGrade}</span>` : ''}${d.shift ? `<span class="info-tag">${d.shift === 'morning' ? '🌅 صباح' : d.shift === 'night' ? '🌙 ليل' : '🔄 كلاهما'}</span>` : ''}</div>${d.checkPhoto ? `<img src="${d.checkPhoto}" class="check-photo" onclick="window.open('${d.checkPhoto}')">` : ''}<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;"><button class="view-btn" onclick="showWorkNotification({name:'${d.name}',jobTitle:'${typeLabel}',startDate:'${d.startDate}',photo:'${photoForNotif}'})" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">📋 إفادة</button><button class="edit-btn" onclick="toggleEditDriverForm('${d.id}')">✏️ تعديل</button><button class="del-btn" onclick="deleteDriver('${d.id}','${d.name}')">حذف</button></div><div id="driverEditForm-${d.id}" class="edit-form"></div></div>`;
   }).join('');
 }
 
@@ -1492,12 +1727,12 @@ async function saveReport() {
 function loadReports() {
   db.collection('dailyReports').orderBy('createdAt', 'desc').limit(20).onSnapshot(sn => {
     const c = document.getElementById('savedReportsList');
-    if (sn.empty) { c.innerHTML = '<p style="text-align:center;color:#666;font-size:12px;">لا توجد تقارير</p>'; return; }
+    if (sn.empty) { c.innerHTML = '<p style="text-align:center;color:#666;font-size:13px;">لا توجد تقارير</p>'; return; }
     c.innerHTML = sn.docs.map(doc => {
       const r = doc.data();
       const photos = (r.photos || []).slice(0, 3).map(p => `<img src="${p}" style="width:50px;height:50px;object-fit:cover;border-radius:6px;margin:2px;" onerror="this.style.display='none'">`).join('');
       const count = r.photosCount || (r.photos || []).length;
-      return `<div class="user-card"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;"><strong>${r.workerName}</strong><span style="font-size:11px;color:#666;">${r.date} - ${r.createdTime || ''}</span></div>${r.location ? `<div style="font-size:11px;color:#666;">📍 ${r.location}</div>` : ''}<div style="font-size:12px;margin-top:5px;">${r.text.substring(0, 100)}${r.text.length > 100 ? '...' : ''}</div>${photos ? `<div style="display:flex;margin-top:5px;align-items:center;">${photos}${count > 3 ? `<span style="font-size:11px;color:#0f766e;margin-left:5px;">+${count - 3} صورة</span>` : ''}</div>` : ''}<div style="display:flex;gap:5px;margin-top:8px;flex-wrap:wrap;"><button class="view-btn" onclick="viewReport('${doc.id}')" style="width:auto;padding:5px 10px;font-size:11px;margin:0;">👁️ عرض</button><button class="word-btn" onclick="exportReportWord('${doc.id}')" style="width:auto;padding:5px 10px;font-size:11px;margin:0;">📄 Word</button><button class="print-btn" onclick="printReport('${doc.id}')" style="width:auto;padding:5px 10px;font-size:11px;margin:0;">🖨️ طباعة</button><button class="del-btn" onclick="deleteReport('${doc.id}')" style="width:auto;padding:5px 10px;font-size:11px;margin:0;">حذف</button></div></div>`;
+      return `<div class="user-card"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;"><strong>${r.workerName}</strong><span style="font-size:12px;color:#666;">${r.date} - ${r.createdTime || ''}</span></div>${r.location ? `<div style="font-size:12px;color:#666;">📍 ${r.location}</div>` : ''}<div style="font-size:13px;margin-top:5px;">${r.text.substring(0, 100)}${r.text.length > 100 ? '...' : ''}</div>${photos ? `<div style="display:flex;margin-top:5px;align-items:center;">${photos}${count > 3 ? `<span style="font-size:12px;color:#0f766e;margin-left:5px;">+${count - 3} صورة</span>` : ''}</div>` : ''}<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;"><button class="view-btn" onclick="viewReport('${doc.id}')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">👁️ عرض</button><button class="word-btn" onclick="exportReportWord('${doc.id}')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">📄 Word</button><button class="print-btn" onclick="printReport('${doc.id}')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">🖨️ طباعة</button><button class="del-btn" onclick="deleteReport('${doc.id}')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">حذف</button></div></div>`;
     }).join('');
   });
 }
@@ -1584,15 +1819,15 @@ async function loadDeductions() {
   const ded = {};
   sn.forEach(doc => { const r = doc.data(); if (r.status === 'absent') { const k = r.workerName || r.workerId; if (!ded[k]) ded[k] = 0; ded[k]++; } });
   const c = document.getElementById('deductionsList');
-  if (!Object.keys(ded).length) { c.innerHTML = '<p style="text-align:center;color:#666;font-size:12px;">✅ لا يوجد خصومات</p>'; return; }
+  if (!Object.keys(ded).length) { c.innerHTML = '<p style="text-align:center;color:#666;font-size:13px;">✅ لا يوجد خصومات</p>'; return; }
   let total = 0;
-  c.innerHTML = Object.keys(ded).map(name => { const days = ded[name], amt = days * deductionAmountValue; total += amt; return `<div class="worker-row"><span class="name">${name}</span><span class="deduction-badge">${days} يوم</span><span class="deduction-badge" style="background:#f57c00;">-${amt} دينار</span></div>`; }).join('') + `<div style="margin-top:10px;text-align:center;font-weight:bold;color:#0f766e;font-size:13px;">الإجمالي: ${total} دينار</div>`;
+  c.innerHTML = Object.keys(ded).map(name => { const days = ded[name], amt = days * deductionAmountValue; total += amt; return `<div class="worker-row"><span class="name">${name}</span><span class="deduction-badge">${days} يوم</span><span class="deduction-badge" style="background:#f57c00;">-${amt} دينار</span></div>`; }).join('') + `<div style="margin-top:10px;text-align:center;font-weight:bold;color:#0f766e;font-size:14px;">الإجمالي: ${total} دينار</div>`;
 }
 
 function watchInventory() {
   db.collection('inventory').orderBy('name').onSnapshot(sn => {
     allInventory = sn.docs.map(d => ({ id: d.id, ...d.data() }));
-    document.getElementById('inventoryList').innerHTML = allInventory.length ? allInventory.map(i => `<div class="worker-row"><span class="name">${i.name}</span><span style="color:#0f766e;font-weight:bold;">${i.quantity} ${i.unit||''}</span><button class="del-btn" onclick="deleteItem('${i.id}','${i.name}')">حذف</button></div>`).join('') : '<p style="text-align:center;color:#666;font-size:12px;">المخزن فارغ</p>';
+    document.getElementById('inventoryList').innerHTML = allInventory.length ? allInventory.map(i => `<div class="worker-row"><span class="name">${i.name}</span><span style="color:#0f766e;font-weight:bold;">${i.quantity} ${i.unit||''}</span><button class="del-btn" onclick="deleteItem('${i.id}','${i.name}')">حذف</button></div>`).join('') : '<p style="text-align:center;color:#666;font-size:13px;">المخزن فارغ</p>';
   });
 }
 
@@ -1613,7 +1848,7 @@ function deleteItem(id, name) {
 
 function loadVehicles() {
   db.collection('vehicles').onSnapshot(sn => {
-    document.getElementById('vehiclesList').innerHTML = sn.empty ? '<p style="text-align:center;color:#666;font-size:12px;">لا توجد آليات</p>' : sn.docs.map(doc => { const v = doc.data(); return `<div class="worker-row">${v.photo ? `<img src="${v.photo}" style="width:35px;height:35px;border-radius:6px;object-fit:cover;">` : ''}<span class="name">${v.typeLabel} - ${v.number}</span><span style="font-size:11px;color:#0f766e;font-weight:bold;">${v.statusLabel}</span><button class="del-btn" onclick="deleteVehicle('${doc.id}','${v.number}')">حذف</button></div>`; }).join('');
+    document.getElementById('vehiclesList').innerHTML = sn.empty ? '<p style="text-align:center;color:#666;font-size:13px;">لا توجد آليات</p>' : sn.docs.map(doc => { const v = doc.data(); return `<div class="worker-row">${v.photo ? `<img src="${v.photo}" style="width:40px;height:40px;border-radius:8px;object-fit:cover;">` : ''}<span class="name">${v.typeLabel} - ${v.number}</span><span style="font-size:12px;color:#0f766e;font-weight:bold;">${v.statusLabel}</span><button class="del-btn" onclick="deleteVehicle('${doc.id}','${v.number}')">حذف</button></div>`; }).join('');
   });
 }
 
@@ -1665,7 +1900,7 @@ async function addUser() {
 
 function loadUsersList() {
   db.collection('systemUsers').onSnapshot(sn => {
-    document.getElementById('usersList').innerHTML = sn.empty ? '<p style="text-align:center;color:#666;font-size:12px;">لا يوجد مستخدمين</p>' : sn.docs.map(doc => { const u = doc.data(); return `<div class="user-card"><strong>${u.name}</strong> <span style="font-size:11px;color:#666;">🔢${u.pin}</span> ${u.viewOnly ? '<span class="view-only-badge">👁️</span>' : ''}<button class="del-btn" onclick="deleteUser('${doc.id}','${u.name}')">حذف</button></div>`; }).join('');
+    document.getElementById('usersList').innerHTML = sn.empty ? '<p style="text-align:center;color:#666;font-size:13px;">لا يوجد مستخدمين</p>' : sn.docs.map(doc => { const u = doc.data(); return `<div class="user-card"><strong>${u.name}</strong> <span style="font-size:12px;color:#666;">🔢${u.pin}</span> ${u.viewOnly ? '<span class="view-only-badge">👁️</span>' : ''}<button class="del-btn" onclick="deleteUser('${doc.id}','${u.name}')">حذف</button></div>`; }).join('');
   });
 }
 

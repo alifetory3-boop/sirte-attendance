@@ -20,12 +20,12 @@
     display: flex; align-items: center; justify-content: center;
   }
   
-  /* شريط علوي شفاف */
   .user-bar {
     max-width: 1200px;
     margin: 20px auto 12px;
     display: flex; gap: 10px; flex-wrap: wrap;
     padding: 0 15px;
+    align-items: center;
   }
   .user-bar .user-info {
     flex: 1;
@@ -45,21 +45,26 @@
     letter-spacing: 0.5px;
   }
   .user-bar .logout-btn {
-    width: auto;
-    padding: 10px 20px;
+    width: 42px;
+    height: 42px;
+    padding: 0;
     margin: 0;
     background: rgba(198,40,40,0.95);
     border: 2px solid #fff;
-    border-radius: 12px;
+    border-radius: 10px;
     color: #fff;
     font-weight: bold;
-    font-size: 16px;
+    font-size: 20px;
     cursor: pointer;
     box-shadow: 0 4px 15px rgba(198,40,40,0.4);
     backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    flex-shrink: 0;
   }
   
-  /* تبويبات شفافة - نص فقط */
   .tabs-container {
     max-width: 1200px;
     margin: 0 auto 20px;
@@ -87,9 +92,7 @@
     transition: all 0.3s;
     font-family: inherit;
   }
-  .tab:hover {
-    transform: translateY(-2px);
-  }
+  .tab:hover { transform: translateY(-2px); }
   .tab.active {
     color: #c62828;
     text-shadow: 
@@ -102,7 +105,6 @@
     transform: scale(1.05);
   }
   
-  /* شاشة تسجيل الدخول */
   #loginScreen { width: 100%; max-width: 420px; padding: 20px; }
   #loginScreen h1 { 
     text-align: center; 
@@ -186,10 +188,8 @@
   }
   #loginMsg { text-align: center; margin-top: 15px; font-size: 14px; font-weight: bold; min-height: 22px; }
   
-  /* النظام الرئيسي */
   #mainApp { display: none; width: 100%; padding: 10px; }
   
-  /* البطاقات - شفافة زجاجية */
   .card {
     max-width: 600px; margin: 0 auto 14px;
     background: rgba(255,255,255,0.25);
@@ -277,7 +277,6 @@
   input::placeholder, textarea::placeholder { color: #999; }
   input[type="date"] { color: #333; }
   
-  /* الإحصائيات */
   .stats { display: flex; flex-wrap: wrap; gap: 10px; }
   .stat {
     flex: 1; min-width: 85px; padding: 14px 10px;
@@ -299,7 +298,6 @@
     text-shadow: 0 0 10px rgba(255,255,255,0.8);
   }
   
-  /* صفوف العمال */
   .row { 
     display: flex; 
     align-items: center; 
@@ -339,7 +337,6 @@
     border-radius: 8px;
   }
   
-  /* الورديات */
   .shift-selector { display: flex; gap: 10px; margin-bottom: 12px; }
   .shift-btn {
     flex: 1; padding: 14px; border-radius: 12px;
@@ -353,7 +350,6 @@
   .shift-btn.night { background: rgba(232,234,246,0.9); color: #283593; border-color: #3f51b5; }
   .shift-btn.night.active { background: #3f51b5; color: #ffffff; border-color: #283593; box-shadow: 0 4px 15px rgba(63,81,181,0.4); }
   
-  /* الشارات */
   .role-badge { 
     display: inline-block; padding: 4px 10px; border-radius: 12px; 
     font-size: 11px; font-weight: bold;
@@ -369,7 +365,6 @@
   .duration-badge { background: #4caf50; color: #fff; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; }
   .salary-badge { background: #9c27b0; color: #fff; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; }
   
-  /* التاريخ */
   .date-display {
     text-align: center; color: #0f766e; font-size: 15px; font-weight: bold;
     margin-bottom: 15px; padding: 10px;
@@ -381,7 +376,6 @@
     box-shadow: 0 3px 12px rgba(0,0,0,0.08);
   }
   
-  /* الصور */
   .photo-preview {
     width: 100%; max-height: 150px; object-fit: cover;
     border-radius: 12px; margin-bottom: 10px; display: none;
@@ -391,7 +385,6 @@
   .photo-buttons { display: flex; gap: 8px; margin-bottom: 10px; }
   .photo-buttons button { margin-bottom: 0; flex: 1; }
   
-  /* بطاقات */
   .user-card {
     background: rgba(255,255,255,0.85);
     border: 2px solid #0f766e;
@@ -409,7 +402,6 @@
   .permission-item label { flex: 1; margin: 0; font-size: 13px; cursor: pointer; color: #0f766e; font-weight: bold; }
   .permission-item input[type="checkbox"] { width: 20px; height: 20px; margin: 0; accent-color: #0f766e; }
   
-  /* نموذج التعديل */
   .edit-form {
     display: none; width: 100%;
     background: rgba(255,255,255,0.95); border-radius: 12px; padding: 15px; margin-top: 10px;
@@ -447,7 +439,6 @@
     display: inline-block; margin-bottom: 8px; font-weight: bold;
   }
   
-  /* التقارير */
   .report-photos-grid { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
   .report-photos-grid img {
     width: 70px; height: 70px; object-fit: cover;
@@ -463,7 +454,6 @@
   .progress-fill { height: 100%; background: #4caf50; width: 0%; transition: width 0.3s; }
   .progress-text { text-align: center; font-size: 13px; color: #0f766e; margin-bottom: 10px; font-weight: bold; text-shadow: 0 0 6px rgba(255,255,255,0.9); }
   
-  /* السائقين */
   .driver-card {
     background: rgba(255,255,255,0.85);
     border: 2px solid #ff9800;
@@ -496,12 +486,8 @@
     font-weight: bold;
   }
   
-  /* القائمة الرئيسية */
-  #loginScreen {
-    background: transparent;
-  }
+  #loginScreen { background: transparent; }
   
-  /* ريسبونسيف */
   @media (min-width: 768px) {
     .tab { padding: 12px 22px; font-size: 16px; }
     .card { padding: 24px; }

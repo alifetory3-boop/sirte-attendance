@@ -43,7 +43,6 @@
     background: rgba(0,150,136,0.7); color: white; cursor: pointer;
   }
   #loginMsg { text-align: center; margin-top: 15px; font-size: 14px; font-weight: bold; min-height: 20px; }
-  
   #mainApp { display: none; width: 100%; padding: 20px; }
   .card {
     max-width: 420px; margin: 0 auto;
@@ -141,7 +140,6 @@
     border-radius: 10px; margin-bottom: 10px; display: none;
     border: 2px solid rgba(255,255,255,0.4);
   }
-  .camera-container { text-align: center; margin-bottom: 15px; }
   .photo-buttons { display: flex; gap: 8px; margin-bottom: 10px; }
   .photo-buttons button { margin-bottom: 0; flex: 1; }
   .user-card {
@@ -206,9 +204,7 @@
   .driver-header img {
     width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,0.4);
   }
-  .driver-info {
-    font-size: 11px; color: rgba(255,255,255,0.8); line-height: 1.8;
-  }
+  .driver-info { font-size: 11px; color: rgba(255,255,255,0.8); line-height: 1.8; }
   .check-photo {
     width: 100%; max-height: 200px; object-fit: cover;
     border-radius: 8px; margin-top: 8px; border: 1px solid rgba(255,255,255,0.4);
@@ -778,7 +774,6 @@ function saveNotificationWord() {
   URL.revokeObjectURL(url);
 }
 
-// ============ الصور ============
 document.getElementById('workerPhotoInputCamera').addEventListener('change', async (e) => {
   const file = e.target.files[0]; if (!file) return;
   workerPhotoBase64 = await compressImage(file);
@@ -1100,7 +1095,6 @@ function watchAttendance() {
   });
 }
 
-// ============ العمال ============
 function watchWorkers() {
   db.collection('workers').orderBy('name').onSnapshot(sn => {
     allWorkers = sn.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -1221,7 +1215,6 @@ function deleteWorker(id, name) {
   if (confirm(`حذف ${name}؟`)) db.collection('workers').doc(id).delete();
 }
 
-// ============ السائقين ============
 function watchDrivers() {
   db.collection('drivers').orderBy('name').onSnapshot(sn => {
     allDrivers = sn.docs.map(d => ({ id: d.id, ...d.data() }));

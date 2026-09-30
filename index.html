@@ -10,7 +10,7 @@
 <style>
   * { box-sizing: border-box; }
   body {
-    font-family: 'Tajawal', -apple-system, "Segoe UI", Tahoma, sans-serif;
+    font-family: Arial, sans-serif;
     margin: 0; padding: 0; min-height: 100vh;
     background: url('background.jpg');
     background-size: cover;
@@ -993,7 +993,7 @@ function showWorkNotification(data) {
   modal.id = 'notificationModal';
   modal.style.cssText = `position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 99999; display: flex; align-items: center; justify-content: center; padding: 20px; overflow-y: auto;`;
   modal.innerHTML = `
-    <div style="background: #fff; color: #000; max-width: 650px; width: 100%; max-height: 90vh; overflow-y: auto; border-radius: 16px; padding: 40px; direction: rtl; font-family: 'Times New Roman', Arial, sans-serif; position: relative;">
+    <div style="background: #fff; color: #000; max-width: 650px; width: 100%; max-height: 90vh; overflow-y: auto; border-radius: 16px; padding: 40px; direction: rtl; font-family: Arial, sans-serif; position: relative;">
       <button onclick="closeNotificationModal()" style="position: absolute; top: 10px; left: 10px; width: 35px; height: 35px; border-radius: 50%; background: #f44336; color: #fff; border: none; font-size: 20px; cursor: pointer; font-weight: bold;">×</button>
       <div id="printableNotification" style="line-height: 2; font-size: 16px;">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #000; gap: 15px;">
@@ -1030,7 +1030,7 @@ function closeNotificationModal() {
 function printNotification() {
   const content = document.getElementById('printableNotification').innerHTML;
   const printWindow = window.open('', '_blank');
-  printWindow.document.write(`<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>إفادة مباشرة في العمل</title><style>body { font-family: 'Times New Roman', Arial, sans-serif; direction: rtl; padding: 40px; line-height: 2; }h2 { text-decoration: underline; }img { max-width: 110px; }</style></head><body>${content}<script>window.onload = function() { setTimeout(function() { window.print(); }, 800); };<\/script></body></html>`);
+  printWindow.document.write(`<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>إفادة مباشرة في العمل</title><style>body { font-family: Arial, sans-serif; direction: rtl; padding: 40px; line-height: 2; }h2 { text-decoration: underline; }img { max-width: 110px; }</style></head><body>${content}<script>window.onload = function() { setTimeout(function() { window.print(); }, 800); };<\/script></body></html>`);
   printWindow.document.close();
 }
 
@@ -1083,7 +1083,7 @@ function saveNotificationPDF() {
 
 function saveNotificationWord() {
   const content = document.getElementById('printableNotification').innerHTML;
-  let htmlContent = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" dir="rtl"><head><meta charset="UTF-8"><title>إفادة مباشرة في العمل</title><style>body { font-family: 'Times New Roman', Arial, sans-serif; direction: rtl; line-height: 2; }h2 { text-decoration: underline; text-align: center; }img { max-width: 110px; }</style></head><body>${content}</body></html>`;
+  let htmlContent = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" dir="rtl"><head><meta charset="UTF-8"><title>إفادة مباشرة في العمل</title><style>body { font-family: Arial, sans-serif; direction: rtl; line-height: 2; }h2 { text-decoration: underline; text-align: center; }img { max-width: 110px; }</style></head><body>${content}</body></html>`;
   const blob = new Blob(['\ufeff' + htmlContent], { type: 'application/msword' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');

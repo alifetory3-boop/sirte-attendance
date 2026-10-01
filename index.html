@@ -545,7 +545,6 @@
   }
   .overtime-summary .row-total:last-child { border-bottom: none; }
   
-  /* ============ تصميم الإحصائيات الشاملة ============ */
   .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -602,11 +601,18 @@
     font-size: 15px;
     font-weight: 800;
     box-shadow: 0 6px 20px rgba(15,118,110,0.4);
+    margin-bottom: 12px;
   }
   .grand-total strong {
     font-size: 24px;
     color: #ffc107;
     margin-right: 8px;
+  }
+  .grand-total .money-line {
+    background: rgba(255,255,255,0.15);
+    padding: 8px;
+    border-radius: 10px;
+    margin-top: 4px;
   }
   
   #loginScreen { background: transparent; }
@@ -704,7 +710,6 @@
         </div>
       </div>
       
-      <!-- ============ قسم الإحصائيات الشاملة ============ -->
       <div class="card">
         <h1>📊 إحصائيات شاملة</h1>
         
@@ -728,6 +733,8 @@
         <div class="grand-total">
           <div>👥 إجمالي الموظفين: <strong id="grandTotalEmployees">0</strong></div>
           <div>🚛 إجمالي الآليات: <strong id="grandTotalVehicles">0</strong></div>
+          <div class="money-line">💰 إجمالي الأجور الشهرية: <strong id="grandTotalSalaries">0</strong> دينار</div>
+          <div class="money-line">⏰ إجمالي ساعات الوقت الإضافي: <strong id="grandTotalOvertime">0</strong> ساعة</div>
         </div>
       </div>
       
@@ -1509,6 +1516,9 @@ function initializeAdmin() {
       }
     };
   });
+  
+  // تشغيل الإحصائيات الشاملة بعد التهيئة
+  setTimeout(updateStats, 1500);
 }
 
 function displayDates() {
@@ -1713,6 +1723,37 @@ function updateStats() {
     if (grandEmpEl) grandEmpEl.textContent = grandEmployees;
     if (grandVehEl) grandVehEl.textContent = sn.size;
   });
+  
+  // ============ إجمالي الأجور الشهرية ============
+  let totalSalaries = 0;
+  allDrivers.forEach(d => {
+    const sal = Number(d.salary) || 0;
+    totalSalaries += sal;
+  });
+  const salaryEl = document.getElementById('grandTotalSalaries');
+  if (salaryEl) salaryEl.textContent = totalSalaries.toLocaleString('ar-LY');
+  
+  // ============ إجمالي ساعات الوقت الإضافي (الشهر الحالي) ============
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  
+  db.collection('overtime')
+    .where('createdAt', '>=', monthStart)
+    .where('createdAt', '<', monthEnd)
+    .get()
+    .then(sn => {
+      let totalHours = 0;
+      sn.forEach(doc => {
+        totalHours += Number(doc.data().hours) || 0;
+      });
+      const otEl = document.getElementById('grandTotalOvertime');
+      if (otEl) otEl.textContent = totalHours.toFixed(1);
+    })
+    .catch(() => {
+      const otEl = document.getElementById('grandTotalOvertime');
+      if (otEl) otEl.textContent = '0';
+    });
 }
 
 function watchWorkers() {
@@ -2075,6 +2116,7 @@ async function saveOvertime() {
     document.getElementById('overtimeDate').value = getTodayISO();
     
     loadOvertimeList();
+    updateStats();
   } catch (err) {
     alert('❌ خطأ: ' + err.message);
   }
@@ -2139,7 +2181,7 @@ async function loadOvertimeList() {
 function deleteOvertime(id) {
   if (!confirm('هل تريد حذف هذا السجل؟')) return;
   db.collection('overtime').doc(id).delete()
-    .then(() => { alert('✅ تم الحذف'); loadOvertimeList(); })
+    .then(() => { alert('✅ تم الحذف'); loadOvertimeList(); updateStats(); })
     .catch(err => alert('❌ خطأ: ' + err.message));
 }
 

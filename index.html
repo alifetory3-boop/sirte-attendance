@@ -1077,45 +1077,46 @@
   </div>
 </div>
 
+<!-- ============================================ -->
+<!-- مكتبات خارجية -->
+<!-- ============================================ -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 
-<!-- ================================================ -->
-<!-- ⚙️ إعدادات Firebase - استبدل القيم ببياناتك الخاصة -->
-<!-- ================================================ -->
-<script>
-const firebaseConfig = {
-  apiKey: "ضع_هنا_apiKey",
-  authDomain: "ضع_هنا.firebaseapp.com",
-  projectId: "ضع_هنا",
-  storageBucket: "ضع_هنا.appspot.com",
-  messagingSenderId: "ضع_هنا",
-  appId: "ضع_هنا"
-};
-</script>
+<!-- ✅ ملف Firebase الخارجي - لا تعدل هذا السطر -->
+<script src="firebase-config.js"></script>
 
 <script>
-// فحص التحميل
-window.addEventListener('DOMContentLoaded', function() {
-  if (typeof firebase === 'undefined') {
+// ============================================
+// ✅ التحقق من Firebase
+// ============================================
+if (typeof firebase === 'undefined') {
+  document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('loginMsg').innerHTML = '<p style="color:#c62828;">❌ فشل تحميل Firebase. تحقق من الاتصال بالإنترنت.</p>';
-    return;
-  }
-  if (typeof firebaseConfig === 'undefined' || firebaseConfig.apiKey === 'ضع_هنا_apiKey') {
-    document.getElementById('loginMsg').innerHTML = '<p style="color:#c62828;">⚠️ لم تُضبط إعدادات Firebase. راجع الكود.</p>';
-    return;
-  }
-  try {
-    firebase.initializeApp(firebaseConfig);
-    console.log('✅ Firebase initialized');
-  } catch(e) {
-    document.getElementById('loginMsg').innerHTML = '<p style="color:#c62828;">❌ خطأ في Firebase: ' + e.message + '</p>';
-  }
-});
+  });
+  console.error('❌ Firebase SDK لم يتم تحميله');
+}
 
-const db = firebase.firestore ? firebase.firestore() : null;
+if (typeof firebaseConfig === 'undefined') {
+  document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('loginMsg').innerHTML = '<p style="color:#c62828;">❌ ملف firebase-config.js مفقود أو غير موجود في نفس المجلد.</p>';
+  });
+  console.error('❌ firebaseConfig غير معرف. تأكد من وجود ملف firebase-config.js');
+}
+
+let db = null;
+try {
+  firebase.initializeApp(firebaseConfig);
+  db = firebase.firestore();
+  console.log('✅ Firebase initialized successfully');
+} catch(e) {
+  console.error('❌ Firebase initialization error:', e.message);
+  document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('loginMsg').innerHTML = '<p style="color:#c62828;">❌ خطأ في Firebase: ' + e.message + '</p>';
+  });
+}
 
 const IMGBB_API_KEY = 'eda920fc86851acbc414c5d058bf2b28';
 
@@ -1488,7 +1489,11 @@ async function login() {
   const pin = document.getElementById('loginPin').value.trim();
   const msg = document.getElementById('loginMsg');
   if (!name || !pin) { msg.innerHTML = '<p style="color:#c62828;">⚠️ أدخل اسمك والرقم السري</p>'; return; }
-  if (!db) { msg.innerHTML = '<p style="color:#c62828;">❌ Firebase لم يتم تهيئته. راجع إعدادات Firebase في الكود.</p>'; return; }
+  
+  if (!db) {
+    msg.innerHTML = '<p style="color:#c62828;">❌ Firebase لم يتم تهيئته. تأكد من وجود ملف firebase-config.js</p>';
+    return;
+  }
   
   if (name === OWNER_NAME && pin === OWNER_PIN) {
     currentUser = { name: OWNER_NAME, role: 'owner' };

@@ -20,6 +20,32 @@
     display: flex; align-items: center; justify-content: center;
   }
   #mainApp { display: none; width: 100%; padding: 100px 20px 40px; min-height: 100vh; }
+  
+  /* شريط علوي جديد */
+  .top-bar {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    right: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+    pointer-events: none;
+  }
+  .top-bar-right {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    pointer-events: auto;
+  }
+  .top-bar-left {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    pointer-events: auto;
+  }
+  
   .user-bar { max-width: 1200px; margin: 0 auto 15px; display: flex; gap: 10px; flex-wrap: wrap; padding: 0 15px; align-items: center; justify-content: center; }
   .user-bar .user-info {
     text-align: center; color: #0f766e; padding: 14px 30px;
@@ -53,17 +79,47 @@
     border-radius: 50%; pointer-events: none;
   }
   .logout-btn:hover { transform: scale(1.1) rotate(5deg); }
+  
+  /* 🎯 زر الترس الصغير */
   .settings-btn {
-    width: 50px; height: 50px; padding: 0; margin: 0;
-    background: linear-gradient(135deg, #607d8b, #455a64);
-    border: 2px solid #fff; border-radius: 50%; color: #fff;
-    font-weight: bold; font-size: 22px; cursor: pointer;
-    box-shadow: 0 5px 18px rgba(96,125,139,0.4);
-    display: none; align-items: center; justify-content: center;
-    transition: all 0.3s; flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    padding: 6px;
+    margin: 0;
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid rgba(255,255,255,0.9);
+    border-radius: 50%;
+    color: #5f6368;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
   }
-  .settings-btn:hover { transform: scale(1.08) rotate(90deg); }
-  .settings-btn.visible { display: flex; }
+  .settings-btn:hover {
+    background: #fff;
+    color: #0f766e;
+    box-shadow: 0 4px 14px rgba(15,118,110,0.3);
+    transform: scale(1.08);
+  }
+  .settings-btn svg {
+    width: 100%;
+    height: 100%;
+    transition: transform 0.4s ease;
+    fill: currentColor;
+  }
+  .settings-btn:hover svg {
+    transform: rotate(60deg);
+  }
+  .settings-btn:active svg {
+    transform: rotate(120deg) scale(0.9);
+  }
+  .settings-btn.visible {
+    display: flex;
+  }
+  
   .tabs-container { max-width: 1200px; margin: 0 auto 20px; padding: 0 15px; }
   .tabs { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
   .tab {
@@ -293,13 +349,12 @@
   .settings-section label { font-size: 13px; color: #0f766e; font-weight: 800; margin-bottom: 6px; display: block; }
   .settings-section input, .settings-section select { width: 100%; padding: 11px 14px; border-radius: 10px; border: 2px solid #0f766e; font-size: 14px; font-family: inherit; margin-bottom: 10px; background: #fff; }
   .bg-preview { width: 100%; height: 120px; background: url('background.jpg') center/cover; border-radius: 12px; border: 2px solid #0f766e; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; text-shadow: 0 2px 8px rgba(0,0,0,0.8); }
-  .danger-zone { background: rgba(198,40,40,0.08); border: 2px solid rgba(198,40,40,0.3); border-radius: 14px; padding: 16px; }
-  .danger-zone h3 { color: #c62828; }
   #loginScreen { background: transparent; }
   @media (max-width: 768px) {
     #mainApp { padding: 60px 15px 30px; }
     .user-info { font-size: 15px !important; padding: 10px 18px !important; }
-    .back-btn, .logout-btn, .settings-btn { width: 42px !important; height: 42px !important; font-size: 20px !important; }
+    .back-btn, .logout-btn { width: 42px !important; height: 42px !important; font-size: 20px !important; }
+    .settings-btn { width: 34px !important; height: 34px !important; padding: 5px !important; }
     .tab { padding: 8px 14px; font-size: 12px; }
     .card { padding: 18px; }
     h1 { font-size: 17px; }
@@ -327,11 +382,24 @@
 </div>
 
 <div id="mainApp">
+  <!-- شريط علوي ثابت -->
+  <div class="top-bar" id="topBar" style="display:none;">
+    <div class="top-bar-left">
+      <button class="back-btn" id="topBackBtn" onclick="backToOverview()" title="رجوع">🔙</button>
+    </div>
+    <div class="top-bar-right">
+      <button class="settings-btn" id="settingsBtn" onclick="openSettings()" title="الإعدادات">
+        <svg viewBox="0 0 24 24">
+          <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
+        </svg>
+      </button>
+      <button onclick="logout()" class="logout-btn" title="خروج">⏻</button>
+    </div>
+  </div>
+  
   <div id="workerView" style="display:none;">
     <div class="user-bar">
-      <button class="back-btn" onclick="backToAdmin()">🔙</button>
       <div class="user-info"><span id="workerInfo"></span></div>
-      <button onclick="logout()" class="logout-btn">⏻</button>
     </div>
     <div class="card">
       <h1>📍 تسجيل الحضور</h1>
@@ -352,10 +420,7 @@
 
   <div id="adminView" style="display:none;">
     <div class="user-bar">
-      <button class="back-btn" onclick="backToOverview()">🔙</button>
       <div class="user-info"><span id="currentUserInfo"></span></div>
-      <button class="settings-btn" id="settingsBtn" onclick="openSettings()">⚙️</button>
-      <button onclick="logout()" class="logout-btn">⏻</button>
     </div>
 
     <div class="tabs-container">
@@ -726,9 +791,6 @@
 <script src="firebase-config.js"></script>
 
 <script>
-// ============================================
-// Firebase
-// ============================================
 let db = null;
 let storage = null;
 try {
@@ -742,9 +804,6 @@ try {
 
 const IMGBB_API_KEY = 'eda920fc86851acbc414c5d058bf2b28';
 
-// ============================================
-// الإعدادات - محملة من localStorage
-// ============================================
 let appSettings = {
   companyName: 'منظومة شركة النظافة',
   supervisorName: 'علي الفتوري',
@@ -789,9 +848,6 @@ function applyBackground() {
   }
 }
 
-// ============================================
-// المتغيرات العامة (بعد الإعدادات)
-// ============================================
 let deductionAmountValue = 50;
 let currentUser = null;
 let currentUserRole = '';
@@ -809,7 +865,6 @@ let vehiclePhotoBase64 = '';
 let reportMediaFiles = [];
 let currentNotificationData = { name: '', jobTitle: '', startDate: '', photo: '' };
 
-// تحميل الإعدادات بعد تعريف المتغيرات
 loadSettings();
 applySettings();
 applyBackground();
@@ -945,9 +1000,6 @@ async function uploadMedia(file) {
   }
 }
 
-// ============================================
-// الإعدادات
-// ============================================
 function openSettings() {
   if (!isOwnerOrAdmin()) { alert('🚫 الإعدادات للمدير فقط'); return; }
   applySettings();
@@ -1038,9 +1090,6 @@ async function downloadFullBackup() {
   } catch (err) { alert('❌ ' + err.message); }
 }
 
-// ============================================
-// إشعار الإفادة
-// ============================================
 function showWorkNotification(data) {
   currentNotificationData = data;
   let photoHTML = '';
@@ -1135,9 +1184,6 @@ function saveNotificationWord() {
   URL.revokeObjectURL(url);
 }
 
-// ============================================
-// ربط الصور
-// ============================================
 ['workerPhotoInputCamera', 'workerPhotoInput'].forEach(id => {
   document.getElementById(id).addEventListener('change', async (e) => {
     const file = e.target.files[0]; if (!file) return;
@@ -1196,9 +1242,6 @@ function handleReportMedia(e) {
   e.target.value = '';
 }
 
-// ============================================
-// الدخول
-// ============================================
 async function login() {
   const name = document.getElementById('loginName').value.trim();
   const pin = document.getElementById('loginPin').value.trim();
@@ -1250,6 +1293,8 @@ function enterWorker() {
   document.getElementById('mainApp').style.display = 'block';
   document.getElementById('workerView').style.display = 'block';
   document.getElementById('adminView').style.display = 'none';
+  document.getElementById('topBar').style.display = 'flex';
+  document.getElementById('topBackBtn').onclick = function() { logout(); };
   if (currentUserRole === 'driver') {
     document.getElementById('workerInfo').innerHTML = '<span class="role-badge role-driver">🚗</span> ' + currentUser.name;
   } else {
@@ -1264,6 +1309,8 @@ function enterAdmin() {
   document.getElementById('mainApp').style.display = 'block';
   document.getElementById('workerView').style.display = 'none';
   document.getElementById('adminView').style.display = 'block';
+  document.getElementById('topBar').style.display = 'flex';
+  document.getElementById('topBackBtn').onclick = backToOverview;
   const ui = document.getElementById('currentUserInfo');
   if (currentUserRole === 'owner') ui.innerHTML = '<span class="role-badge role-owner">👑</span> ' + currentUser.name;
   else if (currentUserRole === 'admin') ui.innerHTML = '<span class="role-badge role-admin">👤</span> ' + currentUser.name;
@@ -1287,6 +1334,7 @@ function logout() {
   document.getElementById('mainApp').style.display = 'none';
   document.getElementById('workerView').style.display = 'none';
   document.getElementById('adminView').style.display = 'none';
+  document.getElementById('topBar').style.display = 'none';
   document.getElementById('loginScreen').style.display = 'block';
 }
 
@@ -1300,8 +1348,6 @@ function backToOverview() {
   });
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-
-function backToAdmin() { logout(); }
 
 function togglePermissionsBox() {
   document.getElementById('permissionsBox').style.display = document.getElementById('newUserRole').value === 'supervisor' ? 'block' : 'none';

@@ -1489,13 +1489,27 @@ function watchAttendance() {
     ld.innerHTML = recs.map(r => {
       const m = meta[r.status] || { c: '#607d8b', l: r.status };
       const icon = r.personType === 'driver' ? '🚗 ' : '👷 ';
-      return `<div class="row"><div><div>${icon}${r.workerName}</div><div style="font-size:12px;color:#666;">${r.time || '--'} ${r.shift==='morning'?'🌅':'🌙'}</div></div><span class="badge" style="background:${m.c};margin-right:auto;">${m.l}</span></div>`;
+      return `<div class="row" style="align-items:center;">
+        <div style="flex:1;">
+          <div>${icon}${r.workerName}</div>
+          <div style="font-size:12px;color:#666;">${r.time || '--'} ${r.shift==='morning'?'🌅':'🌙'}</div>
+        </div>
+        <span class="badge" style="background:${m.c};">${m.l}</span>
+        <button class="del-btn" onclick="deleteAttendance('${r.id}','${r.workerName}')" style="margin-right:6px;">🗑️</button>
+      </div>`;
     }).join('');
   }, (error) => {
     console.error('خطأ في تحميل الحضور:', error);
     document.getElementById('attendanceList').innerHTML = 
       `<p style="text-align:center;color:#c62828;font-size:13px;">⚠️ خطأ: ${error.message}</p>`;
   });
+}
+
+function deleteAttendance(id, name) {
+  if (!confirm(`⚠️ هل تريد حذف سجل الحضور الخاص بـ "${name}"؟`)) return;
+  db.collection('attendance').doc(id).delete()
+    .then(() => { console.log('✅ تم حذف السجل'); })
+    .catch(err => alert('❌ خطأ في الحذف: ' + err.message));
 }
 
 function watchWorkers() {
@@ -1795,10 +1809,6 @@ async function addDriver() {
 function deleteDriver(id, name) {
   if (confirm(`حذف ${name}؟`)) db.collection('drivers').doc(id).delete();
 }
-
-// ============================================
-// ⏰ نظام الوقت الإضافي (Overtime)
-// ============================================
 
 function populateOvertimeMonthSelect() {
   const sel = document.getElementById('overtimeMonthSelect');

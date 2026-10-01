@@ -1469,8 +1469,15 @@ async function markSick() {
 }
 
 function watchAttendance() {
-  db.collection('attendance').where('date','==',getTodayISO()).orderBy('timestamp','desc').onSnapshot(sn => {
-    const recs = sn.docs.map(d => ({ id: d.id, ...d.data() }));
+  db.collection('attendance').where('date','==',getTodayISO()).onSnapshot(sn => {
+    let recs = sn.docs.map(d => ({ id: d.id, ...d.data() }));
+    
+    recs.sort((a, b) => {
+      const ta = a.timestamp?.toDate ? a.timestamp.toDate().getTime() : 0;
+      const tb = b.timestamp?.toDate ? b.timestamp.toDate().getTime() : 0;
+      return tb - ta;
+    });
+    
     latestAttendanceRecords = recs;
     document.getElementById('presentCount').textContent = recs.filter(r => r.status === 'present' || r.status === 'late').length;
     document.getElementById('leaveCount').textContent = recs.filter(r => r.status === 'leave').length;
@@ -1484,6 +1491,10 @@ function watchAttendance() {
       const icon = r.personType === 'driver' ? '🚗 ' : '👷 ';
       return `<div class="row"><div><div>${icon}${r.workerName}</div><div style="font-size:12px;color:#666;">${r.time || '--'} ${r.shift==='morning'?'🌅':'🌙'}</div></div><span class="badge" style="background:${m.c};margin-right:auto;">${m.l}</span></div>`;
     }).join('');
+  }, (error) => {
+    console.error('خطأ في تحميل الحضور:', error);
+    document.getElementById('attendanceList').innerHTML = 
+      `<p style="text-align:center;color:#c62828;font-size:13px;">⚠️ خطأ: ${error.message}</p>`;
   });
 }
 

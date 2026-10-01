@@ -233,7 +233,7 @@
     font-size: 16px; 
     color: #0f766e; 
     font-weight: 800; 
-    margin: 0 0 12px 0;
+    margin: 12px 0 12px 0;
     letter-spacing: 0.2px;
     text-shadow: 
       0.5px 0.5px 0 #fff,
@@ -545,6 +545,70 @@
   }
   .overtime-summary .row-total:last-child { border-bottom: none; }
   
+  /* ============ تصميم الإحصائيات الشاملة ============ */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .stats-grid .stat-item {
+    background: rgba(255,255,255,0.6);
+    border: 2px solid #0f766e;
+    border-radius: 12px;
+    padding: 10px;
+    text-align: center;
+    font-weight: 800;
+    font-size: 13px;
+    color: #0f766e;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .stats-grid .stat-item .count {
+    display: block;
+    font-size: 24px;
+    color: #c62828;
+    margin-top: 4px;
+    font-weight: 900;
+  }
+  .stats-grid .stat-item.empty {
+    opacity: 0.5;
+    font-size: 12px;
+  }
+  .total-line {
+    text-align: center;
+    padding: 10px;
+    background: rgba(15,118,110,0.15);
+    border-radius: 10px;
+    font-weight: 800;
+    color: #0f766e;
+    font-size: 14px;
+    margin-bottom: 15px;
+  }
+  .total-line span {
+    color: #c62828;
+    font-size: 20px;
+    margin-right: 6px;
+    font-weight: 900;
+  }
+  .grand-total {
+    background: linear-gradient(135deg, #0f766e, #0d5c55);
+    color: #fff;
+    padding: 16px;
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 800;
+    box-shadow: 0 6px 20px rgba(15,118,110,0.4);
+  }
+  .grand-total strong {
+    font-size: 24px;
+    color: #ffc107;
+    margin-right: 8px;
+  }
+  
   #loginScreen { background: transparent; }
   
   @media (max-width: 768px) {
@@ -556,6 +620,8 @@
     .tab { padding: 8px 14px; font-size: 12px; }
     .card { padding: 18px; }
     h1 { font-size: 17px; }
+    .stats-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
+    .stats-grid .stat-item .count { font-size: 20px; }
   }
   
   @media (min-width: 769px) {
@@ -637,6 +703,34 @@
           <div class="stat"><span class="num" id="absentCount">0</span>غائب</div>
         </div>
       </div>
+      
+      <!-- ============ قسم الإحصائيات الشاملة ============ -->
+      <div class="card">
+        <h1>📊 إحصائيات شاملة</h1>
+        
+        <h2>👷 العمال</h2>
+        <div id="workersStats" class="stats-grid"></div>
+        <div class="total-line">📌 إجمالي العمال: <span id="totalWorkers">0</span></div>
+        
+        <h2>🚗 السائقين</h2>
+        <div id="driversStats" class="stats-grid"></div>
+        <div class="total-line">📌 إجمالي السائقين: <span id="totalDrivers">0</span></div>
+        
+        <h2>👷 المشرفين</h2>
+        <div id="supervisorsStats" class="stats-grid"></div>
+        <div class="total-line">📌 إجمالي المشرفين: <span id="totalSupervisors">0</span></div>
+        
+        <h2>🚛 الآليات</h2>
+        <div id="vehiclesStats" class="stats-grid"></div>
+        <div class="total-line">📌 إجمالي الآليات: <span id="totalVehicles">0</span></div>
+        
+        <h2>📈 الإجمالي العام</h2>
+        <div class="grand-total">
+          <div>👥 إجمالي الموظفين: <strong id="grandTotalEmployees">0</strong></div>
+          <div>🚛 إجمالي الآليات: <strong id="grandTotalVehicles">0</strong></div>
+        </div>
+      </div>
+      
       <div class="card">
         <h2>سجل الحضور</h2>
         <button class="export-btn" onclick="exportAttendanceExcel()">📊 تصدير Excel</button>
@@ -974,6 +1068,14 @@ const DRIVER_TYPES = {
   large_compactor: 'سائق كباسة كبيرة',
   small_compactor: 'سائق كباسة صغيرة',
   cleaning_supervisor: 'مشرف نظافة'
+};
+
+const VEHICLE_TYPES = {
+  small_compactor: 'كبس صغير',
+  large_compactor: 'كبس كبير',
+  small_garbage_truck: 'صندوق قمامة صغير',
+  large_garbage_truck: 'صندوق قمامة كبير',
+  dump_truck: 'قلاب'
 };
 
 function getTodayDate() {
@@ -1512,6 +1614,107 @@ function deleteAttendance(id, name) {
     .catch(err => alert('❌ خطأ في الحذف: ' + err.message));
 }
 
+// ============================================
+// 📊 دالة الإحصائيات الشاملة
+// ============================================
+function updateStats() {
+  // ============ العمال حسب الفريق ============
+  const workerTeams = {};
+  allWorkers.forEach(w => {
+    const key = w.team || 'other';
+    if (!workerTeams[key]) workerTeams[key] = 0;
+    workerTeams[key]++;
+  });
+  
+  const workersEl = document.getElementById('workersStats');
+  if (workersEl) {
+    const entries = Object.keys(workerTeams);
+    if (entries.length === 0) {
+      workersEl.innerHTML = '<div class="stat-item empty">لا يوجد عمال</div>';
+    } else {
+      workersEl.innerHTML = entries.map(teamId => 
+        '<div class="stat-item">' + (teamLabel(teamId) || 'أخرى') + 
+        '<span class="count">' + workerTeams[teamId] + '</span></div>'
+      ).join('');
+    }
+    document.getElementById('totalWorkers').textContent = allWorkers.length;
+  }
+  
+  // ============ السائقين حسب النوع (بدون المشرفين) ============
+  const driverTypes = {};
+  let driversOnly = 0;
+  let supervisorsOnly = 0;
+  
+  allDrivers.forEach(d => {
+    if (d.driverType === 'cleaning_supervisor') {
+      supervisorsOnly++;
+    } else {
+      driversOnly++;
+      const key = d.driverType || 'other';
+      if (!driverTypes[key]) driverTypes[key] = 0;
+      driverTypes[key]++;
+    }
+  });
+  
+  const driversEl = document.getElementById('driversStats');
+  if (driversEl) {
+    const entries = Object.keys(driverTypes);
+    if (entries.length === 0) {
+      driversEl.innerHTML = '<div class="stat-item empty">لا يوجد سائقين</div>';
+    } else {
+      driversEl.innerHTML = entries.map(typeId => 
+        '<div class="stat-item">' + (DRIVER_TYPES[typeId] || 'أخرى') + 
+        '<span class="count">' + driverTypes[typeId] + '</span></div>'
+      ).join('');
+    }
+    document.getElementById('totalDrivers').textContent = driversOnly;
+  }
+  
+  // ============ المشرفين ============
+  const supervisorsEl = document.getElementById('supervisorsStats');
+  if (supervisorsEl) {
+    if (supervisorsOnly === 0) {
+      supervisorsEl.innerHTML = '<div class="stat-item empty">لا يوجد مشرفين</div>';
+    } else {
+      supervisorsEl.innerHTML = '<div class="stat-item">👷 مشرف نظافة<span class="count">' + supervisorsOnly + '</span></div>';
+    }
+    document.getElementById('totalSupervisors').textContent = supervisorsOnly;
+  }
+  
+  // ============ الآليات حسب النوع ============
+  db.collection('vehicles').get().then(sn => {
+    const vehicleTypes = {};
+    
+    sn.forEach(doc => {
+      const v = doc.data();
+      const key = v.type || 'other';
+      if (!vehicleTypes[key]) vehicleTypes[key] = 0;
+      vehicleTypes[key]++;
+    });
+    
+    const vehiclesEl = document.getElementById('vehiclesStats');
+    if (vehiclesEl) {
+      const entries = Object.keys(vehicleTypes);
+      if (entries.length === 0) {
+        vehiclesEl.innerHTML = '<div class="stat-item empty">لا توجد آليات</div>';
+      } else {
+        vehiclesEl.innerHTML = entries.map(typeId => 
+          '<div class="stat-item">' + (VEHICLE_TYPES[typeId] || typeId) + 
+          '<span class="count">' + vehicleTypes[typeId] + '</span></div>'
+        ).join('');
+      }
+      document.getElementById('totalVehicles').textContent = sn.size;
+    }
+    
+    // ============ الإجمالي العام ============
+    const grandEmployees = allWorkers.length + allDrivers.length;
+    const grandEmpEl = document.getElementById('grandTotalEmployees');
+    const grandVehEl = document.getElementById('grandTotalVehicles');
+    if (grandEmpEl) grandEmpEl.textContent = grandEmployees;
+    if (grandVehEl) grandVehEl.textContent = sn.size;
+  });
+}
+
 function watchWorkers() {
   db.collection('workers').orderBy('name').onSnapshot(sn => {
     allWorkers = sn.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -1521,6 +1724,7 @@ function watchWorkers() {
       return '<div class="worker-row"><img src="' + (w.photo||'') + '" onerror="this.style.visibility=\'hidden\'"><span class="name">' + w.name + '</span><span style="font-size:11px;color:#666;">' + teamLabel(w.team) + '</span><span class="duration-badge">' + duration + '</span><button class="edit-btn" onclick="toggleEditWorkerForm(\'' + w.id + '\')">✏️</button><button class="del-btn" onclick="deleteWorker(\'' + w.id + '\',\'' + w.name + '\')">حذف</button><div id="editForm-' + w.id + '" class="edit-form"></div></div>';
     }).join('') : '<p style="text-align:center;color:#666;font-size:13px;">لا يوجد عمال</p>';
     updateDailyMarkList();
+    updateStats();
   });
 }
 
@@ -1638,6 +1842,7 @@ function watchDrivers() {
     renderDriversList();
     updateDailyMarkList();
     populateOvertimeDriverSelect();
+    updateStats();
   });
 }
 
@@ -2148,6 +2353,7 @@ function deleteItem(id, name) {
 function loadVehicles() {
   db.collection('vehicles').onSnapshot(sn => {
     document.getElementById('vehiclesList').innerHTML = sn.empty ? '<p style="text-align:center;color:#666;font-size:13px;">لا توجد آليات</p>' : sn.docs.map(doc => { const v = doc.data(); return '<div class="worker-row">' + (v.photo ? '<img src="' + v.photo + '" style="width:40px;height:40px;border-radius:8px;object-fit:cover;">' : '') + '<span class="name">' + v.typeLabel + ' - ' + v.number + '</span><span style="font-size:12px;color:#0f766e;font-weight:800;">' + v.statusLabel + '</span><button class="del-btn" onclick="deleteVehicle(\'' + doc.id + '\',\'' + v.number + '\')">حذف</button></div>'; }).join('');
+    updateStats();
   });
 }
 

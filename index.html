@@ -615,7 +615,6 @@
     margin-top: 4px;
   }
   
-  /* بطاقات المستخدمين */
   .user-perm-card {
     background: rgba(255,255,255,0.65);
     border: 2px solid #0f766e;
@@ -727,9 +726,7 @@
 <div id="mainApp">
   <div id="workerView" style="display:none;">
     <div class="user-bar">
-      <div class="user-info">
-        <span id="workerInfo"></span>
-      </div>
+      <div class="user-info"><span id="workerInfo"></span></div>
       <button onclick="logout()" class="logout-btn">🚪</button>
     </div>
     <div class="card">
@@ -751,9 +748,7 @@
 
   <div id="adminView" style="display:none;">
     <div class="user-bar">
-      <div class="user-info">
-        <span id="currentUserInfo"></span>
-      </div>
+      <div class="user-info"><span id="currentUserInfo"></span></div>
       <button onclick="logout()" class="logout-btn">🚪</button>
     </div>
 
@@ -786,23 +781,18 @@
       
       <div class="card">
         <h1>📊 إحصائيات شاملة</h1>
-        
         <h2>👷 العمال</h2>
         <div id="workersStats" class="stats-grid"></div>
         <div class="total-line">📌 إجمالي العمال: <span id="totalWorkers">0</span></div>
-        
         <h2>🚗 السائقين</h2>
         <div id="driversStats" class="stats-grid"></div>
         <div class="total-line">📌 إجمالي السائقين: <span id="totalDrivers">0</span></div>
-        
         <h2>👷 المشرفين</h2>
         <div id="supervisorsStats" class="stats-grid"></div>
         <div class="total-line">📌 إجمالي المشرفين: <span id="totalSupervisors">0</span></div>
-        
         <h2>🚛 الآليات</h2>
         <div id="vehiclesStats" class="stats-grid"></div>
         <div class="total-line">📌 إجمالي الآليات: <span id="totalVehicles">0</span></div>
-        
         <h2>📈 الإجمالي العام</h2>
         <div class="grand-total">
           <div>👥 إجمالي الموظفين: <strong id="grandTotalEmployees">0</strong></div>
@@ -895,7 +885,6 @@
     <div id="tab-drivers" style="display:none;">
       <div class="card">
         <h2>➕ إضافة سائق / مشرف</h2>
-        
         <label>📸 الصورة الشخصية</label>
         <img id="driverPhotoPreview" class="photo-preview">
         <input type="file" id="driverPhotoInput" accept="image/*" style="display:none;">
@@ -904,10 +893,8 @@
           <button class="camera-btn" onclick="document.getElementById('driverPhotoInputCamera').click()">📷 كاميرا</button>
           <button class="file-btn" onclick="document.getElementById('driverPhotoInput').click()">🖼️ من الملفات</button>
         </div>
-        
         <label>👤 الاسم</label>
         <input id="newDriverName" placeholder="اسم الموظف">
-        
         <label>🚙 نوع السائق / الوظيفة</label>
         <select id="newDriverType">
           <option value="general_driver">🚗 سائق</option>
@@ -918,23 +905,18 @@
           <option value="small_compactor">🚜 سائق كباسة صغيرة</option>
           <option value="cleaning_supervisor">👷 مشرف نظافة</option>
         </select>
-        
         <label>🔄 الوردية</label>
         <select id="newDriverShift">
           <option value="morning">🌅 صباح</option>
           <option value="night">🌙 ليل</option>
           <option value="both">🔄 كلاهما</option>
         </select>
-        
         <label>📅 تاريخ مباشرة العمل</label>
         <input type="date" id="newDriverStartDate">
-        
         <label>💰 المرتب الشهري (دينار)</label>
         <input id="newDriverSalary" type="number" placeholder="مثال: 1500" min="0">
-        
         <label>🏦 رقم الحساب</label>
         <input id="newDriverAccount" placeholder="رقم الحساب البنكي">
-        
         <label>🏛️ اسم المصرف</label>
         <select id="newDriverBank">
           <option value="">— اختر —</option>
@@ -946,7 +928,6 @@
           <option value="الادخار">مصرف الادخار</option>
           <option value="أخرى">أخرى</option>
         </select>
-        
         <label>🚗 درجة الرخصة (للسائقين فقط)</label>
         <select id="newDriverLicense">
           <option value="">— اختر —</option>
@@ -957,7 +938,6 @@
           <option value="درجة ثالثة">درجة ثالثة</option>
           <option value="معدات ثقيلة">معدات ثقيلة</option>
         </select>
-        
         <label>📄 صورة الصك</label>
         <img id="driverCheckPreview" class="photo-preview">
         <input type="file" id="driverCheckInput" accept="image/*" style="display:none;">
@@ -966,10 +946,8 @@
           <button class="camera-btn" onclick="document.getElementById('driverCheckInputCamera').click()">📷 كاميرا</button>
           <button class="file-btn" onclick="document.getElementById('driverCheckInput').click()">🖼️ من الملفات</button>
         </div>
-        
         <button onclick="addDriver()">✅ تسجيل الموظف</button>
       </div>
-      
       <div class="card">
         <h2>🚗 السائقين والمشرفين</h2>
         <input id="driversSearch" placeholder="🔍 ابحث بالاسم">
@@ -982,22 +960,16 @@
       <div class="card">
         <h2>⏰ تسجيل وقت إضافي (للسائقين)</h2>
         <div class="date-display" id="overtimeDateDisplay"></div>
-        
         <label>🚗 اختر السائق</label>
         <select id="overtimeDriverSelect"></select>
-        
         <label>📅 التاريخ</label>
         <input type="date" id="overtimeDate">
-        
         <label>⏱️ عدد الساعات الإضافية</label>
         <input id="overtimeHours" type="number" placeholder="مثال: 2.5" step="0.5" min="0">
-        
         <label>📝 ملاحظة (اختياري)</label>
         <input id="overtimeNote" placeholder="سبب الوقت الإضافي">
-        
         <button class="overtime-btn" onclick="saveOvertime()">💾 حفظ الوقت الإضافي</button>
       </div>
-      
       <div class="card">
         <h2>📊 سجل الأوقات الإضافية</h2>
         <label>📅 اختر الشهر</label>
@@ -1109,11 +1081,41 @@
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-<script src="firebase-config.js"></script>
+
+<!-- ================================================ -->
+<!-- ⚙️ إعدادات Firebase - استبدل القيم ببياناتك الخاصة -->
+<!-- ================================================ -->
+<script>
+const firebaseConfig = {
+  apiKey: "ضع_هنا_apiKey",
+  authDomain: "ضع_هنا.firebaseapp.com",
+  projectId: "ضع_هنا",
+  storageBucket: "ضع_هنا.appspot.com",
+  messagingSenderId: "ضع_هنا",
+  appId: "ضع_هنا"
+};
+</script>
 
 <script>
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+// فحص التحميل
+window.addEventListener('DOMContentLoaded', function() {
+  if (typeof firebase === 'undefined') {
+    document.getElementById('loginMsg').innerHTML = '<p style="color:#c62828;">❌ فشل تحميل Firebase. تحقق من الاتصال بالإنترنت.</p>';
+    return;
+  }
+  if (typeof firebaseConfig === 'undefined' || firebaseConfig.apiKey === 'ضع_هنا_apiKey') {
+    document.getElementById('loginMsg').innerHTML = '<p style="color:#c62828;">⚠️ لم تُضبط إعدادات Firebase. راجع الكود.</p>';
+    return;
+  }
+  try {
+    firebase.initializeApp(firebaseConfig);
+    console.log('✅ Firebase initialized');
+  } catch(e) {
+    document.getElementById('loginMsg').innerHTML = '<p style="color:#c62828;">❌ خطأ في Firebase: ' + e.message + '</p>';
+  }
+});
+
+const db = firebase.firestore ? firebase.firestore() : null;
 
 const IMGBB_API_KEY = 'eda920fc86851acbc414c5d058bf2b28';
 
@@ -1163,9 +1165,6 @@ const VEHICLE_TYPES = {
   dump_truck: 'قلاب'
 };
 
-// ============================================
-// 🔒 دوال التحقق من الصلاحيات
-// ============================================
 function isOwnerOrAdmin() {
   return currentUserRole === 'owner' || currentUserRole === 'admin';
 }
@@ -1190,39 +1189,23 @@ function canDelete() {
 
 function canExport() {
   if (isOwnerOrAdmin()) return true;
-  if (currentUserPermissions.viewOnly) return currentUserPermissions.canExport !== false;
   return currentUserPermissions.canExport !== false;
 }
 
 function checkAddPermission() {
-  if (!canAdd()) {
-    alert('🚫 لا تملك صلاحية الإضافة. تواصل مع المدير.');
-    return false;
-  }
+  if (!canAdd()) { alert('🚫 لا تملك صلاحية الإضافة. تواصل مع المدير.'); return false; }
   return true;
 }
-
 function checkEditPermission() {
-  if (!canEdit()) {
-    alert('🚫 لا تملك صلاحية التعديل. تواصل مع المدير.');
-    return false;
-  }
+  if (!canEdit()) { alert('🚫 لا تملك صلاحية التعديل. تواصل مع المدير.'); return false; }
   return true;
 }
-
 function checkDeletePermission() {
-  if (!canDelete()) {
-    alert('🚫 لا تملك صلاحية الحذف. تواصل مع المدير.');
-    return false;
-  }
+  if (!canDelete()) { alert('🚫 لا تملك صلاحية الحذف. تواصل مع المدير.'); return false; }
   return true;
 }
-
 function checkExportPermission() {
-  if (!canExport()) {
-    alert('🚫 لا تملك صلاحية التصدير. تواصل مع المدير.');
-    return false;
-  }
+  if (!canExport()) { alert('🚫 لا تملك صلاحية التصدير. تواصل مع المدير.'); return false; }
   return true;
 }
 
@@ -1505,6 +1488,8 @@ async function login() {
   const pin = document.getElementById('loginPin').value.trim();
   const msg = document.getElementById('loginMsg');
   if (!name || !pin) { msg.innerHTML = '<p style="color:#c62828;">⚠️ أدخل اسمك والرقم السري</p>'; return; }
+  if (!db) { msg.innerHTML = '<p style="color:#c62828;">❌ Firebase لم يتم تهيئته. راجع إعدادات Firebase في الكود.</p>'; return; }
+  
   if (name === OWNER_NAME && pin === OWNER_PIN) {
     currentUser = { name: OWNER_NAME, role: 'owner' };
     currentUserRole = 'owner';
@@ -1512,6 +1497,9 @@ async function login() {
     enterAdmin();
     return;
   }
+  
+  msg.innerHTML = '<p style="color:#f57c00;">⏳ جاري التحقق...</p>';
+  
   try {
     const us = await db.collection('systemUsers').where('name','==',name).where('pin','==',pin).get();
     if (!us.empty) {
@@ -1521,7 +1509,8 @@ async function login() {
       enterAdmin();
       return;
     }
-  } catch (err) {}
+  } catch (err) { console.warn('systemUsers error:', err.message); }
+  
   try {
     const ws = await db.collection('workers').where('name','==',name).get();
     if (!ws.empty) {
@@ -1530,7 +1519,8 @@ async function login() {
       enterWorker();
       return;
     }
-  } catch (err) {}
+  } catch (err) { console.warn('workers error:', err.message); }
+  
   try {
     const ds = await db.collection('drivers').where('name','==',name).get();
     if (!ds.empty) {
@@ -1539,7 +1529,8 @@ async function login() {
       enterWorker();
       return;
     }
-  } catch (err) {}
+  } catch (err) { console.warn('drivers error:', err.message); }
+  
   msg.innerHTML = '<p style="color:#c62828;">❌ الاسم أو الرقم السري غير صحيح</p>';
 }
 
@@ -1723,13 +1714,11 @@ async function markSick() {
 function watchAttendance() {
   db.collection('attendance').where('date','==',getTodayISO()).onSnapshot(sn => {
     let recs = sn.docs.map(d => ({ id: d.id, ...d.data() }));
-    
     recs.sort((a, b) => {
       const ta = a.timestamp?.toDate ? a.timestamp.toDate().getTime() : 0;
       const tb = b.timestamp?.toDate ? b.timestamp.toDate().getTime() : 0;
       return tb - ta;
     });
-    
     latestAttendanceRecords = recs;
     document.getElementById('presentCount').textContent = recs.filter(r => r.status === 'present' || r.status === 'late').length;
     document.getElementById('leaveCount').textContent = recs.filter(r => r.status === 'leave').length;
@@ -1829,14 +1818,12 @@ function updateStats() {
   
   db.collection('vehicles').get().then(sn => {
     const vehicleTypes = {};
-    
     sn.forEach(doc => {
       const v = doc.data();
       const key = v.type || 'other';
       if (!vehicleTypes[key]) vehicleTypes[key] = 0;
       vehicleTypes[key]++;
     });
-    
     const vehiclesEl = document.getElementById('vehiclesStats');
     if (vehiclesEl) {
       const entries = Object.keys(vehicleTypes);
@@ -1850,13 +1837,12 @@ function updateStats() {
       }
       document.getElementById('totalVehicles').textContent = sn.size;
     }
-    
     const grandEmployees = allWorkers.length + allDrivers.length;
     const grandEmpEl = document.getElementById('grandTotalEmployees');
     const grandVehEl = document.getElementById('grandTotalVehicles');
     if (grandEmpEl) grandEmpEl.textContent = grandEmployees;
     if (grandVehEl) grandVehEl.textContent = sn.size;
-  });
+  }).catch(err => console.warn('vehicles stats error:', err.message));
   
   let totalSalaries = 0;
   allDrivers.forEach(d => {
@@ -1930,7 +1916,6 @@ function toggleEditWorkerForm(workerId) {
     </select>
     <label>📅 تاريخ المباشرة</label>
     <input id="editStartDate-${workerId}" type="date" value="${w.startDate || ''}">
-    
     <div class="photo-section">
       <h3>📸 الصورة الشخصية</h3>
       ${w.photo ? '<img src="' + w.photo + '" class="current-photo" onclick="window.open(\'' + w.photo + '\')">' : '<div class="no-photo-text">لا توجد صورة - أضف صورة</div>'}
@@ -1942,7 +1927,6 @@ function toggleEditWorkerForm(workerId) {
       </div>
       <img id="editWorkerPhotoPreview-${workerId}" style="width:100%;max-height:120px;object-fit:cover;border-radius:8px;display:none;margin-top:8px;border:2px solid #4caf50;">
     </div>
-    
     <button onclick="saveEditWorker('${workerId}')">💾 حفظ التعديل</button>
     ${deleteBtnHTML}
   `;
@@ -2073,7 +2057,6 @@ function toggleEditDriverForm(driverId) {
     <input id="editDriverBank-${driverId}" value="${d.bankName || ''}">
     <label>🚗 الرخصة</label>
     <input id="editDriverLicense-${driverId}" value="${d.licenseGrade || ''}">
-    
     <div class="photo-section">
       <h3>📸 الصورة الشخصية</h3>
       ${d.photo ? '<img src="' + d.photo + '" class="current-photo" onclick="window.open(\'' + d.photo + '\')">' : '<div class="no-photo-text">لا توجد صورة - أضف صورة</div>'}
@@ -2085,7 +2068,6 @@ function toggleEditDriverForm(driverId) {
       </div>
       <img id="editDriverPhotoPreview-${driverId}" style="width:100%;max-height:120px;object-fit:cover;border-radius:8px;display:none;margin-top:8px;border:2px solid #4caf50;">
     </div>
-    
     <div class="photo-section">
       <h3>📄 صورة الصك</h3>
       ${d.checkPhoto ? '<img src="' + d.checkPhoto + '" class="current-photo" onclick="window.open(\'' + d.checkPhoto + '\')">' : '<div class="no-photo-text">لا توجد صورة للصك - أضف صورة</div>'}
@@ -2097,7 +2079,6 @@ function toggleEditDriverForm(driverId) {
       </div>
       <img id="editDriverCheckPreview-${driverId}" style="width:100%;max-height:120px;object-fit:cover;border-radius:8px;display:none;margin-top:8px;border:2px solid #4caf50;">
     </div>
-    
     <button onclick="saveEditDriver('${driverId}')">💾 حفظ التعديل</button>
     ${deleteBtnHTML}
   `;
@@ -2246,23 +2227,16 @@ async function saveOvertime() {
   
   try {
     await db.collection('overtime').add({
-      driverId,
-      driverName,
-      date,
-      hours,
-      note,
+      driverId, driverName, date, hours, note,
       createdBy: currentUser?.name || 'غير معروف',
       createdTime: getNowTime(),
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-    
     alert('✅ تم تسجيل ' + hours + ' ساعة إضافية للسائق ' + driverName);
-    
     document.getElementById('overtimeDriverSelect').value = '';
     document.getElementById('overtimeHours').value = '';
     document.getElementById('overtimeNote').value = '';
     document.getElementById('overtimeDate').value = getTodayISO();
-    
     loadOvertimeList();
     updateStats();
   } catch (err) {
@@ -2273,28 +2247,22 @@ async function saveOvertime() {
 async function loadOvertimeList() {
   const monthVal = document.getElementById('overtimeMonthSelect')?.value;
   if (!monthVal) return;
-  
   const [y, m] = monthVal.split('-').map(Number);
   const from = new Date(y, m - 1, 1);
   const to = new Date(y, m, 1);
-  
   try {
     const sn = await db.collection('overtime')
       .where('createdAt', '>=', from)
       .where('createdAt', '<', to)
       .orderBy('createdAt', 'desc')
       .get();
-    
     const list = document.getElementById('overtimeList');
-    
     if (sn.empty) {
       list.innerHTML = '<p style="text-align:center;color:#666;font-size:13px;">لا يوجد أوقات إضافية هذا الشهر</p>';
       return;
     }
-    
     const totals = {};
     const records = [];
-    
     sn.forEach(doc => {
       const r = { id: doc.id, ...doc.data() };
       records.push(r);
@@ -2302,13 +2270,11 @@ async function loadOvertimeList() {
       totals[r.driverName].hours += r.hours;
       totals[r.driverName].count += 1;
     });
-    
     let totalsHTML = '<div class="overtime-summary"><h3>📊 إجمالي الساعات لكل سائق:</h3>';
     Object.keys(totals).forEach(name => {
       totalsHTML += '<div class="row-total"><span style="font-weight:700;">🚗 ' + name + '</span><span style="color:#f57c00;font-weight:800;">⏰ ' + totals[name].hours.toFixed(1) + ' ساعة (' + totals[name].count + ' مرة)</span></div>';
     });
     totalsHTML += '</div>';
-    
     let recordsHTML = '<h3 style="color:#0f766e;font-size:14px;">📋 السجلات التفصيلية:</h3>';
     recordsHTML += records.map(r => {
       const delBtn = canDelete() ? '<button class="del-btn" onclick="deleteOvertime(\'' + r.id + '\')">حذف</button>' : '';
@@ -2320,10 +2286,9 @@ async function loadOvertimeList() {
         delBtn +
       '</div>';
     }).join('');
-    
     list.innerHTML = totalsHTML + recordsHTML;
   } catch (err) {
-    document.getElementById('overtimeList').innerHTML = '<p style="text-align:center;color:#c62828;font-size:13px;">⚠️ خطأ: ' + err.message + '<br>قد تحتاج لإنشاء فهرس في Firebase</p>';
+    document.getElementById('overtimeList').innerHTML = '<p style="text-align:center;color:#c62828;font-size:13px;">⚠️ خطأ: ' + err.message + '</p>';
   }
 }
 
@@ -2339,43 +2304,29 @@ function exportOvertimeExcel() {
   if (!checkExportPermission()) return;
   const monthVal = document.getElementById('overtimeMonthSelect')?.value;
   if (!monthVal) return;
-  
   const [y, m] = monthVal.split('-').map(Number);
   const from = new Date(y, m - 1, 1);
   const to = new Date(y, m, 1);
-  
   db.collection('overtime')
     .where('createdAt', '>=', from)
     .where('createdAt', '<', to)
     .get()
     .then(sn => {
       if (sn.empty) { alert('لا يوجد بيانات للتصدير'); return; }
-      
       const totals = {};
       const rows = [];
-      
       sn.forEach(doc => {
         const r = doc.data();
         rows.push([r.driverName, r.date, r.hours, r.note || '', r.createdBy || '', r.createdTime || '']);
         if (!totals[r.driverName]) totals[r.driverName] = 0;
         totals[r.driverName] += r.hours;
       });
-      
-      const ws1 = XLSX.utils.aoa_to_sheet([
-        ['الاسم', 'التاريخ', 'الساعات', 'ملاحظة', 'سجّلها', 'الوقت'],
-        ...rows
-      ]);
-      
+      const ws1 = XLSX.utils.aoa_to_sheet([['الاسم', 'التاريخ', 'الساعات', 'ملاحظة', 'سجّلها', 'الوقت'], ...rows]);
       const totalsRows = Object.keys(totals).map(name => [name, totals[name].toFixed(1)]);
-      const ws2 = XLSX.utils.aoa_to_sheet([
-        ['الاسم', 'إجمالي الساعات'],
-        ...totalsRows
-      ]);
-      
+      const ws2 = XLSX.utils.aoa_to_sheet([['الاسم', 'إجمالي الساعات'], ...totalsRows]);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws1, 'السجلات');
       XLSX.utils.book_append_sheet(wb, ws2, 'الإجماليات');
-      
       XLSX.writeFile(wb, 'وقت-إضافي-' + monthVal + '.xlsx');
     });
 }
@@ -2554,8 +2505,7 @@ function deleteItem(id, name) {
 
 function loadVehicles() {
   db.collection('vehicles').onSnapshot(sn => {
-    document.getElementById('vehiclesList').innerHTML = sn.empty ? '<p style="text-align:center;color:#666;font-size:13px;">لا توجد آليات</p>' : sn.docs.map(doc };
- => { const v = doc.data(); const delBtn = canDelete() ? '<button class="del-btn" onclick="deleteVehicle(\'' + doc.id + '\',\'' + v.number + '\')">حذف</button>' : ''; return '<div class="worker-row">' + (v.photo ? '<img src="' + v.photo + '" style="width:40px;height:40px;border-radius:8px;object-fit:cover;">' : '') + '<span class="name">' + v.typeLabel + ' - ' + v.number + '</span><span style="font-size:12px;color:#0f766e;font-weight:800;">' + v.statusLabel + '</span>' + delBtn + '</div>'; }).join('');
+    document.getElementById('vehiclesList').innerHTML = sn.empty ? '<p style="text-align:center;color:#666;font-size:13px;">لا توجد آليات</p>' : sn.docs.map(doc => { const v = doc.data(); const delBtn = canDelete() ? '<button class="del-btn" onclick="deleteVehicle(\'' + doc.id + '\',\'' + v.number + '\')">حذف</button>' : ''; return '<div class="worker-row">' + (v.photo ? '<img src="' + v.photo + '" style="width:40px;height:40px;border-radius:8px;object-fit:cover;">' : '') + '<span class="name">' + v.typeLabel + ' - ' + v.number + '</span><span style="font-size:12px;color:#0f766e;font-weight:800;">' + v.statusLabel + '</span>' + delBtn + '</div>'; }).join('');
     updateStats();
   });
 }
@@ -2603,7 +2553,8 @@ async function addUser() {
       canEdit: document.getElementById('perm-edit').checked,
       canDelete: document.getElementById('perm-delete').checked,
       canExport: document.getElementById('perm-export').checked
-       viewOnly = document.getElementById('perm-viewonly').checked;
+    };
+    viewOnly = document.getElementById('perm-viewonly').checked;
   }
   await db.collection('systemUsers').add({ name, pin, role, permissions, viewOnly, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
   showWorkNotification({ name: name, jobTitle: role === 'admin' ? 'مدير' : 'مشرف', startDate: getTodayISO(), photo: '' });
@@ -2612,9 +2563,6 @@ async function addUser() {
   loadUsersList();
 }
 
-// ============================================
-// 👥 عرض المستخدمين مع بطاقات صلاحيات
-// ============================================
 function loadUsersList() {
   db.collection('systemUsers').onSnapshot(sn => {
     const list = document.getElementById('usersList');
@@ -2626,11 +2574,9 @@ function loadUsersList() {
       const u = doc.data();
       const perms = u.permissions || {};
       const isAdminRole = u.role === 'admin';
-      
       const badge = (label, active) => 
         '<span class="perm-badge ' + (active ? 'active' : 'inactive') + '">' +
         (active ? '✅ ' : '❌ ') + label + '</span>';
-      
       let permissionsHTML;
       if (isAdminRole) {
         permissionsHTML = '<div style="padding:10px;background:rgba(156,39,176,0.15);border-radius:10px;margin-top:10px;text-align:center;color:#9c27b0;font-weight:800;font-size:13px;">👤 مدير — كل الصلاحيات تلقائياً</div>';
@@ -2653,7 +2599,6 @@ function loadUsersList() {
           '</div>' +
           (u.viewOnly ? '<div style="padding:6px;background:rgba(255,193,7,0.2);border-radius:8px;margin-top:8px;text-align:center;color:#f57c00;font-weight:800;font-size:12px;">👁️ مشاهدة فقط (بدون أي تعديل)</div>' : '');
       }
-      
       return '<div class="user-perm-card" onclick="toggleUserEditForm(\'' + doc.id + '\')">' +
         '<div class="user-perm-header">' +
           '<div>' +
@@ -2676,28 +2621,22 @@ function toggleUserEditForm(userId) {
   const form = document.getElementById('userEditForm-' + userId);
   if (!form) return;
   if (form.style.display === 'block') { form.style.display = 'none'; form.innerHTML = ''; return; }
-  
   db.collection('systemUsers').doc(userId).get().then(doc => {
     if (!doc.exists) { alert('❌ المستخدم غير موجود'); return; }
     const u = doc.data();
     const p = u.permissions || {};
     const isAdminRole = u.role === 'admin';
-    
     form.innerHTML = `
       <h3>✏️ تعديل صلاحيات: ${u.name}</h3>
-      
       <label>👤 الاسم</label>
       <input id="editUserName-${userId}" value="${u.name}">
-      
       <label>🔢 الرقم السري</label>
       <input id="editUserPin-${userId}" value="${u.pin}" maxlength="6" style="text-align:center;letter-spacing:8px;font-weight:bold;">
-      
       <label>💼 الدور</label>
       <select id="editUserRole-${userId}" onchange="toggleEditPermissionsBox('${userId}')">
         <option value="supervisor" ${u.role === 'supervisor' ? 'selected' : ''}>👤 مشرف (صلاحيات مخصصة)</option>
         <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>👤 مدير (كل الصلاحيات)</option>
       </select>
-      
       <div id="editPermissionsBox-${userId}" class="permission-box" style="display:${isAdminRole ? 'none' : 'block'};">
         <h3 style="margin:0 0 10px;font-size:14px;color:#0f766e;">☑️ حدد الصلاحيات:</h3>
         <div class="permission-item"><label>📊 نظرة عامة</label><input type="checkbox" id="edit-perm-overview-${userId}" ${p.viewOverview !== false ? 'checked' : ''}></div>
@@ -2715,7 +2654,6 @@ function toggleUserEditForm(userId) {
         <div class="permission-item"><label>📊 تصدير Excel</label><input type="checkbox" id="edit-perm-export-${userId}" ${p.canExport !== false ? 'checked' : ''}></div>
         <div class="permission-item"><label>👁️ مشاهدة فقط</label><input type="checkbox" id="edit-perm-viewonly-${userId}" ${u.viewOnly === true ? 'checked' : ''}></div>
       </div>
-      
       <button onclick="saveUserEdit('${userId}')">💾 حفظ التعديلات</button>
       ${canDelete() ? '<button class="del-btn-inline" onclick="deleteUserWithConfirm(\'' + userId + '\',\'' + u.name + '\')">🗑️ حذف المستخدم</button>' : ''}
     `;
@@ -2732,15 +2670,12 @@ async function saveUserEdit(userId) {
   const name = document.getElementById('editUserName-' + userId).value.trim();
   const pin = document.getElementById('editUserPin-' + userId).value.trim();
   const role = document.getElementById('editUserRole-' + userId).value;
-  
   if (!name || !pin || pin.length < 4) {
     alert('⚠️ أدخل اسماً صحيحاً ورقماً سرياً (4-6 أرقام)');
     return;
   }
-  
   let permissions = {};
   let viewOnly = false;
-  
   if (role === 'admin') {
     permissions = {
       viewOverview: true, manageAttendance: true, manageReports: true,
@@ -2766,14 +2701,9 @@ async function saveUserEdit(userId) {
     };
     viewOnly = document.getElementById('edit-perm-viewonly-' + userId).checked;
   }
-  
   try {
     await db.collection('systemUsers').doc(userId).update({
-      name: name,
-      pin: pin,
-      role: role,
-      permissions: permissions,
-      viewOnly: viewOnly,
+      name: name, pin: pin, role: role, permissions: permissions, viewOnly: viewOnly,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     });
     alert('✅ تم حفظ التعديلات بنجاح');

@@ -992,9 +992,9 @@ function calculateWorkDuration(startDate) {
   if (days < 0) { months--; const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0); days += lastMonth.getDate(); }
   if (months < 0) { years--; months += 12; }
   let result = '';
-  if (years > 0) result += `${years} سنة `;
-  if (months > 0) result += `${months} شهر `;
-  if (days > 0 || result === '') result += `${days} يوم`;
+  if (years > 0) result += years + ' سنة ';
+  if (months > 0) result += months + ' شهر ';
+  if (days > 0 || result === '') result += days + ' يوم';
   return result.trim() || 'اليوم';
 }
 
@@ -1040,13 +1040,13 @@ function showWorkNotification(data) {
   currentNotificationData = data;
   let photoHTML = '';
   if (data.photo && data.photo.length > 50) {
-    photoHTML = `<img src="${data.photo}" style="width: 110px; height: 110px; object-fit: cover; border-radius: 8px; border: 2px solid #0f766e; display: block; background: #f0f0f0;" onerror="this.style.display='none'">`;
+    photoHTML = '<img src="' + data.photo + '" style="width: 110px; height: 110px; object-fit: cover; border-radius: 8px; border: 2px solid #0f766e; display: block; background: #f0f0f0;" onerror="this.style.display=\'none\'">';
   } else {
-    photoHTML = `<div style="width: 110px; height: 110px; border: 2px dashed #999; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #999; font-size: 12px; text-align: center;">لا توجد<br>صورة</div>`;
+    photoHTML = '<div style="width: 110px; height: 110px; border: 2px dashed #999; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #999; font-size: 12px; text-align: center;">لا توجد<br>صورة</div>';
   }
   const modal = document.createElement('div');
   modal.id = 'notificationModal';
-  modal.style.cssText = `position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 99999; display: flex; align-items: center; justify-content: center; padding: 20px; overflow-y: auto;`;
+  modal.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 99999; display: flex; align-items: center; justify-content: center; padding: 20px; overflow-y: auto;';
   modal.innerHTML = `
     <div style="background: #fff; color: #000; max-width: 650px; width: 100%; max-height: 90vh; overflow-y: auto; border-radius: 16px; padding: 40px; direction: rtl; font-family: Arial, sans-serif; position: relative;">
       <button onclick="closeNotificationModal()" style="position: absolute; top: 10px; left: 10px; width: 35px; height: 35px; border-radius: 50%; background: #f44336; color: #fff; border: none; font-size: 20px; cursor: pointer; font-weight: bold;">×</button>
@@ -1085,7 +1085,7 @@ function closeNotificationModal() {
 function printNotification() {
   const content = document.getElementById('printableNotification').innerHTML;
   const printWindow = window.open('', '_blank');
-  printWindow.document.write(`<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>إفادة مباشرة في العمل</title><style>body { font-family: Arial, sans-serif; direction: rtl; padding: 40px; line-height: 2; }h2 { text-decoration: underline; }img { max-width: 110px; }</style></head><body>${content}<script>window.onload = function() { setTimeout(function() { window.print(); }, 800); };<\/script></body></html>`);
+  printWindow.document.write('<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>إفادة مباشرة في العمل</title><style>body { font-family: Arial, sans-serif; direction: rtl; padding: 40px; line-height: 2; }h2 { text-decoration: underline; }img { max-width: 110px; }</style></head><body>' + content + '<script>window.onload = function() { setTimeout(function() { window.print(); }, 800); };<\/script></body></html>');
   printWindow.document.close();
 }
 
@@ -1133,17 +1133,17 @@ function saveNotificationPDF() {
   pdf.text('الصفة: ' + currentNotificationData.jobTitle, 190, yPos, { align: 'right' });
   yPos += 12;
   pdf.text('التوقيع: ________________________', 190, yPos, { align: 'right' });
-  pdf.save(`افادة-مباشرة-${currentNotificationData.name}.pdf`);
+  pdf.save('افادة-مباشرة-' + currentNotificationData.name + '.pdf');
 }
 
 function saveNotificationWord() {
   const content = document.getElementById('printableNotification').innerHTML;
-  let htmlContent = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" dir="rtl"><head><meta charset="UTF-8"><title>إفادة مباشرة في العمل</title><style>body { font-family: Arial, sans-serif; direction: rtl; line-height: 2; }h2 { text-decoration: underline; text-align: center; }img { max-width: 110px; }</style></head><body>${content}</body></html>`;
+  let htmlContent = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" dir="rtl"><head><meta charset="UTF-8"><title>إفادة مباشرة في العمل</title><style>body { font-family: Arial, sans-serif; direction: rtl; line-height: 2; }h2 { text-decoration: underline; text-align: center; }img { max-width: 110px; }</style></head><body>' + content + '</body></html>';
   const blob = new Blob(['\ufeff' + htmlContent], { type: 'application/msword' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `افادة-مباشرة-${currentNotificationData.name}.doc`;
+  a.download = 'افادة-مباشرة-' + currentNotificationData.name + '.doc';
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -1426,7 +1426,7 @@ function setDefaultDates() {
 }
 
 function populateTeamSelect() {
-  document.getElementById('newWorkerTeam').innerHTML = TEAMS.map(t => `<option value="${t.id}">${t.label}</option>`).join('');
+  document.getElementById('newWorkerTeam').innerHTML = TEAMS.map(t => '<option value="' + t.id + '">' + t.label + '</option>').join('');
 }
 
 function populateDeductionMonthSelect() {
@@ -1434,7 +1434,7 @@ function populateDeductionMonthSelect() {
   let o = '';
   for (let i = 0; i < 6; i++) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    o += `<option value="${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}">${d.toLocaleDateString('ar-LY',{year:'numeric',month:'long'})}</option>`;
+    o += '<option value="' + d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '">' + d.toLocaleDateString('ar-LY',{year:'numeric',month:'long'}) + '</option>';
   }
   document.getElementById('deductionMonthSelect').innerHTML = o;
 }
@@ -1489,24 +1489,24 @@ function watchAttendance() {
     ld.innerHTML = recs.map(r => {
       const m = meta[r.status] || { c: '#607d8b', l: r.status };
       const icon = r.personType === 'driver' ? '🚗 ' : '👷 ';
-      return `<div class="row" style="align-items:center;">
-        <div style="flex:1;">
-          <div>${icon}${r.workerName}</div>
-          <div style="font-size:12px;color:#666;">${r.time || '--'} ${r.shift==='morning'?'🌅':'🌙'}</div>
-        </div>
-        <span class="badge" style="background:${m.c};">${m.l}</span>
-        <button class="del-btn" onclick="deleteAttendance('${r.id}','${r.workerName}')" style="margin-right:6px;">🗑️</button>
-      </div>`;
+      return '<div class="row" style="align-items:center;">' +
+        '<div style="flex:1;">' +
+          '<div>' + icon + r.workerName + '</div>' +
+          '<div style="font-size:12px;color:#666;">' + (r.time || '--') + ' ' + (r.shift==='morning'?'🌅':'🌙') + '</div>' +
+        '</div>' +
+        '<span class="badge" style="background:' + m.c + ';">' + m.l + '</span>' +
+        '<button class="del-btn" onclick="deleteAttendance(\'' + r.id + '\',\'' + r.workerName + '\')" style="margin-right:6px;">🗑️</button>' +
+      '</div>';
     }).join('');
   }, (error) => {
     console.error('خطأ في تحميل الحضور:', error);
     document.getElementById('attendanceList').innerHTML = 
-      `<p style="text-align:center;color:#c62828;font-size:13px;">⚠️ خطأ: ${error.message}</p>`;
+      '<p style="text-align:center;color:#c62828;font-size:13px;">⚠️ خطأ: ' + error.message + '</p>';
   });
 }
 
 function deleteAttendance(id, name) {
-  if (!confirm(`⚠️ هل تريد حذف سجل الحضور الخاص بـ "${name}"؟`)) return;
+  if (!confirm('⚠️ هل تريد حذف سجل الحضور الخاص بـ "' + name + '"؟')) return;
   db.collection('attendance').doc(id).delete()
     .then(() => { console.log('✅ تم حذف السجل'); })
     .catch(err => alert('❌ خطأ في الحذف: ' + err.message));
@@ -1518,7 +1518,7 @@ function watchWorkers() {
     const c1 = document.getElementById('workersList');
     c1.innerHTML = allWorkers.length ? allWorkers.map(w => {
       const duration = calculateWorkDuration(w.startDate);
-      return `<div class="worker-row"><img src="${w.photo||''}" onerror="this.style.visibility='hidden'"><span class="name">${w.name}</span><span style="font-size:11px;color:#666;">${teamLabel(w.team)}</span><span class="duration-badge">${duration}</span><button class="edit-btn" onclick="toggleEditWorkerForm('${w.id}')">✏️</button><button class="del-btn" onclick="deleteWorker('${w.id}','${w.name}')">حذف</button><div id="editForm-${w.id}" class="edit-form"></div></div>`;
+      return '<div class="worker-row"><img src="' + (w.photo||'') + '" onerror="this.style.visibility=\'hidden\'"><span class="name">' + w.name + '</span><span style="font-size:11px;color:#666;">' + teamLabel(w.team) + '</span><span class="duration-badge">' + duration + '</span><button class="edit-btn" onclick="toggleEditWorkerForm(\'' + w.id + '\')">✏️</button><button class="del-btn" onclick="deleteWorker(\'' + w.id + '\',\'' + w.name + '\')">حذف</button><div id="editForm-' + w.id + '" class="edit-form"></div></div>';
     }).join('') : '<p style="text-align:center;color:#666;font-size:13px;">لا يوجد عمال</p>';
     updateDailyMarkList();
   });
@@ -1527,7 +1527,7 @@ function watchWorkers() {
 function updateDailyMarkList() {
   const c2 = document.getElementById('dailyMarkList');
   const allPeople = [...allWorkers.map(w => ({...w, type: 'worker'})), ...allDrivers.map(d => ({...d, type: 'driver'}))];
-  c2.innerHTML = allPeople.length ? allPeople.map(w => `<div class="worker-row"><img src="${w.photo||''}" onerror="this.style.visibility='hidden'"><span class="name">${w.type === 'driver' ? '🚗 ' : '👷 '}${w.name}</span><button onclick="manualMark('${w.id}','${w.name}','present')" style="width:auto;padding:6px 10px;margin:0;background:#388e3c;border-color:#388e3c;">✅</button><button onclick="manualMark('${w.id}','${w.name}','absent')" style="width:auto;padding:6px 10px;margin:0;background:#c62828;border-color:#c62828;">✗</button><button onclick="manualMark('${w.id}','${w.name}','leave')" style="width:auto;padding:6px 10px;margin:0;background:#7b1fa2;border-color:#7b1fa2;">📝</button><button onclick="manualMark('${w.id}','${w.name}','sick')" style="width:auto;padding:6px 10px;margin:0;background:#ad1457;border-color:#ad1457;">🤒</button></div>`).join('') : '<p style="text-align:center;color:#666;font-size:13px;">لا يوجد أشخاص</p>';
+  c2.innerHTML = allPeople.length ? allPeople.map(w => '<div class="worker-row"><img src="' + (w.photo||'') + '" onerror="this.style.visibility=\'hidden\'"><span class="name">' + (w.type === 'driver' ? '🚗 ' : '👷 ') + w.name + '</span><button onclick="manualMark(\'' + w.id + '\',\'' + w.name + '\',\'present\')" style="width:auto;padding:6px 10px;margin:0;background:#388e3c;border-color:#388e3c;">✅</button><button onclick="manualMark(\'' + w.id + '\',\'' + w.name + '\',\'absent\')" style="width:auto;padding:6px 10px;margin:0;background:#c62828;border-color:#c62828;">✗</button><button onclick="manualMark(\'' + w.id + '\',\'' + w.name + '\',\'leave\')" style="width:auto;padding:6px 10px;margin:0;background:#7b1fa2;border-color:#7b1fa2;">📝</button><button onclick="manualMark(\'' + w.id + '\',\'' + w.name + '\',\'sick\')" style="width:auto;padding:6px 10px;margin:0;background:#ad1457;border-color:#ad1457;">🤒</button></div>').join('') : '<p style="text-align:center;color:#666;font-size:13px;">لا يوجد أشخاص</p>';
 }
 
 function toggleEditWorkerForm(workerId) {
@@ -1540,7 +1540,7 @@ function toggleEditWorkerForm(workerId) {
     <input id="editName-${workerId}" value="${w.name}" placeholder="الاسم">
     <label>الفريق</label>
     <select id="editTeam-${workerId}">
-      ${TEAMS.map(t => `<option value="${t.id}" ${t.id === w.team ? 'selected' : ''}>${t.label}</option>`).join('')}
+      ${TEAMS.map(t => '<option value="' + t.id + '" ' + (t.id === w.team ? 'selected' : '') + '>' + t.label + '</option>').join('')}
     </select>
     <label>الوردية</label>
     <select id="editShift-${workerId}">
@@ -1553,7 +1553,7 @@ function toggleEditWorkerForm(workerId) {
     
     <div class="photo-section">
       <h3>📸 الصورة الشخصية</h3>
-      ${w.photo ? `<img src="${w.photo}" class="current-photo" onclick="window.open('${w.photo}')">` : '<div class="no-photo-text">لا توجد صورة - أضف صورة</div>'}
+      ${w.photo ? '<img src="' + w.photo + '" class="current-photo" onclick="window.open(\'' + w.photo + '\')">' : '<div class="no-photo-text">لا توجد صورة - أضف صورة</div>'}
       <input type="file" id="editWorkerPhoto-${workerId}" accept="image/*" style="display:none;">
       <input type="file" id="editWorkerPhotoCam-${workerId}" accept="image/*" capture="user" style="display:none;">
       <div class="photo-buttons">
@@ -1601,7 +1601,7 @@ async function saveEditWorker(workerId) {
 }
 
 function deleteWorkerWithConfirm(id, name) {
-  if (confirm(`⚠️ هل تريد حذف "${name}" نهائياً؟`)) {
+  if (confirm('⚠️ هل تريد حذف "' + name + '" نهائياً؟')) {
     db.collection('workers').doc(id).delete().then(() => alert('✅ تم الحذف')).catch(err => alert('❌ خطأ: ' + err.message));
   }
 }
@@ -1629,7 +1629,7 @@ async function addWorker() {
 }
 
 function deleteWorker(id, name) {
-  if (confirm(`حذف ${name}؟`)) db.collection('workers').doc(id).delete();
+  if (confirm('حذف ' + name + '؟')) db.collection('workers').doc(id).delete();
 }
 
 function watchDrivers() {
@@ -1650,7 +1650,7 @@ function renderDriversList() {
     const duration = calculateWorkDuration(d.startDate);
     const typeLabel = DRIVER_TYPES[d.driverType] || '';
     const photoForNotif = d.photoURL || d.photo || '';
-    return `<div class="driver-card"><div class="driver-header"><img src="${d.photo||d.photoURL||''}" onerror="this.style.visibility='hidden'"><div style="flex:1;"><strong>${d.name}</strong><div style="font-size:12px;color:#666;">${typeLabel}</div></div></div><div class="driver-info"><span class="info-tag">📅 من: ${d.startDate || '—'}</span><span class="duration-badge">⏱️ ${duration}</span>${d.salary ? `<span class="salary-badge">💰 ${d.salary} دينار</span>` : ''}${d.accountNumber ? `<span class="info-tag">🏦 ${d.accountNumber}</span>` : ''}${d.bankName ? `<span class="info-tag">🏛️ ${d.bankName}</span>` : ''}${d.licenseGrade ? `<span class="info-tag">🚗 ${d.licenseGrade}</span>` : ''}${d.shift ? `<span class="info-tag">${d.shift === 'morning' ? '🌅 صباح' : d.shift === 'night' ? '🌙 ليل' : '🔄 كلاهما'}</span>` : ''}</div>${d.checkPhoto ? `<img src="${d.checkPhoto}" class="check-photo" onclick="window.open('${d.checkPhoto}')">` : ''}<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;"><button class="view-btn" onclick="showWorkNotification({name:'${d.name}',jobTitle:'${typeLabel}',startDate:'${d.startDate}',photo:'${photoForNotif}'})" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">📋 إفادة</button><button class="edit-btn" onclick="toggleEditDriverForm('${d.id}')">✏️ تعديل</button><button class="del-btn" onclick="deleteDriver('${d.id}','${d.name}')">حذف</button></div><div id="driverEditForm-${d.id}" class="edit-form"></div></div>`;
+    return '<div class="driver-card"><div class="driver-header"><img src="' + (d.photo||d.photoURL||'') + '" onerror="this.style.visibility=\'hidden\'"><div style="flex:1;"><strong>' + d.name + '</strong><div style="font-size:12px;color:#666;">' + typeLabel + '</div></div></div><div class="driver-info"><span class="info-tag">📅 من: ' + (d.startDate || '—') + '</span><span class="duration-badge">⏱️ ' + duration + '</span>' + (d.salary ? '<span class="salary-badge">💰 ' + d.salary + ' دينار</span>' : '') + (d.accountNumber ? '<span class="info-tag">🏦 ' + d.accountNumber + '</span>' : '') + (d.bankName ? '<span class="info-tag">🏛️ ' + d.bankName + '</span>' : '') + (d.licenseGrade ? '<span class="info-tag">🚗 ' + d.licenseGrade + '</span>' : '') + (d.shift ? '<span class="info-tag">' + (d.shift === 'morning' ? '🌅 صباح' : d.shift === 'night' ? '🌙 ليل' : '🔄 كلاهما') + '</span>' : '') + '</div>' + (d.checkPhoto ? '<img src="' + d.checkPhoto + '" class="check-photo" onclick="window.open(\'' + d.checkPhoto + '\')">' : '') + '<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;"><button class="view-btn" onclick="showWorkNotification({name:\'' + d.name + '\',jobTitle:\'' + typeLabel + '\',startDate:\'' + d.startDate + '\',photo:\'' + photoForNotif + '\'})" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">📋 إفادة</button><button class="edit-btn" onclick="toggleEditDriverForm(\'' + d.id + '\')">✏️ تعديل</button><button class="del-btn" onclick="deleteDriver(\'' + d.id + '\',\'' + d.name + '\')">حذف</button></div><div id="driverEditForm-' + d.id + '" class="edit-form"></div></div>';
   }).join('');
 }
 
@@ -1666,7 +1666,7 @@ function toggleEditDriverForm(driverId) {
     <input id="editDriverName-${driverId}" value="${d.name}">
     <label>الوظيفة</label>
     <select id="editDriverType-${driverId}">
-      ${Object.keys(DRIVER_TYPES).map(k => `<option value="${k}" ${k === d.driverType ? 'selected' : ''}>${DRIVER_TYPES[k]}</option>`).join('')}
+      ${Object.keys(DRIVER_TYPES).map(k => '<option value="' + k + '" ' + (k === d.driverType ? 'selected' : '') + '>' + DRIVER_TYPES[k] + '</option>').join('')}
     </select>
     <label>الوردية</label>
     <select id="editDriverShift-${driverId}">
@@ -1687,7 +1687,7 @@ function toggleEditDriverForm(driverId) {
     
     <div class="photo-section">
       <h3>📸 الصورة الشخصية</h3>
-      ${d.photo ? `<img src="${d.photo}" class="current-photo" onclick="window.open('${d.photo}')">` : '<div class="no-photo-text">لا توجد صورة - أضف صورة</div>'}
+      ${d.photo ? '<img src="' + d.photo + '" class="current-photo" onclick="window.open(\'' + d.photo + '\')">' : '<div class="no-photo-text">لا توجد صورة - أضف صورة</div>'}
       <input type="file" id="editDriverPhoto-${driverId}" accept="image/*" style="display:none;">
       <input type="file" id="editDriverPhotoCam-${driverId}" accept="image/*" capture="user" style="display:none;">
       <div class="photo-buttons">
@@ -1699,7 +1699,7 @@ function toggleEditDriverForm(driverId) {
     
     <div class="photo-section">
       <h3>📄 صورة الصك</h3>
-      ${d.checkPhoto ? `<img src="${d.checkPhoto}" class="current-photo" onclick="window.open('${d.checkPhoto}')">` : '<div class="no-photo-text">لا توجد صورة للصك - أضف صورة</div>'}
+      ${d.checkPhoto ? '<img src="' + d.checkPhoto + '" class="current-photo" onclick="window.open(\'' + d.checkPhoto + '\')">' : '<div class="no-photo-text">لا توجد صورة للصك - أضف صورة</div>'}
       <input type="file" id="editDriverCheck-${driverId}" accept="image/*" style="display:none;">
       <input type="file" id="editDriverCheckCam-${driverId}" accept="image/*" capture="environment" style="display:none;">
       <div class="photo-buttons">
@@ -1770,7 +1770,7 @@ async function saveEditDriver(driverId) {
 }
 
 function deleteDriverWithConfirm(id, name) {
-  if (confirm(`⚠️ هل تريد حذف "${name}" نهائياً؟`)) {
+  if (confirm('⚠️ هل تريد حذف "' + name + '" نهائياً؟')) {
     db.collection('drivers').doc(id).delete().then(() => alert('✅ تم الحذف')).catch(err => alert('❌ خطأ: ' + err.message));
   }
 }
@@ -1807,7 +1807,7 @@ async function addDriver() {
 }
 
 function deleteDriver(id, name) {
-  if (confirm(`حذف ${name}؟`)) db.collection('drivers').doc(id).delete();
+  if (confirm('حذف ' + name + '؟')) db.collection('drivers').doc(id).delete();
 }
 
 function populateOvertimeMonthSelect() {
@@ -1817,9 +1817,9 @@ function populateOvertimeMonthSelect() {
   let o = '';
   for (let i = 0; i < 12; i++) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const val = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    const val = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
     const lbl = d.toLocaleDateString('ar-LY', { year: 'numeric', month: 'long' });
-    o += `<option value="${val}">${lbl}</option>`;
+    o += '<option value="' + val + '">' + lbl + '</option>';
   }
   sel.innerHTML = o;
 }
@@ -1834,7 +1834,7 @@ function populateOvertimeDriverSelect() {
   sel.innerHTML = '<option value="">— اختر السائق —</option>' + 
     allDrivers.map(d => {
       const typeLabel = DRIVER_TYPES[d.driverType] || '';
-      return `<option value="${d.id}" data-name="${d.name}">${d.name} - ${typeLabel}</option>`;
+      return '<option value="' + d.id + '" data-name="' + d.name + '">' + d.name + ' - ' + typeLabel + '</option>';
     }).join('');
 }
 
@@ -1862,7 +1862,7 @@ async function saveOvertime() {
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
     
-    alert(`✅ تم تسجيل ${hours} ساعة إضافية للسائق ${driverName}`);
+    alert('✅ تم تسجيل ' + hours + ' ساعة إضافية للسائق ' + driverName);
     
     document.getElementById('overtimeDriverSelect').value = '';
     document.getElementById('overtimeHours').value = '';
@@ -1910,24 +1910,24 @@ async function loadOvertimeList() {
     
     let totalsHTML = '<div class="overtime-summary"><h3>📊 إجمالي الساعات لكل سائق:</h3>';
     Object.keys(totals).forEach(name => {
-      totalsHTML += `<div class="row-total"><span style="font-weight:700;">🚗 ${name}</span><span style="color:#f57c00;font-weight:800;">⏰ ${totals[name].hours.toFixed(1)} ساعة (${totals[name].count} مرة)</span></div>`;
+      totalsHTML += '<div class="row-total"><span style="font-weight:700;">🚗 ' + name + '</span><span style="color:#f57c00;font-weight:800;">⏰ ' + totals[name].hours.toFixed(1) + ' ساعة (' + totals[name].count + ' مرة)</span></div>';
     });
     totalsHTML += '</div>';
     
     let recordsHTML = '<h3 style="color:#0f766e;font-size:14px;">📋 السجلات التفصيلية:</h3>';
-    recordsHTML += records.map(r => `
-      <div class="worker-row">
-        <span class="name">🚗 ${r.driverName}</span>
-        <span class="info-tag">📅 ${r.date}</span>
-        <span class="overtime-badge">⏰ ${r.hours} ساعة</span>
-        ${r.note ? `<span class="info-tag">📝 ${r.note}</span>` : ''}
-        <button class="del-btn" onclick="deleteOvertime('${r.id}')">حذف</button>
-      </div>
-    `).join('');
+    recordsHTML += records.map(r => 
+      '<div class="worker-row">' +
+        '<span class="name">🚗 ' + r.driverName + '</span>' +
+        '<span class="info-tag">📅 ' + r.date + '</span>' +
+        '<span class="overtime-badge">⏰ ' + r.hours + ' ساعة</span>' +
+        (r.note ? '<span class="info-tag">📝 ' + r.note + '</span>' : '') +
+        '<button class="del-btn" onclick="deleteOvertime(\'' + r.id + '\')">حذف</button>' +
+      '</div>'
+    ).join('');
     
     list.innerHTML = totalsHTML + recordsHTML;
   } catch (err) {
-    document.getElementById('overtimeList').innerHTML = `<p style="text-align:center;color:#c62828;font-size:13px;">⚠️ خطأ: ${err.message}<br>قد تحتاج لإنشاء فهرس في Firebase</p>`;
+    document.getElementById('overtimeList').innerHTML = '<p style="text-align:center;color:#c62828;font-size:13px;">⚠️ خطأ: ' + err.message + '<br>قد تحتاج لإنشاء فهرس في Firebase</p>';
   }
 }
 
@@ -1978,7 +1978,7 @@ function exportOvertimeExcel() {
       XLSX.utils.book_append_sheet(wb, ws1, 'السجلات');
       XLSX.utils.book_append_sheet(wb, ws2, 'الإجماليات');
       
-      XLSX.writeFile(wb, `وقت-إضافي-${monthVal}.xlsx`);
+      XLSX.writeFile(wb, 'وقت-إضافي-' + monthVal + '.xlsx');
     });
 }
 
@@ -2000,7 +2000,7 @@ async function saveReport() {
     const photoURLs = [];
     const totalPhotos = reportPhotoFiles.length;
     for (let i = 0; i < totalPhotos; i++) {
-      progressText.textContent = `جاري رفع الصورة ${i + 1} من ${totalPhotos}...`;
+      progressText.textContent = 'جاري رفع الصورة ' + (i + 1) + ' من ' + totalPhotos + '...';
       try { const url = await uploadPhoto(reportPhotoFiles[i]); photoURLs.push(url); } catch (err) {}
       const percent = 10 + Math.round(((i + 1) / totalPhotos) * 85);
       progressFill.style.width = percent + '%';
@@ -2009,8 +2009,8 @@ async function saveReport() {
     progressFill.style.width = '98%';
     await db.collection('dailyReports').doc(reportId).update({ photos: photoURLs, photosCount: photoURLs.length });
     progressFill.style.width = '100%';
-    progressText.textContent = `✅ تم حفظ التقرير مع ${totalPhotos} صورة`;
-    alert(`✅ تم حفظ التقرير بنجاح مع ${totalPhotos} صورة`);
+    progressText.textContent = '✅ تم حفظ التقرير مع ' + totalPhotos + ' صورة';
+    alert('✅ تم حفظ التقرير بنجاح مع ' + totalPhotos + ' صورة');
     document.getElementById('reportWorkerName').value = '';
     document.getElementById('reportLocation').value = '';
     document.getElementById('reportText').value = '';
@@ -2029,9 +2029,9 @@ function loadReports() {
     if (sn.empty) { c.innerHTML = '<p style="text-align:center;color:#666;font-size:13px;">لا توجد تقارير</p>'; return; }
     c.innerHTML = sn.docs.map(doc => {
       const r = doc.data();
-      const photos = (r.photos || []).slice(0, 3).map(p => `<img src="${p}" style="width:50px;height:50px;object-fit:cover;border-radius:6px;margin:2px;" onerror="this.style.display='none'">`).join('');
+      const photos = (r.photos || []).slice(0, 3).map(p => '<img src="' + p + '" style="width:50px;height:50px;object-fit:cover;border-radius:6px;margin:2px;" onerror="this.style.display=\'none\'">').join('');
       const count = r.photosCount || (r.photos || []).length;
-      return `<div class="user-card"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;"><strong>${r.workerName}</strong><span style="font-size:12px;color:#666;">${r.date} - ${r.createdTime || ''}</span></div>${r.location ? `<div style="font-size:12px;color:#666;">📍 ${r.location}</div>` : ''}<div style="font-size:13px;margin-top:5px;">${r.text.substring(0, 100)}${r.text.length > 100 ? '...' : ''}</div>${photos ? `<div style="display:flex;margin-top:5px;align-items:center;">${photos}${count > 3 ? `<span style="font-size:12px;color:#0f766e;margin-left:5px;">+${count - 3} صورة</span>` : ''}</div>` : ''}<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;"><button class="view-btn" onclick="viewReport('${doc.id}')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">👁️ عرض</button><button class="word-btn" onclick="exportReportWord('${doc.id}')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">📄 Word</button><button class="print-btn" onclick="printReport('${doc.id}')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">🖨️ طباعة</button><button class="del-btn" onclick="deleteReport('${doc.id}')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">حذف</button></div></div>`;
+      return '<div class="user-card"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;"><strong>' + r.workerName + '</strong><span style="font-size:12px;color:#666;">' + r.date + ' - ' + (r.createdTime || '') + '</span></div>' + (r.location ? '<div style="font-size:12px;color:#666;">📍 ' + r.location + '</div>' : '') + '<div style="font-size:13px;margin-top:5px;">' + r.text.substring(0, 100) + (r.text.length > 100 ? '...' : '') + '</div>' + (photos ? '<div style="display:flex;margin-top:5px;align-items:center;">' + photos + (count > 3 ? '<span style="font-size:12px;color:#0f766e;margin-left:5px;">+' + (count - 3) + ' صورة</span>' : '') + '</div>' : '') + '<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;"><button class="view-btn" onclick="viewReport(\'' + doc.id + '\')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">👁️ عرض</button><button class="word-btn" onclick="exportReportWord(\'' + doc.id + '\')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">📄 Word</button><button class="print-btn" onclick="printReport(\'' + doc.id + '\')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">🖨️ طباعة</button><button class="del-btn" onclick="deleteReport(\'' + doc.id + '\')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">حذف</button></div></div>';
     }).join('');
   });
 }
@@ -2040,11 +2040,11 @@ function viewReport(reportId) {
   db.collection('dailyReports').doc(reportId).get().then(doc => {
     if (!doc.exists) return;
     const r = doc.data();
-    const photosHTML = (r.photos || []).map(p => `<img src="${p}" style="width:100%;max-width:300px;border-radius:8px;margin:5px;border:1px solid #ddd;">`).join('');
+    const photosHTML = (r.photos || []).map(p => '<img src="' + p + '" style="width:100%;max-width:300px;border-radius:8px;margin:5px;border:1px solid #ddd;">').join('');
     const modal = document.createElement('div');
     modal.id = 'reportModal';
-    modal.style.cssText = `position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;`;
-    modal.innerHTML = `<div style="background:#fff;color:#000;max-width:700px;width:100%;max-height:90vh;overflow-y:auto;border-radius:16px;padding:24px;direction:rtl;font-family:Arial,sans-serif;position:relative;"><button onclick="closeReportModal()" style="position:absolute;top:10px;left:10px;width:35px;height:35px;border-radius:50%;background:#f44336;color:#fff;border:none;font-size:20px;cursor:pointer;font-weight:bold;">×</button><h1 style="text-align:center;color:#0f766e;margin-bottom:20px;">📋 تقرير يومي</h1><hr style="border:1px solid #0f766e;"><div style="margin:20px 0;padding:15px;background:#f5f5f5;border-radius:10px;"><p style="margin:8px 0;"><strong>📅 التاريخ:</strong> ${r.date}</p><p style="margin:8px 0;"><strong>⏰ الوقت:</strong> ${r.createdTime || ''}</p><p style="margin:8px 0;"><strong>👷 كاتب التقرير:</strong> ${r.workerName}</p>${r.location ? `<p style="margin:8px 0;"><strong>📍 الموقع:</strong> ${r.location}</p>` : ''}</div><hr style="border:1px solid #ddd;"><h2 style="color:#0f766e;">📝 نص التقرير:</h2><div style="padding:15px;background:#fafafa;border-right:4px solid #0f766e;border-radius:8px;line-height:1.8;white-space:pre-wrap;">${r.text}</div>${photosHTML ? `<hr style="border:1px solid #ddd;margin-top:20px;"><h2 style="color:#0f766e;">📸 الصور (${r.photos.length}):</h2><div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;">${photosHTML}</div>` : ''}<div style="display:flex;gap:10px;margin-top:20px;justify-content:center;flex-wrap:wrap;"><button onclick="printReport('${reportId}')" style="padding:12px 24px;background:#9c27b0;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:bold;cursor:pointer;">🖨️ طباعة</button><button onclick="exportReportWord('${reportId}')" style="padding:12px 24px;background:#4caf50;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:bold;cursor:pointer;">📄 Word</button><button onclick="closeReportModal()" style="padding:12px 24px;background:#607d8b;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:bold;cursor:pointer;">إغلاق</button></div></div>`;
+    modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;';
+    modal.innerHTML = '<div style="background:#fff;color:#000;max-width:700px;width:100%;max-height:90vh;overflow-y:auto;border-radius:16px;padding:24px;direction:rtl;font-family:Arial,sans-serif;position:relative;"><button onclick="closeReportModal()" style="position:absolute;top:10px;left:10px;width:35px;height:35px;border-radius:50%;background:#f44336;color:#fff;border:none;font-size:20px;cursor:pointer;font-weight:bold;">×</button><h1 style="text-align:center;color:#0f766e;margin-bottom:20px;">📋 تقرير يومي</h1><hr style="border:1px solid #0f766e;"><div style="margin:20px 0;padding:15px;background:#f5f5f5;border-radius:10px;"><p style="margin:8px 0;"><strong>📅 التاريخ:</strong> ' + r.date + '</p><p style="margin:8px 0;"><strong>⏰ الوقت:</strong> ' + (r.createdTime || '') + '</p><p style="margin:8px 0;"><strong>👷 كاتب التقرير:</strong> ' + r.workerName + '</p>' + (r.location ? '<p style="margin:8px 0;"><strong>📍 الموقع:</strong> ' + r.location + '</p>' : '') + '</div><hr style="border:1px solid #ddd;"><h2 style="color:#0f766e;">📝 نص التقرير:</h2><div style="padding:15px;background:#fafafa;border-right:4px solid #0f766e;border-radius:8px;line-height:1.8;white-space:pre-wrap;">' + r.text + '</div>' + (photosHTML ? '<hr style="border:1px solid #ddd;margin-top:20px;"><h2 style="color:#0f766e;">📸 الصور (' + r.photos.length + '):</h2><div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;">' + photosHTML + '</div>' : '') + '<div style="display:flex;gap:10px;margin-top:20px;justify-content:center;flex-wrap:wrap;"><button onclick="printReport(\'' + reportId + '\')" style="padding:12px 24px;background:#9c27b0;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:bold;cursor:pointer;">🖨️ طباعة</button><button onclick="exportReportWord(\'' + reportId + '\')" style="padding:12px 24px;background:#4caf50;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:bold;cursor:pointer;">📄 Word</button><button onclick="closeReportModal()" style="padding:12px 24px;background:#607d8b;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:bold;cursor:pointer;">إغلاق</button></div></div>';
     document.body.appendChild(modal);
   });
 }
@@ -2058,9 +2058,9 @@ function printReport(reportId) {
   db.collection('dailyReports').doc(reportId).get().then(doc => {
     if (!doc.exists) return;
     const r = doc.data();
-    const photosHTML = (r.photos || []).map(p => `<img src="${p}" style="max-width:400px;display:block;margin:15px auto;border-radius:8px;">`).join('');
+    const photosHTML = (r.photos || []).map(p => '<img src="' + p + '" style="max-width:400px;display:block;margin:15px auto;border-radius:8px;">').join('');
     const printWindow = window.open('', '_blank');
-    printWindow.document.write(`<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>تقرير - ${r.date}</title><style>body { font-family: Arial, sans-serif; direction: rtl; padding: 20px; color: #000; }h1 { text-align: center; color: #0f766e; }hr { border: 1px solid #0f766e; }.info { margin: 20px 0; padding: 15px; background: #f5f5f5; border-radius: 10px; }.info p { margin: 8px 0; }.text-content { padding: 15px; background: #fafafa; border-right: 4px solid #0f766e; border-radius: 8px; line-height: 1.8; white-space: pre-wrap; margin: 15px 0; }.photos { text-align: center; }.photos img { max-width: 400px; display: block; margin: 15px auto; }</style></head><body><h1>📋 تقرير يومي</h1><hr><div class="info"><p><strong>📅 التاريخ:</strong> ${r.date}</p><p><strong>⏰ الوقت:</strong> ${r.createdTime || ''}</p><p><strong>👷 كاتب التقرير:</strong> ${r.workerName}</p>${r.location ? `<p><strong>📍 الموقع:</strong> ${r.location}</p>` : ''}</div><hr><h2>📝 نص التقرير:</h2><div class="text-content">${r.text}</div>${photosHTML ? `<hr><h2>📸 الصور:</h2><div class="photos">${photosHTML}</div>` : ''}<script>window.onload = function() { setTimeout(function() { window.print(); }, 1000); };<\/script></body></html>`);
+    printWindow.document.write('<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>تقرير - ' + r.date + '</title><style>body { font-family: Arial, sans-serif; direction: rtl; padding: 20px; color: #000; }h1 { text-align: center; color: #0f766e; }hr { border: 1px solid #0f766e; }.info { margin: 20px 0; padding: 15px; background: #f5f5f5; border-radius: 10px; }.info p { margin: 8px 0; }.text-content { padding: 15px; background: #fafafa; border-right: 4px solid #0f766e; border-radius: 8px; line-height: 1.8; white-space: pre-wrap; margin: 15px 0; }.photos { text-align: center; }.photos img { max-width: 400px; display: block; margin: 15px auto; }</style></head><body><h1>📋 تقرير يومي</h1><hr><div class="info"><p><strong>📅 التاريخ:</strong> ' + r.date + '</p><p><strong>⏰ الوقت:</strong> ' + (r.createdTime || '') + '</p><p><strong>👷 كاتب التقرير:</strong> ' + r.workerName + '</p>' + (r.location ? '<p><strong>📍 الموقع:</strong> ' + r.location + '</p>' : '') + '</div><hr><h2>📝 نص التقرير:</h2><div class="text-content">' + r.text + '</div>' + (photosHTML ? '<hr><h2>📸 الصور:</h2><div class="photos">' + photosHTML + '</div>' : '') + '<script>window.onload = function() { setTimeout(function() { window.print(); }, 1000); };<\/script></body></html>');
     printWindow.document.close();
   });
 }
@@ -2120,13 +2120,13 @@ async function loadDeductions() {
   const c = document.getElementById('deductionsList');
   if (!Object.keys(ded).length) { c.innerHTML = '<p style="text-align:center;color:#666;font-size:13px;">✅ لا يوجد خصومات</p>'; return; }
   let total = 0;
-  c.innerHTML = Object.keys(ded).map(name => { const days = ded[name], amt = days * deductionAmountValue; total += amt; return `<div class="worker-row"><span class="name">${name}</span><span class="deduction-badge">${days} يوم</span><span class="deduction-badge" style="background:#f57c00;">-${amt} دينار</span></div>`; }).join('') + `<div style="margin-top:10px;text-align:center;font-weight:bold;color:#0f766e;font-size:14px;">الإجمالي: ${total} دينار</div>`;
+  c.innerHTML = Object.keys(ded).map(name => { const days = ded[name], amt = days * deductionAmountValue; total += amt; return '<div class="worker-row"><span class="name">' + name + '</span><span class="deduction-badge">' + days + ' يوم</span><span class="deduction-badge" style="background:#f57c00;">-' + amt + ' دينار</span></div>'; }).join('') + '<div style="margin-top:10px;text-align:center;font-weight:bold;color:#0f766e;font-size:14px;">الإجمالي: ' + total + ' دينار</div>';
 }
 
 function watchInventory() {
   db.collection('inventory').orderBy('name').onSnapshot(sn => {
     allInventory = sn.docs.map(d => ({ id: d.id, ...d.data() }));
-    document.getElementById('inventoryList').innerHTML = allInventory.length ? allInventory.map(i => `<div class="worker-row"><span class="name">${i.name}</span><span style="color:#0f766e;font-weight:800;">${i.quantity} ${i.unit||''}</span><button class="del-btn" onclick="deleteItem('${i.id}','${i.name}')">حذف</button></div>`).join('') : '<p style="text-align:center;color:#666;font-size:13px;">المخزن فارغ</p>';
+    document.getElementById('inventoryList').innerHTML = allInventory.length ? allInventory.map(i => '<div class="worker-row"><span class="name">' + i.name + '</span><span style="color:#0f766e;font-weight:800;">' + i.quantity + ' ' + (i.unit||'') + '</span><button class="del-btn" onclick="deleteItem(\'' + i.id + '\',\'' + i.name + '\')">حذف</button></div>').join('') : '<p style="text-align:center;color:#666;font-size:13px;">المخزن فارغ</p>';
   });
 }
 
@@ -2142,12 +2142,12 @@ async function addItem() {
 }
 
 function deleteItem(id, name) {
-  if (confirm(`حذف ${name}؟`)) db.collection('inventory').doc(id).delete();
+  if (confirm('حذف ' + name + '؟')) db.collection('inventory').doc(id).delete();
 }
 
 function loadVehicles() {
   db.collection('vehicles').onSnapshot(sn => {
-    document.getElementById('vehiclesList').innerHTML = sn.empty ? '<p style="text-align:center;color:#666;font-size:13px;">لا توجد آليات</p>' : sn.docs.map(doc => { const v = doc.data(); return `<div class="worker-row">${v.photo ? `<img src="${v.photo}" style="width:40px;height:40px;border-radius:8px;object-fit:cover;">` : ''}<span class="name">${v.typeLabel} - ${v.number}</span><span style="font-size:12px;color:#0f766e;font-weight:800;">${v.statusLabel}</span><button class="del-btn" onclick="deleteVehicle('${doc.id}','${v.number}')">حذف</button></div>`; }).join('');
+    document.getElementById('vehiclesList').innerHTML = sn.empty ? '<p style="text-align:center;color:#666;font-size:13px;">لا توجد آليات</p>' : sn.docs.map(doc => { const v = doc.data(); return '<div class="worker-row">' + (v.photo ? '<img src="' + v.photo + '" style="width:40px;height:40px;border-radius:8px;object-fit:cover;">' : '') + '<span class="name">' + v.typeLabel + ' - ' + v.number + '</span><span style="font-size:12px;color:#0f766e;font-weight:800;">' + v.statusLabel + '</span><button class="del-btn" onclick="deleteVehicle(\'' + doc.id + '\',\'' + v.number + '\')">حذف</button></div>'; }).join('');
   });
 }
 
@@ -2167,7 +2167,7 @@ async function saveVehicle() {
 }
 
 function deleteVehicle(id, number) {
-  if (confirm(`حذف ${number}؟`)) db.collection('vehicles').doc(id).delete();
+  if (confirm('حذف ' + number + '؟')) db.collection('vehicles').doc(id).delete();
 }
 
 async function addUser() {
@@ -2200,12 +2200,12 @@ async function addUser() {
 
 function loadUsersList() {
   db.collection('systemUsers').onSnapshot(sn => {
-    document.getElementById('usersList').innerHTML = sn.empty ? '<p style="text-align:center;color:#666;font-size:13px;">لا يوجد مستخدمين</p>' : sn.docs.map(doc => { const u = doc.data(); return `<div class="user-card"><strong>${u.name}</strong> <span style="font-size:12px;color:#666;">🔢${u.pin}</span> ${u.viewOnly ? '<span class="view-only-badge">👁️</span>' : ''}<button class="del-btn" onclick="deleteUser('${doc.id}','${u.name}')">حذف</button></div>`; }).join('');
+    document.getElementById('usersList').innerHTML = sn.empty ? '<p style="text-align:center;color:#666;font-size:13px;">لا يوجد مستخدمين</p>' : sn.docs.map(doc => { const u = doc.data(); return '<div class="user-card"><strong>' + u.name + '</strong> <span style="font-size:12px;color:#666;">🔢' + u.pin + '</span> ' + (u.viewOnly ? '<span class="view-only-badge">👁️</span>' : '') + '<button class="del-btn" onclick="deleteUser(\'' + doc.id + '\',\'' + u.name + '\')">حذف</button></div>'; }).join('');
   });
 }
 
 function deleteUser(id, name) {
-  if (confirm(`حذف ${name}؟`)) db.collection('systemUsers').doc(id).delete();
+  if (confirm('حذف ' + name + '؟')) db.collection('systemUsers').doc(id).delete();
 }
 
 function exportAttendanceExcel() {
@@ -2215,7 +2215,7 @@ function exportAttendanceExcel() {
   const ws = XLSX.utils.aoa_to_sheet([['الاسم','النوع','الوردية','الحالة','التاريخ','الوقت'], ...rows]);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'الحضور');
-  XLSX.writeFile(wb, `حضور-${getTodayISO()}.xlsx`);
+  XLSX.writeFile(wb, 'حضور-' + getTodayISO() + '.xlsx');
 }
 
 function exportWorkersExcel() {

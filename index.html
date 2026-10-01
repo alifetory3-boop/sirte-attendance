@@ -1015,6 +1015,7 @@
           <div class="permission-item"><label>💰 الخصومات</label><input type="checkbox" id="perm-deductions"></div>
           <div class="permission-item"><label>📦 المخزن</label><input type="checkbox" id="perm-inventory"></div>
           <div class="permission-item"><label>🚛 الآليات</label><input type="checkbox" id="perm-vehicles"></div>
+          <div class="permission-item"><label>🗑️ صلاحية الحذف</label><input type="checkbox" id="perm-delete"></div>
           <div class="permission-item"><label>👁️ مشاهدة فقط</label><input type="checkbox" id="perm-viewonly"></div>
         </div>
         <button onclick="addUser()">➕ إضافة</button>
@@ -1040,7 +1041,7 @@ const db = firebase.firestore();
 const IMGBB_API_KEY = 'eda920fc86851acbc414c5d058bf2b28';
 
 const OWNER_NAME = 'المدير';
-const OWNER_PIN = '35020';
+const OWNER_PIN = '1234';
 let deductionAmountValue = 50;
 let currentUser = null;
 let currentUserRole = '';
@@ -1084,6 +1085,23 @@ const VEHICLE_TYPES = {
   large_garbage_truck: 'صندوق قمامة كبير',
   dump_truck: 'قلاب'
 };
+
+// ============================================
+// 🔒 دالة التحقق من صلاحية الحذف
+// ============================================
+function canDelete() {
+  if (currentUserRole === 'owner') return true;
+  if (currentUserRole === 'admin') return true;
+  return currentUserPermissions.canDelete === true;
+}
+
+function checkDeletePermission() {
+  if (!canDelete()) {
+    alert('🚫 لا تملك صلاحية الحذف. تواصل مع المدير.');
+    return false;
+  }
+  return true;
+}
 
 function getTodayDate() {
   return new Date().toLocaleDateString('ar-LY', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
@@ -1517,7 +1535,6 @@ function initializeAdmin() {
     };
   });
   
-  // تشغيل الإحصائيات الشاملة بعد التهيئة
   setTimeout(updateStats, 1500);
 }
 
@@ -1601,13 +1618,14 @@ function watchAttendance() {
     ld.innerHTML = recs.map(r => {
       const m = meta[r.status] || { c: '#607d8b', l: r.status };
       const icon = r.personType === 'driver' ? '🚗 ' : '👷 ';
+      const delBtn = canDelete() ? '<button class="del-btn" onclick="deleteAttendance(\'' + r.id + '\',\'' + r.workerName + '\')" style="margin-right:6px;">🗑️</button>' : '';
       return '<div class="row" style="align-items:center;">' +
         '<div style="flex:1;">' +
           '<div>' + icon + r.workerName + '</div>' +
           '<div style="font-size:12px;color:#666;">' + (r.time || '--') + ' ' + (r.shift==='morning'?'🌅':'🌙') + '</div>' +
         '</div>' +
         '<span class="badge" style="background:' + m.c + ';">' + m.l + '</span>' +
-        '<button class="del-btn" onclick="deleteAttendance(\'' + r.id + '\',\'' + r.workerName + '\')" style="margin-right:6px;">🗑️</button>' +
+        delBtn +
       '</div>';
     }).join('');
   }, (error) => {
@@ -1618,17 +1636,14 @@ function watchAttendance() {
 }
 
 function deleteAttendance(id, name) {
+  if (!checkDeletePermission()) return;
   if (!confirm('⚠️ هل تريد حذف سجل الحضور الخاص بـ "' + name + '"؟')) return;
   db.collection('attendance').doc(id).delete()
     .then(() => { console.log('✅ تم حذف السجل'); })
     .catch(err => alert('❌ خطأ في الحذف: ' + err.message));
 }
 
-// ============================================
-// 📊 دالة الإحصائيات الشاملة
-// ============================================
 function updateStats() {
-  // ============ العمال حسب الفريق ============
   const workerTeams = {};
   allWorkers.forEach(w => {
     const key = w.team || 'other';
@@ -1650,7 +1665,6 @@ function updateStats() {
     document.getElementById('totalWorkers').textContent = allWorkers.length;
   }
   
-  // ============ السائقين حسب النوع (بدون المشرفين) ============
   const driverTypes = {};
   let driversOnly = 0;
   let supervisorsOnly = 0;
@@ -1680,7 +1694,6 @@ function updateStats() {
     document.getElementById('totalDrivers').textContent = driversOnly;
   }
   
-  // ============ المشرفين ============
   const supervisorsEl = document.getElementById('supervisorsStats');
   if (supervisorsEl) {
     if (supervisorsOnly === 0) {
@@ -1691,7 +1704,6 @@ function updateStats() {
     document.getElementById('totalSupervisors').textContent = supervisorsOnly;
   }
   
-  // ============ الآليات حسب النوع ============
   db.collection('vehicles').get().then(sn => {
     const vehicleTypes = {};
     
@@ -1716,7 +1728,6 @@ function updateStats() {
       document.getElementById('totalVehicles').textContent = sn.size;
     }
     
-    // ============ الإجمالي العام ============
     const grandEmployees = allWorkers.length + allDrivers.length;
     const grandEmpEl = document.getElementById('grandTotalEmployees');
     const grandVehEl = document.getElementById('grandTotalVehicles');
@@ -1724,7 +1735,6 @@ function updateStats() {
     if (grandVehEl) grandVehEl.textContent = sn.size;
   });
   
-  // ============ إجمالي الأجور الشهرية ============
   let totalSalaries = 0;
   allDrivers.forEach(d => {
     const sal = Number(d.salary) || 0;
@@ -1733,7 +1743,6 @@ function updateStats() {
   const salaryEl = document.getElementById('grandTotalSalaries');
   if (salaryEl) salaryEl.textContent = totalSalaries.toLocaleString('ar-LY');
   
-  // ============ إجمالي ساعات الوقت الإضافي (الشهر الحالي) ============
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
@@ -1762,7 +1771,8 @@ function watchWorkers() {
     const c1 = document.getElementById('workersList');
     c1.innerHTML = allWorkers.length ? allWorkers.map(w => {
       const duration = calculateWorkDuration(w.startDate);
-      return '<div class="worker-row"><img src="' + (w.photo||'') + '" onerror="this.style.visibility=\'hidden\'"><span class="name">' + w.name + '</span><span style="font-size:11px;color:#666;">' + teamLabel(w.team) + '</span><span class="duration-badge">' + duration + '</span><button class="edit-btn" onclick="toggleEditWorkerForm(\'' + w.id + '\')">✏️</button><button class="del-btn" onclick="deleteWorker(\'' + w.id + '\',\'' + w.name + '\')">حذف</button><div id="editForm-' + w.id + '" class="edit-form"></div></div>';
+      const delBtn = canDelete() ? '<button class="del-btn" onclick="deleteWorker(\'' + w.id + '\',\'' + w.name + '\')">حذف</button>' : '';
+      return '<div class="worker-row"><img src="' + (w.photo||'') + '" onerror="this.style.visibility=\'hidden\'"><span class="name">' + w.name + '</span><span style="font-size:11px;color:#666;">' + teamLabel(w.team) + '</span><span class="duration-badge">' + duration + '</span><button class="edit-btn" onclick="toggleEditWorkerForm(\'' + w.id + '\')">✏️</button>' + delBtn + '<div id="editForm-' + w.id + '" class="edit-form"></div></div>';
     }).join('') : '<p style="text-align:center;color:#666;font-size:13px;">لا يوجد عمال</p>';
     updateDailyMarkList();
     updateStats();
@@ -1779,6 +1789,7 @@ function toggleEditWorkerForm(workerId) {
   const form = document.getElementById('editForm-' + workerId);
   if (form.style.display === 'block') { form.style.display = 'none'; form.innerHTML = ''; return; }
   const w = allWorkers.find(x => x.id === workerId);
+  const deleteBtnHTML = canDelete() ? '<button class="del-btn-inline" onclick="deleteWorkerWithConfirm(\'' + workerId + '\',\'' + w.name + '\')">🗑️ حذف الموظف</button>' : '';
   form.innerHTML = `
     <h3>✏️ تعديل: ${w.name}</h3>
     <label>الاسم</label>
@@ -1809,7 +1820,7 @@ function toggleEditWorkerForm(workerId) {
     </div>
     
     <button onclick="saveEditWorker('${workerId}')">💾 حفظ التعديل</button>
-    <button class="del-btn-inline" onclick="deleteWorkerWithConfirm('${workerId}','${w.name}')">🗑️ حذف الموظف</button>
+    ${deleteBtnHTML}
   `;
   form.style.display = 'block';
   
@@ -1846,6 +1857,7 @@ async function saveEditWorker(workerId) {
 }
 
 function deleteWorkerWithConfirm(id, name) {
+  if (!checkDeletePermission()) return;
   if (confirm('⚠️ هل تريد حذف "' + name + '" نهائياً؟')) {
     db.collection('workers').doc(id).delete().then(() => alert('✅ تم الحذف')).catch(err => alert('❌ خطأ: ' + err.message));
   }
@@ -1874,6 +1886,7 @@ async function addWorker() {
 }
 
 function deleteWorker(id, name) {
+  if (!checkDeletePermission()) return;
   if (confirm('حذف ' + name + '؟')) db.collection('workers').doc(id).delete();
 }
 
@@ -1896,7 +1909,8 @@ function renderDriversList() {
     const duration = calculateWorkDuration(d.startDate);
     const typeLabel = DRIVER_TYPES[d.driverType] || '';
     const photoForNotif = d.photoURL || d.photo || '';
-    return '<div class="driver-card"><div class="driver-header"><img src="' + (d.photo||d.photoURL||'') + '" onerror="this.style.visibility=\'hidden\'"><div style="flex:1;"><strong>' + d.name + '</strong><div style="font-size:12px;color:#666;">' + typeLabel + '</div></div></div><div class="driver-info"><span class="info-tag">📅 من: ' + (d.startDate || '—') + '</span><span class="duration-badge">⏱️ ' + duration + '</span>' + (d.salary ? '<span class="salary-badge">💰 ' + d.salary + ' دينار</span>' : '') + (d.accountNumber ? '<span class="info-tag">🏦 ' + d.accountNumber + '</span>' : '') + (d.bankName ? '<span class="info-tag">🏛️ ' + d.bankName + '</span>' : '') + (d.licenseGrade ? '<span class="info-tag">🚗 ' + d.licenseGrade + '</span>' : '') + (d.shift ? '<span class="info-tag">' + (d.shift === 'morning' ? '🌅 صباح' : d.shift === 'night' ? '🌙 ليل' : '🔄 كلاهما') + '</span>' : '') + '</div>' + (d.checkPhoto ? '<img src="' + d.checkPhoto + '" class="check-photo" onclick="window.open(\'' + d.checkPhoto + '\')">' : '') + '<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;"><button class="view-btn" onclick="showWorkNotification({name:\'' + d.name + '\',jobTitle:\'' + typeLabel + '\',startDate:\'' + d.startDate + '\',photo:\'' + photoForNotif + '\'})" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">📋 إفادة</button><button class="edit-btn" onclick="toggleEditDriverForm(\'' + d.id + '\')">✏️ تعديل</button><button class="del-btn" onclick="deleteDriver(\'' + d.id + '\',\'' + d.name + '\')">حذف</button></div><div id="driverEditForm-' + d.id + '" class="edit-form"></div></div>';
+    const delBtn = canDelete() ? '<button class="del-btn" onclick="deleteDriver(\'' + d.id + '\',\'' + d.name + '\')">حذف</button>' : '';
+    return '<div class="driver-card"><div class="driver-header"><img src="' + (d.photo||d.photoURL||'') + '" onerror="this.style.visibility=\'hidden\'"><div style="flex:1;"><strong>' + d.name + '</strong><div style="font-size:12px;color:#666;">' + typeLabel + '</div></div></div><div class="driver-info"><span class="info-tag">📅 من: ' + (d.startDate || '—') + '</span><span class="duration-badge">⏱️ ' + duration + '</span>' + (d.salary ? '<span class="salary-badge">💰 ' + d.salary + ' دينار</span>' : '') + (d.accountNumber ? '<span class="info-tag">🏦 ' + d.accountNumber + '</span>' : '') + (d.bankName ? '<span class="info-tag">🏛️ ' + d.bankName + '</span>' : '') + (d.licenseGrade ? '<span class="info-tag">🚗 ' + d.licenseGrade + '</span>' : '') + (d.shift ? '<span class="info-tag">' + (d.shift === 'morning' ? '🌅 صباح' : d.shift === 'night' ? '🌙 ليل' : '🔄 كلاهما') + '</span>' : '') + '</div>' + (d.checkPhoto ? '<img src="' + d.checkPhoto + '" class="check-photo" onclick="window.open(\'' + d.checkPhoto + '\')">' : '') + '<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;"><button class="view-btn" onclick="showWorkNotification({name:\'' + d.name + '\',jobTitle:\'' + typeLabel + '\',startDate:\'' + d.startDate + '\',photo:\'' + photoForNotif + '\'})" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">📋 إفادة</button><button class="edit-btn" onclick="toggleEditDriverForm(\'' + d.id + '\')">✏️ تعديل</button>' + delBtn + '</div><div id="driverEditForm-' + d.id + '" class="edit-form"></div></div>';
   }).join('');
 }
 
@@ -1906,6 +1920,7 @@ function toggleEditDriverForm(driverId) {
   const form = document.getElementById('driverEditForm-' + driverId);
   if (form.style.display === 'block') { form.style.display = 'none'; form.innerHTML = ''; return; }
   const d = allDrivers.find(x => x.id === driverId);
+  const deleteBtnHTML = canDelete() ? '<button class="del-btn-inline" onclick="deleteDriverWithConfirm(\'' + driverId + '\',\'' + d.name + '\')">🗑️ حذف الموظف</button>' : '';
   form.innerHTML = `
     <h3>✏️ تعديل: ${d.name}</h3>
     <label>الاسم</label>
@@ -1956,7 +1971,7 @@ function toggleEditDriverForm(driverId) {
     </div>
     
     <button onclick="saveEditDriver('${driverId}')">💾 حفظ التعديل</button>
-    <button class="del-btn-inline" onclick="deleteDriverWithConfirm('${driverId}','${d.name}')">🗑️ حذف الموظف</button>
+    ${deleteBtnHTML}
   `;
   form.style.display = 'block';
   
@@ -2016,6 +2031,7 @@ async function saveEditDriver(driverId) {
 }
 
 function deleteDriverWithConfirm(id, name) {
+  if (!checkDeletePermission()) return;
   if (confirm('⚠️ هل تريد حذف "' + name + '" نهائياً؟')) {
     db.collection('drivers').doc(id).delete().then(() => alert('✅ تم الحذف')).catch(err => alert('❌ خطأ: ' + err.message));
   }
@@ -2053,6 +2069,7 @@ async function addDriver() {
 }
 
 function deleteDriver(id, name) {
+  if (!checkDeletePermission()) return;
   if (confirm('حذف ' + name + '؟')) db.collection('drivers').doc(id).delete();
 }
 
@@ -2162,15 +2179,16 @@ async function loadOvertimeList() {
     totalsHTML += '</div>';
     
     let recordsHTML = '<h3 style="color:#0f766e;font-size:14px;">📋 السجلات التفصيلية:</h3>';
-    recordsHTML += records.map(r => 
-      '<div class="worker-row">' +
+    recordsHTML += records.map(r => {
+      const delBtn = canDelete() ? '<button class="del-btn" onclick="deleteOvertime(\'' + r.id + '\')">حذف</button>' : '';
+      return '<div class="worker-row">' +
         '<span class="name">🚗 ' + r.driverName + '</span>' +
         '<span class="info-tag">📅 ' + r.date + '</span>' +
         '<span class="overtime-badge">⏰ ' + r.hours + ' ساعة</span>' +
         (r.note ? '<span class="info-tag">📝 ' + r.note + '</span>' : '') +
-        '<button class="del-btn" onclick="deleteOvertime(\'' + r.id + '\')">حذف</button>' +
-      '</div>'
-    ).join('');
+        delBtn +
+      '</div>';
+    }).join('');
     
     list.innerHTML = totalsHTML + recordsHTML;
   } catch (err) {
@@ -2179,6 +2197,7 @@ async function loadOvertimeList() {
 }
 
 function deleteOvertime(id) {
+  if (!checkDeletePermission()) return;
   if (!confirm('هل تريد حذف هذا السجل؟')) return;
   db.collection('overtime').doc(id).delete()
     .then(() => { alert('✅ تم الحذف'); loadOvertimeList(); updateStats(); })
@@ -2278,7 +2297,8 @@ function loadReports() {
       const r = doc.data();
       const photos = (r.photos || []).slice(0, 3).map(p => '<img src="' + p + '" style="width:50px;height:50px;object-fit:cover;border-radius:6px;margin:2px;" onerror="this.style.display=\'none\'">').join('');
       const count = r.photosCount || (r.photos || []).length;
-      return '<div class="user-card"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;"><strong>' + r.workerName + '</strong><span style="font-size:12px;color:#666;">' + r.date + ' - ' + (r.createdTime || '') + '</span></div>' + (r.location ? '<div style="font-size:12px;color:#666;">📍 ' + r.location + '</div>' : '') + '<div style="font-size:13px;margin-top:5px;">' + r.text.substring(0, 100) + (r.text.length > 100 ? '...' : '') + '</div>' + (photos ? '<div style="display:flex;margin-top:5px;align-items:center;">' + photos + (count > 3 ? '<span style="font-size:12px;color:#0f766e;margin-left:5px;">+' + (count - 3) + ' صورة</span>' : '') + '</div>' : '') + '<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;"><button class="view-btn" onclick="viewReport(\'' + doc.id + '\')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">👁️ عرض</button><button class="word-btn" onclick="exportReportWord(\'' + doc.id + '\')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">📄 Word</button><button class="print-btn" onclick="printReport(\'' + doc.id + '\')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">🖨️ طباعة</button><button class="del-btn" onclick="deleteReport(\'' + doc.id + '\')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">حذف</button></div></div>';
+      const delBtn = canDelete() ? '<button class="del-btn" onclick="deleteReport(\'' + doc.id + '\')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">حذف</button>' : '';
+      return '<div class="user-card"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;"><strong>' + r.workerName + '</strong><span style="font-size:12px;color:#666;">' + r.date + ' - ' + (r.createdTime || '') + '</span></div>' + (r.location ? '<div style="font-size:12px;color:#666;">📍 ' + r.location + '</div>' : '') + '<div style="font-size:13px;margin-top:5px;">' + r.text.substring(0, 100) + (r.text.length > 100 ? '...' : '') + '</div>' + (photos ? '<div style="display:flex;margin-top:5px;align-items:center;">' + photos + (count > 3 ? '<span style="font-size:12px;color:#0f766e;margin-left:5px;">+' + (count - 3) + ' صورة</span>' : '') + '</div>' : '') + '<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;"><button class="view-btn" onclick="viewReport(\'' + doc.id + '\')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">👁️ عرض</button><button class="word-btn" onclick="exportReportWord(\'' + doc.id + '\')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">📄 Word</button><button class="print-btn" onclick="printReport(\'' + doc.id + '\')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">🖨️ طباعة</button>' + delBtn + '</div></div>';
     }).join('');
   });
 }
@@ -2343,6 +2363,7 @@ function exportReportWord(reportId) {
 }
 
 async function deleteReport(reportId) {
+  if (!checkDeletePermission()) return;
   if (!confirm('حذف التقرير؟')) return;
   await db.collection('dailyReports').doc(reportId).delete();
   alert('✅ تم حذف التقرير');
@@ -2373,7 +2394,10 @@ async function loadDeductions() {
 function watchInventory() {
   db.collection('inventory').orderBy('name').onSnapshot(sn => {
     allInventory = sn.docs.map(d => ({ id: d.id, ...d.data() }));
-    document.getElementById('inventoryList').innerHTML = allInventory.length ? allInventory.map(i => '<div class="worker-row"><span class="name">' + i.name + '</span><span style="color:#0f766e;font-weight:800;">' + i.quantity + ' ' + (i.unit||'') + '</span><button class="del-btn" onclick="deleteItem(\'' + i.id + '\',\'' + i.name + '\')">حذف</button></div>').join('') : '<p style="text-align:center;color:#666;font-size:13px;">المخزن فارغ</p>';
+    document.getElementById('inventoryList').innerHTML = allInventory.length ? allInventory.map(i => {
+      const delBtn = canDelete() ? '<button class="del-btn" onclick="deleteItem(\'' + i.id + '\',\'' + i.name + '\')">حذف</button>' : '';
+      return '<div class="worker-row"><span class="name">' + i.name + '</span><span style="color:#0f766e;font-weight:800;">' + i.quantity + ' ' + (i.unit||'') + '</span>' + delBtn + '</div>';
+    }).join('') : '<p style="text-align:center;color:#666;font-size:13px;">المخزن فارغ</p>';
   });
 }
 
@@ -2389,12 +2413,13 @@ async function addItem() {
 }
 
 function deleteItem(id, name) {
+  if (!checkDeletePermission()) return;
   if (confirm('حذف ' + name + '؟')) db.collection('inventory').doc(id).delete();
 }
 
 function loadVehicles() {
   db.collection('vehicles').onSnapshot(sn => {
-    document.getElementById('vehiclesList').innerHTML = sn.empty ? '<p style="text-align:center;color:#666;font-size:13px;">لا توجد آليات</p>' : sn.docs.map(doc => { const v = doc.data(); return '<div class="worker-row">' + (v.photo ? '<img src="' + v.photo + '" style="width:40px;height:40px;border-radius:8px;object-fit:cover;">' : '') + '<span class="name">' + v.typeLabel + ' - ' + v.number + '</span><span style="font-size:12px;color:#0f766e;font-weight:800;">' + v.statusLabel + '</span><button class="del-btn" onclick="deleteVehicle(\'' + doc.id + '\',\'' + v.number + '\')">حذف</button></div>'; }).join('');
+    document.getElementById('vehiclesList').innerHTML = sn.empty ? '<p style="text-align:center;color:#666;font-size:13px;">لا توجد آليات</p>' : sn.docs.map(doc => { const v = doc.data(); const delBtn = canDelete() ? '<button class="del-btn" onclick="deleteVehicle(\'' + doc.id + '\',\'' + v.number + '\')">حذف</button>' : ''; return '<div class="worker-row">' + (v.photo ? '<img src="' + v.photo + '" style="width:40px;height:40px;border-radius:8px;object-fit:cover;">' : '') + '<span class="name">' + v.typeLabel + ' - ' + v.number + '</span><span style="font-size:12px;color:#0f766e;font-weight:800;">' + v.statusLabel + '</span>' + delBtn + '</div>'; }).join('');
     updateStats();
   });
 }
@@ -2415,6 +2440,7 @@ async function saveVehicle() {
 }
 
 function deleteVehicle(id, number) {
+  if (!checkDeletePermission()) return;
   if (confirm('حذف ' + number + '؟')) db.collection('vehicles').doc(id).delete();
 }
 
@@ -2424,7 +2450,7 @@ async function addUser() {
   const role = document.getElementById('newUserRole').value;
   if (!name || !pin || pin.length < 4) { alert('أدخل اسم ورقم سري (4-6 أرقام)'); return; }
   let permissions = {}, viewOnly = false;
-  if (role === 'admin') { permissions = { viewOverview:true, manageAttendance:true, manageReports:true, manageWorkers:true, manageDrivers:true, manageOvertime:true, viewDeductions:true, manageInventory:true, manageVehicles:true }; }
+  if (role === 'admin') { permissions = { viewOverview:true, manageAttendance:true, manageReports:true, manageWorkers:true, manageDrivers:true, manageOvertime:true, viewDeductions:true, manageInventory:true, manageVehicles:true, canDelete:true }; }
   else {
     permissions = {
       viewOverview: document.getElementById('perm-overview').checked,
@@ -2435,7 +2461,8 @@ async function addUser() {
       manageOvertime: document.getElementById('perm-overtime').checked,
       viewDeductions: document.getElementById('perm-deductions').checked,
       manageInventory: document.getElementById('perm-inventory').checked,
-      manageVehicles: document.getElementById('perm-vehicles').checked
+      manageVehicles: document.getElementById('perm-vehicles').checked,
+      canDelete: document.getElementById('perm-delete').checked
     };
     viewOnly = document.getElementById('perm-viewonly').checked;
   }
@@ -2448,11 +2475,12 @@ async function addUser() {
 
 function loadUsersList() {
   db.collection('systemUsers').onSnapshot(sn => {
-    document.getElementById('usersList').innerHTML = sn.empty ? '<p style="text-align:center;color:#666;font-size:13px;">لا يوجد مستخدمين</p>' : sn.docs.map(doc => { const u = doc.data(); return '<div class="user-card"><strong>' + u.name + '</strong> <span style="font-size:12px;color:#666;">🔢' + u.pin + '</span> ' + (u.viewOnly ? '<span class="view-only-badge">👁️</span>' : '') + '<button class="del-btn" onclick="deleteUser(\'' + doc.id + '\',\'' + u.name + '\')">حذف</button></div>'; }).join('');
+    document.getElementById('usersList').innerHTML = sn.empty ? '<p style="text-align:center;color:#666;font-size:13px;">لا يوجد مستخدمين</p>' : sn.docs.map(doc => { const u = doc.data(); const delBtn = canDelete() ? '<button class="del-btn" onclick="deleteUser(\'' + doc.id + '\',\'' + u.name + '\')">حذف</button>' : ''; return '<div class="user-card"><strong>' + u.name + '</strong> <span style="font-size:12px;color:#666;">🔢' + u.pin + '</span> ' + (u.viewOnly ? '<span class="view-only-badge">👁️</span>' : '') + delBtn + '</div>'; }).join('');
   });
 }
 
 function deleteUser(id, name) {
+  if (!checkDeletePermission()) return;
   if (confirm('حذف ' + name + '؟')) db.collection('systemUsers').doc(id).delete();
 }
 

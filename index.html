@@ -21,7 +21,6 @@
   }
   #mainApp { display: none; width: 100%; padding: 100px 20px 40px; min-height: 100vh; }
   
-  /* شريط علوي جديد */
   .top-bar {
     position: fixed;
     top: 15px;
@@ -80,7 +79,6 @@
   }
   .logout-btn:hover { transform: scale(1.1) rotate(5deg); }
   
-  /* 🎯 زر الترس الصغير */
   .settings-btn {
     width: 38px;
     height: 38px;
@@ -110,15 +108,9 @@
     transition: transform 0.4s ease;
     fill: currentColor;
   }
-  .settings-btn:hover svg {
-    transform: rotate(60deg);
-  }
-  .settings-btn:active svg {
-    transform: rotate(120deg) scale(0.9);
-  }
-  .settings-btn.visible {
-    display: flex;
-  }
+  .settings-btn:hover svg { transform: rotate(60deg); }
+  .settings-btn:active svg { transform: rotate(120deg) scale(0.9); }
+  .settings-btn.visible { display: flex; }
   
   .tabs-container { max-width: 1200px; margin: 0 auto 20px; padding: 0 15px; }
   .tabs { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
@@ -382,7 +374,6 @@
 </div>
 
 <div id="mainApp">
-  <!-- شريط علوي ثابت -->
   <div class="top-bar" id="topBar" style="display:none;">
     <div class="top-bar-left">
       <button class="back-btn" id="topBackBtn" onclick="backToOverview()" title="رجوع">🔙</button>
@@ -897,15 +888,53 @@ const VEHICLE_TYPES = {
   dump_truck: 'قلاب'
 };
 
-function isOwnerOrAdmin() { return currentUserRole === 'owner' || currentUserRole === 'admin'; }
-function canAdd() { if (isOwnerOrAdmin()) return true; if (currentUserPermissions.viewOnly) return false; return currentUserPermissions.canAdd !== false; }
-function canEdit() { if (isOwnerOrAdmin()) return true; if (currentUserPermissions.viewOnly) return false; return currentUserPermissions.canEdit !== false; }
-function canDelete() { if (isOwnerOrAdmin()) return true; if (currentUserPermissions.viewOnly) return false; return currentUserPermissions.canDelete === true; }
-function canExport() { if (isOwnerOrAdmin()) return true; return currentUserPermissions.canExport !== false; }
-function checkAddPermission() { if (!canAdd()) { alert('🚫 لا تملك صلاحية الإضافة.'); return false; } return true; }
-function checkEditPermission() { if (!canEdit()) { alert('🚫 لا تملك صلاحية التعديل.'); return false; } return true; }
-function checkDeletePermission() { if (!canDelete()) { alert('🚫 لا تملك صلاحية الحذف.'); return false; } return true; }
-function checkExportPermission() { if (!canExport()) { alert('🚫 لا تملك صلاحية التصدير.'); return false; } return true; }
+// ============================================
+// 🔒 دوال الصلاحيات (مُصحَّحة - صارمة)
+// ============================================
+function isOwnerOrAdmin() {
+  return currentUserRole === 'owner' || currentUserRole === 'admin';
+}
+
+function canAdd() {
+  if (isOwnerOrAdmin()) return true;
+  if (currentUserPermissions.viewOnly === true) return false;
+  return currentUserPermissions.canAdd === true;
+}
+
+function canEdit() {
+  if (isOwnerOrAdmin()) return true;
+  if (currentUserPermissions.viewOnly === true) return false;
+  return currentUserPermissions.canEdit === true;
+}
+
+function canDelete() {
+  if (isOwnerOrAdmin()) return true;
+  if (currentUserPermissions.viewOnly === true) return false;
+  return currentUserPermissions.canDelete === true;
+}
+
+function canExport() {
+  if (isOwnerOrAdmin()) return true;
+  if (currentUserPermissions.viewOnly === true) return false;
+  return currentUserPermissions.canExport === true;
+}
+
+function checkAddPermission() {
+  if (!canAdd()) { alert('🚫 لا تملك صلاحية الإضافة. تواصل مع المدير.'); return false; }
+  return true;
+}
+function checkEditPermission() {
+  if (!canEdit()) { alert('🚫 لا تملك صلاحية التعديل. تواصل مع المدير.'); return false; }
+  return true;
+}
+function checkDeletePermission() {
+  if (!canDelete()) { alert('🚫 لا تملك صلاحية الحذف. تواصل مع المدير.'); return false; }
+  return true;
+}
+function checkExportPermission() {
+  if (!canExport()) { alert('🚫 لا تملك صلاحية التصدير. تواصل مع المدير.'); return false; }
+  return true;
+}
 
 function getTodayDate() { return new Date().toLocaleDateString('ar-LY', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }); }
 function getTodayISO() { return new Date().toISOString().slice(0, 10); }
@@ -1315,7 +1344,7 @@ function enterAdmin() {
   if (currentUserRole === 'owner') ui.innerHTML = '<span class="role-badge role-owner">👑</span> ' + currentUser.name;
   else if (currentUserRole === 'admin') ui.innerHTML = '<span class="role-badge role-admin">👤</span> ' + currentUser.name;
   else ui.innerHTML = '<span class="role-badge role-supervisor">👤</span> ' + currentUser.name;
-  if (currentUser.viewOnly) ui.innerHTML += ' <span class="view-only-badge">👁️</span>';
+  if (currentUserPermissions.viewOnly) ui.innerHTML += ' <span class="view-only-badge">👁️</span>';
   if (isOwnerOrAdmin()) document.getElementById('settingsBtn').classList.add('visible');
   else document.getElementById('settingsBtn').classList.remove('visible');
   clearLogin();
@@ -1359,7 +1388,7 @@ function applyPermissionsToTabs() {
     const n = tab.dataset.tab;
     let show = false;
     switch(n) {
-      case 'overview': show = currentUserPermissions.viewOverview !== false; break;
+      case 'overview': show = currentUserPermissions.viewOverview === true; break;
       case 'daily': show = currentUserPermissions.manageAttendance === true; break;
       case 'reports': show = currentUserPermissions.manageReports === true; break;
       case 'workers': show = currentUserPermissions.manageWorkers === true; break;
@@ -1565,10 +1594,12 @@ function watchWorkers() {
   db.collection('workers').orderBy('name').onSnapshot(sn => {
     allWorkers = sn.docs.map(d => ({ id: d.id, ...d.data() }));
     const c1 = document.getElementById('workersList');
+    const editBtn = canEdit() ? '<button class="edit-btn" onclick="toggleEditWorkerForm(\'' + '" data-x="' + '\')">✏️</button>' : '';
     c1.innerHTML = allWorkers.length ? allWorkers.map(w => {
       const du = calculateWorkDuration(w.startDate);
       const db2 = canDelete() ? '<button class="del-btn" onclick="deleteWorker(\'' + w.id + '\',\'' + w.name + '\')">حذف</button>' : '';
-      return '<div class="worker-row"><img src="' + (w.photo||'') + '" onerror="this.style.visibility=\'hidden\'"><span class="name">' + w.name + '</span><span style="font-size:11px;color:#666;">' + teamLabel(w.team) + '</span><span class="duration-badge">' + du + '</span><button class="edit-btn" onclick="toggleEditWorkerForm(\'' + w.id + '\')">✏️</button>' + db2 + '<div id="editForm-' + w.id + '" class="edit-form"></div></div>';
+      const ed2 = canEdit() ? '<button class="edit-btn" onclick="toggleEditWorkerForm(\'' + w.id + '\')">✏️</button>' : '';
+      return '<div class="worker-row"><img src="' + (w.photo||'') + '" onerror="this.style.visibility=\'hidden\'"><span class="name">' + w.name + '</span><span style="font-size:11px;color:#666;">' + teamLabel(w.team) + '</span><span class="duration-badge">' + du + '</span>' + ed2 + db2 + '<div id="editForm-' + w.id + '" class="edit-form"></div></div>';
     }).join('') : '<p style="text-align:center;color:#666;">لا يوجد عمال</p>';
     updateDailyMarkList();
     updateStats();
@@ -1578,7 +1609,13 @@ function watchWorkers() {
 function updateDailyMarkList() {
   const c2 = document.getElementById('dailyMarkList');
   const ap = [].concat(allWorkers.map(w => Object.assign({}, w, { type: 'worker' })), allDrivers.map(d => Object.assign({}, d, { type: 'driver' })));
-  c2.innerHTML = ap.length ? ap.map(w => '<div class="worker-row"><img src="' + (w.photo||'') + '" onerror="this.style.visibility=\'hidden\'"><span class="name">' + (w.type === 'driver' ? '🚗 ' : '👷 ') + w.name + '</span><button onclick="manualMark(\'' + w.id + '\',\'' + w.name + '\',\'present\')" style="width:auto;padding:6px 10px;margin:0;background:#388e3c;border-color:#388e3c;">✅</button><button onclick="manualMark(\'' + w.id + '\',\'' + w.name + '\',\'absent\')" style="width:auto;padding:6px 10px;margin:0;background:#c62828;border-color:#c62828;">✗</button><button onclick="manualMark(\'' + w.id + '\',\'' + w.name + '\',\'leave\')" style="width:auto;padding:6px 10px;margin:0;background:#7b1fa2;border-color:#7b1fa2;">📝</button><button onclick="manualMark(\'' + w.id + '\',\'' + w.name + '\',\'sick\')" style="width:auto;padding:6px 10px;margin:0;background:#ad1457;border-color:#ad1457;">🤒</button></div>').join('') : '<p style="text-align:center;color:#666;">لا يوجد أشخاص</p>';
+  const canMark = canAdd();
+  c2.innerHTML = ap.length ? ap.map(w => {
+    if (!canMark) {
+      return '<div class="worker-row"><img src="' + (w.photo||'') + '" onerror="this.style.visibility=\'hidden\'"><span class="name">' + (w.type === 'driver' ? '🚗 ' : '👷 ') + w.name + '</span><span style="font-size:11px;color:#888;">(مشاهدة فقط)</span></div>';
+    }
+    return '<div class="worker-row"><img src="' + (w.photo||'') + '" onerror="this.style.visibility=\'hidden\'"><span class="name">' + (w.type === 'driver' ? '🚗 ' : '👷 ') + w.name + '</span><button onclick="manualMark(\'' + w.id + '\',\'' + w.name + '\',\'present\')" style="width:auto;padding:6px 10px;margin:0;background:#388e3c;border-color:#388e3c;">✅</button><button onclick="manualMark(\'' + w.id + '\',\'' + w.name + '\',\'absent\')" style="width:auto;padding:6px 10px;margin:0;background:#c62828;border-color:#c62828;">✗</button><button onclick="manualMark(\'' + w.id + '\',\'' + w.name + '\',\'leave\')" style="width:auto;padding:6px 10px;margin:0;background:#7b1fa2;border-color:#7b1fa2;">📝</button><button onclick="manualMark(\'' + w.id + '\',\'' + w.name + '\',\'sick\')" style="width:auto;padding:6px 10px;margin:0;background:#ad1457;border-color:#ad1457;">🤒</button></div>';
+  }).join('') : '<p style="text-align:center;color:#666;">لا يوجد أشخاص</p>';
 }
 
 function toggleEditWorkerForm(workerId) {
@@ -1681,7 +1718,8 @@ function renderDriversList() {
     const tl = DRIVER_TYPES[d.driverType] || '';
     const p = d.photoURL || d.photo || '';
     const db2 = canDelete() ? '<button class="del-btn" onclick="deleteDriver(\'' + d.id + '\',\'' + d.name + '\')">حذف</button>' : '';
-    return '<div class="driver-card"><div class="driver-header"><img src="' + (d.photo||d.photoURL||'') + '" onerror="this.style.visibility=\'hidden\'"><div style="flex:1;"><strong>' + d.name + '</strong><div style="font-size:12px;color:#666;">' + tl + '</div></div></div><div class="driver-info"><span class="info-tag">📅 ' + (d.startDate || '—') + '</span><span class="duration-badge">⏱️ ' + du + '</span>' + (d.salary ? '<span class="salary-badge">💰 ' + d.salary + ' د</span>' : '') + '</div><div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;"><button class="view-btn" onclick="showWorkNotification({name:\'' + d.name + '\',jobTitle:\'' + tl + '\',startDate:\'' + d.startDate + '\',photo:\'' + p + '\'})" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">📋 إفادة</button><button class="edit-btn" onclick="toggleEditDriverForm(\'' + d.id + '\')">✏️</button>' + db2 + '</div><div id="driverEditForm-' + d.id + '" class="edit-form"></div></div>';
+    const ed2 = canEdit() ? '<button class="edit-btn" onclick="toggleEditDriverForm(\'' + d.id + '\')">✏️</button>' : '';
+    return '<div class="driver-card"><div class="driver-header"><img src="' + (d.photo||d.photoURL||'') + '" onerror="this.style.visibility=\'hidden\'"><div style="flex:1;"><strong>' + d.name + '</strong><div style="font-size:12px;color:#666;">' + tl + '</div></div></div><div class="driver-info"><span class="info-tag">📅 ' + (d.startDate || '—') + '</span><span class="duration-badge">⏱️ ' + du + '</span>' + (d.salary ? '<span class="salary-badge">💰 ' + d.salary + ' د</span>' : '') + '</div><div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;"><button class="view-btn" onclick="showWorkNotification({name:\'' + d.name + '\',jobTitle:\'' + tl + '\',startDate:\'' + d.startDate + '\',photo:\'' + p + '\'})" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">📋 إفادة</button>' + ed2 + db2 + '</div><div id="driverEditForm-' + d.id + '" class="edit-form"></div></div>';
   }).join('');
 }
 
@@ -2098,7 +2136,7 @@ function loadUsersList() {
       const b = (l, a) => '<span class="perm-badge ' + (a ? 'active' : 'inactive') + '">' + (a ? '✅ ' : '❌ ') + l + '</span>';
       let ph;
       if (ia) ph = '<div style="padding:10px;background:rgba(156,39,176,0.15);border-radius:10px;margin-top:10px;text-align:center;color:#9c27b0;font-weight:800;">👤 مدير — كل الصلاحيات</div>';
-      else ph = '<div class="perm-badges-container">' + b('نظرة', p.viewOverview !== false) + b('حضور', p.manageAttendance === true) + b('تقارير', p.manageReports === true) + b('عمال', p.manageWorkers === true) + b('سائقين', p.manageDrivers === true) + b('وقت إضافي', p.manageOvertime === true) + b('خصومات', p.viewDeductions === true) + b('مخزن', p.manageInventory === true) + b('آليات', p.manageVehicles === true) + b('➕', p.canAdd !== false) + b('✏️', p.canEdit !== false) + b('🗑️', p.canDelete === true) + b('📊', p.canExport !== false) + '</div>' + (u.viewOnly ? '<div style="padding:6px;background:rgba(255,193,7,0.2);border-radius:8px;margin-top:8px;text-align:center;color:#f57c00;font-weight:800;">👁️ مشاهدة فقط</div>' : '');
+      else ph = '<div class="perm-badges-container">' + b('نظرة', p.viewOverview === true) + b('حضور', p.manageAttendance === true) + b('تقارير', p.manageReports === true) + b('عمال', p.manageWorkers === true) + b('سائقين', p.manageDrivers === true) + b('وقت إضافي', p.manageOvertime === true) + b('خصومات', p.viewDeductions === true) + b('مخزن', p.manageInventory === true) + b('آليات', p.manageVehicles === true) + b('➕', p.canAdd === true) + b('✏️', p.canEdit === true) + b('🗑️', p.canDelete === true) + b('📊', p.canExport === true) + '</div>' + (u.viewOnly ? '<div style="padding:6px;background:rgba(255,193,7,0.2);border-radius:8px;margin-top:8px;text-align:center;color:#f57c00;font-weight:800;">👁️ مشاهدة فقط</div>' : '');
       return '<div class="user-perm-card" onclick="toggleUserEditForm(\'' + doc.id + '\')"><div class="user-perm-header"><div><span class="user-perm-name">👤 ' + u.name + '</span><span class="user-perm-pin">🔢 ' + u.pin + '</span></div><span class="role-badge ' + (ia ? 'role-admin' : 'role-supervisor') + '">' + (ia ? '👤 مدير' : '👤 مشرف') + '</span></div>' + ph + '<div class="click-hint">👇 اضغط لتعديل الصلاحيات</div><div id="userEditForm-' + doc.id + '" class="edit-form" onclick="event.stopPropagation()"></div></div>';
     }).join('');
   });
@@ -2118,7 +2156,7 @@ function toggleUserEditForm(userId) {
       '<label>🔢 الرقم السري</label><input id="editUserPin-' + userId + '" value="' + u.pin + '" maxlength="6" style="text-align:center;letter-spacing:8px;font-weight:bold;">' +
       '<label>💼 الدور</label><select id="editUserRole-' + userId + '" onchange="toggleEditPermissionsBox(\'' + userId + '\')"><option value="supervisor" ' + (u.role === 'supervisor' ? 'selected' : '') + '>👤 مشرف</option><option value="admin" ' + (u.role === 'admin' ? 'selected' : '') + '>👤 مدير</option></select>' +
       '<div id="editPermissionsBox-' + userId + '" class="permission-box" style="display:' + (ia ? 'none' : 'block') + ';">' +
-      '<div class="permission-item"><label>📊 نظرة</label><input type="checkbox" id="edit-perm-overview-' + userId + '" ' + (p.viewOverview !== false ? 'checked' : '') + '></div>' +
+      '<div class="permission-item"><label>📊 نظرة</label><input type="checkbox" id="edit-perm-overview-' + userId + '" ' + (p.viewOverview === true ? 'checked' : '') + '></div>' +
       '<div class="permission-item"><label>✅ حضور</label><input type="checkbox" id="edit-perm-attendance-' + userId + '" ' + (p.manageAttendance === true ? 'checked' : '') + '></div>' +
       '<div class="permission-item"><label>📋 تقارير</label><input type="checkbox" id="edit-perm-reports-' + userId + '" ' + (p.manageReports === true ? 'checked' : '') + '></div>' +
       '<div class="permission-item"><label>👷 عمال</label><input type="checkbox" id="edit-perm-workers-' + userId + '" ' + (p.manageWorkers === true ? 'checked' : '') + '></div>' +
@@ -2127,10 +2165,10 @@ function toggleUserEditForm(userId) {
       '<div class="permission-item"><label>💰 خصومات</label><input type="checkbox" id="edit-perm-deductions-' + userId + '" ' + (p.viewDeductions === true ? 'checked' : '') + '></div>' +
       '<div class="permission-item"><label>📦 مخزن</label><input type="checkbox" id="edit-perm-inventory-' + userId + '" ' + (p.manageInventory === true ? 'checked' : '') + '></div>' +
       '<div class="permission-item"><label>🚛 آليات</label><input type="checkbox" id="edit-perm-vehicles-' + userId + '" ' + (p.manageVehicles === true ? 'checked' : '') + '></div>' +
-      '<div class="permission-item"><label>➕ إضافة</label><input type="checkbox" id="edit-perm-add-' + userId + '" ' + (p.canAdd !== false ? 'checked' : '') + '></div>' +
-      '<div class="permission-item"><label>✏️ تعديل</label><input type="checkbox" id="edit-perm-edit-' + userId + '" ' + (p.canEdit !== false ? 'checked' : '') + '></div>' +
+      '<div class="permission-item"><label>➕ إضافة</label><input type="checkbox" id="edit-perm-add-' + userId + '" ' + (p.canAdd === true ? 'checked' : '') + '></div>' +
+      '<div class="permission-item"><label>✏️ تعديل</label><input type="checkbox" id="edit-perm-edit-' + userId + '" ' + (p.canEdit === true ? 'checked' : '') + '></div>' +
       '<div class="permission-item"><label>🗑️ حذف</label><input type="checkbox" id="edit-perm-delete-' + userId + '" ' + (p.canDelete === true ? 'checked' : '') + '></div>' +
-      '<div class="permission-item"><label>📊 تصدير</label><input type="checkbox" id="edit-perm-export-' + userId + '" ' + (p.canExport !== false ? 'checked' : '') + '></div>' +
+      '<div class="permission-item"><label>📊 تصدير</label><input type="checkbox" id="edit-perm-export-' + userId + '" ' + (p.canExport === true ? 'checked' : '') + '></div>' +
       '<div class="permission-item"><label>👁️ مشاهدة فقط</label><input type="checkbox" id="edit-perm-viewonly-' + userId + '" ' + (u.viewOnly === true ? 'checked' : '') + '></div>' +
       '</div>' +
       '<button onclick="saveUserEdit(\'' + userId + '\')">💾 حفظ</button>' +

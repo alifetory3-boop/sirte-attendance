@@ -1384,6 +1384,18 @@ function togglePermissionsBox() {
 
 function applyPermissionsToTabs() {
   if (currentUserRole === 'owner') return;
+
+  // 👁️ مشاهدة فقط = مشاهدة جميع أقسام المنظومة والبيانات
+  // مع منع أي إضافة/تعديل/حذف/تصدير بواسطة دوال الصلاحيات.
+  if (currentUserPermissions.viewOnly === true) {
+    document.querySelectorAll('#adminTabs .tab').forEach(tab => {
+      const n = tab.dataset.tab;
+      // قسم الصلاحيات يبقى للمدير فقط حتى لا يتمكن مستخدم المشاهدة من إدارة المستخدمين.
+      tab.style.display = n === 'permissions' ? 'none' : 'block';
+    });
+    return;
+  }
+
   document.querySelectorAll('#adminTabs .tab').forEach(tab => {
     const n = tab.dataset.tab;
     let show = false;

@@ -20,7 +20,41 @@
     display: flex; align-items: center; justify-content: center;
   }
   #mainApp { display: none; width: 100%; padding: 100px 20px 40px; min-height: 100vh; }
-  
+
+  /* ============================================ */
+  /* 🎯 نظام الصلاحيات - إخفاء كل الأزرار عند view-only */
+  /* ============================================ */
+  body.view-only-mode .edit-btn,
+  body.view-only-mode .del-btn,
+  body.view-only-mode .del-btn-inline,
+  body.view-only-mode .camera-btn,
+  body.view-only-mode .file-btn,
+  body.view-only-mode .video-btn,
+  body.view-only-mode .export-btn,
+  body.view-only-mode #settingsBtn,
+  body.view-only-mode .save-action-btn,
+  body.view-only-mode .overtime-btn,
+  body.view-only-mode .word-btn,
+  body.view-only-mode .backup-btn,
+  body.view-only-mode .save-settings-btn,
+  body.view-only-mode .add-worker-form,
+  body.view-only-mode .add-driver-form,
+  body.view-only-mode .add-item-form,
+  body.view-only-mode .add-vehicle-form,
+  body.view-only-mode .add-user-form,
+  body.view-only-mode .manual-mark-btn,
+  body.view-only-mode .shift-btn,
+  body.view-only-mode #tab-daily .card,
+  body.view-only-mode #tab-workers .card:first-child,
+  body.view-only-mode #tab-drivers .card:first-child,
+  body.view-only-mode #tab-reports .card:first-child,
+  body.view-only-mode #tab-overtime .card:first-child,
+  body.view-only-mode #tab-inventory .card:first-child,
+  body.view-only-mode #tab-vehicles .card:first-child,
+  body.view-only-mode #tab-permissions .card:first-child {
+    display: none !important;
+  }
+
   .top-bar {
     position: fixed;
     top: 15px;
@@ -32,18 +66,8 @@
     z-index: 1000;
     pointer-events: none;
   }
-  .top-bar-right {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    pointer-events: auto;
-  }
-  .top-bar-left {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    pointer-events: auto;
-  }
+  .top-bar-right { display: flex; gap: 8px; align-items: center; pointer-events: auto; }
+  .top-bar-left { display: flex; gap: 8px; align-items: center; pointer-events: auto; }
   
   .user-bar { max-width: 1200px; margin: 0 auto 15px; display: flex; gap: 10px; flex-wrap: wrap; padding: 0 15px; align-items: center; justify-content: center; }
   .user-bar .user-info {
@@ -80,36 +104,21 @@
   .logout-btn:hover { transform: scale(1.1) rotate(5deg); }
   
   .settings-btn {
-    width: 38px;
-    height: 38px;
-    padding: 6px;
-    margin: 0;
+    width: 38px; height: 38px; padding: 6px; margin: 0;
     background: rgba(255, 255, 255, 0.9);
     border: 2px solid rgba(255,255,255,0.9);
-    border-radius: 50%;
-    color: #5f6368;
-    cursor: pointer;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    flex-shrink: 0;
+    border-radius: 50%; color: #5f6368; cursor: pointer;
+    display: none; align-items: center; justify-content: center;
+    transition: all 0.2s ease; flex-shrink: 0;
     box-shadow: 0 3px 10px rgba(0,0,0,0.15);
   }
   .settings-btn:hover {
-    background: #fff;
-    color: #0f766e;
+    background: #fff; color: #0f766e;
     box-shadow: 0 4px 14px rgba(15,118,110,0.3);
     transform: scale(1.08);
   }
-  .settings-btn svg {
-    width: 100%;
-    height: 100%;
-    transition: transform 0.4s ease;
-    fill: currentColor;
-  }
+  .settings-btn svg { width: 100%; height: 100%; transition: transform 0.4s ease; fill: currentColor; }
   .settings-btn:hover svg { transform: rotate(60deg); }
-  .settings-btn:active svg { transform: rotate(120deg) scale(0.9); }
   .settings-btn.visible { display: flex; }
   
   .tabs-container { max-width: 1200px; margin: 0 auto 20px; padding: 0 15px; }
@@ -505,7 +514,7 @@
         </div>
         <div class="progress-bar" id="uploadProgress"><div class="progress-fill" id="progressFill"></div></div>
         <div class="progress-text" id="progressText"></div>
-        <button class="word-btn" onclick="saveReport()">💾 حفظ التقرير</button>
+        <button class="word-btn save-action-btn" onclick="saveReport()">💾 حفظ التقرير</button>
       </div>
       <div class="card">
         <h2>📄 التقارير المحفوظة</h2>
@@ -514,7 +523,7 @@
     </div>
 
     <div id="tab-workers" style="display:none;">
-      <div class="card">
+      <div class="card add-worker-form">
         <h2>➕ إضافة عامل</h2>
         <label>📸 صورة العامل</label>
         <img id="workerPhotoPreview" class="photo-preview">
@@ -536,7 +545,7 @@
         </select>
         <label>📅 تاريخ مباشرة العمل</label>
         <input type="date" id="newWorkerStartDate">
-        <button onclick="addWorker()">✅ تسجيل العامل</button>
+        <button class="save-action-btn" onclick="addWorker()">✅ تسجيل العامل</button>
       </div>
       <div class="card">
         <h2>👷 العمال</h2>
@@ -546,7 +555,7 @@
     </div>
 
     <div id="tab-drivers" style="display:none;">
-      <div class="card">
+      <div class="card add-driver-form">
         <h2>➕ إضافة سائق / مشرف</h2>
         <label>📸 الصورة الشخصية</label>
         <img id="driverPhotoPreview" class="photo-preview">
@@ -609,7 +618,7 @@
           <button class="camera-btn" onclick="document.getElementById('driverCheckInputCamera').click()">📷 كاميرا</button>
           <button class="file-btn" onclick="document.getElementById('driverCheckInput').click()">🖼️ من الملفات</button>
         </div>
-        <button onclick="addDriver()">✅ تسجيل الموظف</button>
+        <button class="save-action-btn" onclick="addDriver()">✅ تسجيل الموظف</button>
       </div>
       <div class="card">
         <h2>🚗 السائقين والمشرفين</h2>
@@ -631,7 +640,7 @@
         <input id="overtimeHours" type="number" placeholder="مثال: 2.5" step="0.5" min="0">
         <label>📝 ملاحظة (اختياري)</label>
         <input id="overtimeNote" placeholder="سبب الوقت الإضافي">
-        <button class="overtime-btn" onclick="saveOvertime()">💾 حفظ الوقت الإضافي</button>
+        <button class="overtime-btn save-action-btn" onclick="saveOvertime()">💾 حفظ الوقت الإضافي</button>
       </div>
       <div class="card">
         <h2>📊 سجل الأوقات الإضافية</h2>
@@ -652,12 +661,12 @@
     </div>
 
     <div id="tab-inventory" style="display:none;">
-      <div class="card">
+      <div class="card add-item-form">
         <h2>➕ إضافة صنف</h2>
         <input id="newItemName" placeholder="اسم الصنف">
         <input id="newItemQty" type="number" placeholder="الكمية">
         <input id="newItemUnit" placeholder="الوحدة">
-        <button onclick="addItem()">➕ إضافة</button>
+        <button class="save-action-btn" onclick="addItem()">➕ إضافة</button>
       </div>
       <div class="card">
         <h2>📦 المخزن</h2>
@@ -667,7 +676,7 @@
     </div>
 
     <div id="tab-vehicles" style="display:none;">
-      <div class="card">
+      <div class="card add-vehicle-form">
         <h2>➕ إضافة آلية</h2>
         <select id="vehicleType">
           <option value="small_compactor">كبس صغير</option>
@@ -690,7 +699,7 @@
           <button class="camera-btn" onclick="document.getElementById('vehiclePhotoInputCamera').click()">📷 كاميرا</button>
           <button class="file-btn" onclick="document.getElementById('vehiclePhotoInput').click()">🖼️ من الملفات</button>
         </div>
-        <button onclick="saveVehicle()">💾 حفظ</button>
+        <button class="save-action-btn" onclick="saveVehicle()">💾 حفظ</button>
       </div>
       <div class="card">
         <h2>🚛 الآليات</h2>
@@ -700,7 +709,7 @@
     </div>
 
     <div id="tab-permissions" style="display:none;">
-      <div class="card">
+      <div class="card add-user-form">
         <h2>👥 إضافة مستخدم</h2>
         <input id="newUserName" placeholder="اسم المستخدم">
         <input id="newUserPin" type="password" placeholder="الرقم السري (4-6)" maxlength="6" style="text-align:center;letter-spacing:10px;">
@@ -725,7 +734,7 @@
           <div class="permission-item"><label>📊 تصدير Excel</label><input type="checkbox" id="perm-export"></div>
           <div class="permission-item"><label>👁️ مشاهدة فقط</label><input type="checkbox" id="perm-viewonly"></div>
         </div>
-        <button onclick="addUser()">➕ إضافة</button>
+        <button class="save-action-btn" onclick="addUser()">➕ إضافة</button>
       </div>
       <div class="card">
         <h2>📋 المستخدمين (اضغط لتعديل الصلاحيات)</h2>
@@ -889,7 +898,7 @@ const VEHICLE_TYPES = {
 };
 
 // ============================================
-// 🔒 دوال الصلاحيات (مُصحَّحة - صارمة)
+// 🔒 دوال الصلاحيات (صارمة - view-only يمنع كل شيء)
 // ============================================
 function isOwnerOrAdmin() {
   return currentUserRole === 'owner' || currentUserRole === 'admin';
@@ -934,6 +943,15 @@ function checkDeletePermission() {
 function checkExportPermission() {
   if (!canExport()) { alert('🚫 لا تملك صلاحية التصدير. تواصل مع المدير.'); return false; }
   return true;
+}
+
+// 🎯 تطبيق view-only-mode على body
+function applyBodyClasses() {
+  document.body.classList.remove('view-only-mode');
+  if (isOwnerOrAdmin()) return;
+  if (currentUserPermissions.viewOnly === true) {
+    document.body.classList.add('view-only-mode');
+  }
 }
 
 function getTodayDate() { return new Date().toLocaleDateString('ar-LY', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }); }
@@ -1344,9 +1362,14 @@ function enterAdmin() {
   if (currentUserRole === 'owner') ui.innerHTML = '<span class="role-badge role-owner">👑</span> ' + currentUser.name;
   else if (currentUserRole === 'admin') ui.innerHTML = '<span class="role-badge role-admin">👤</span> ' + currentUser.name;
   else ui.innerHTML = '<span class="role-badge role-supervisor">👤</span> ' + currentUser.name;
-  if (currentUserPermissions.viewOnly) ui.innerHTML += ' <span class="view-only-badge">👁️</span>';
+  if (currentUserPermissions.viewOnly) ui.innerHTML += ' <span class="view-only-badge">👁️ مشاهدة فقط</span>';
+  
+  // 🎯 تطبيق class view-only على body
+  applyBodyClasses();
+  
   if (isOwnerOrAdmin()) document.getElementById('settingsBtn').classList.add('visible');
   else document.getElementById('settingsBtn').classList.remove('visible');
+  
   clearLogin();
   initializeAdmin();
 }
@@ -1359,6 +1382,7 @@ function clearLogin() {
 
 function logout() {
   if (!confirm('هل تريد الخروج؟')) return;
+  document.body.classList.remove('view-only-mode');
   currentUser = null;
   document.getElementById('mainApp').style.display = 'none';
   document.getElementById('workerView').style.display = 'none';
@@ -1384,18 +1408,16 @@ function togglePermissionsBox() {
 
 function applyPermissionsToTabs() {
   if (currentUserRole === 'owner') return;
-
-  // 👁️ مشاهدة فقط = مشاهدة جميع أقسام المنظومة والبيانات
-  // مع منع أي إضافة/تعديل/حذف/تصدير بواسطة دوال الصلاحيات.
+  
+  // 🎯 مشاهدة فقط = يشوف كل التبويبات
   if (currentUserPermissions.viewOnly === true) {
     document.querySelectorAll('#adminTabs .tab').forEach(tab => {
       const n = tab.dataset.tab;
-      // قسم الصلاحيات يبقى للمدير فقط حتى لا يتمكن مستخدم المشاهدة من إدارة المستخدمين.
       tab.style.display = n === 'permissions' ? 'none' : 'block';
     });
     return;
   }
-
+  
   document.querySelectorAll('#adminTabs .tab').forEach(tab => {
     const n = tab.dataset.tab;
     let show = false;
@@ -1439,6 +1461,7 @@ function initializeAdmin() {
   loadReports();
   if (currentUserRole === 'owner' || currentUserRole === 'admin') loadUsersList();
   applyPermissionsToTabs();
+  applyBodyClasses();
   const otDate = document.getElementById('overtimeDate');
   if (otDate) otDate.value = getTodayISO();
   const otMonth = document.getElementById('overtimeMonthSelect');
@@ -1454,6 +1477,7 @@ function initializeAdmin() {
       if (tab.dataset.tab === 'deductions') loadDeductions();
       if (tab.dataset.tab === 'reports') loadReports();
       if (tab.dataset.tab === 'overtime') { populateOvertimeDriverSelect(); loadOvertimeList(); }
+      applyBodyClasses();
     };
   });
   setTimeout(updateStats, 1500);
@@ -1606,7 +1630,6 @@ function watchWorkers() {
   db.collection('workers').orderBy('name').onSnapshot(sn => {
     allWorkers = sn.docs.map(d => ({ id: d.id, ...d.data() }));
     const c1 = document.getElementById('workersList');
-    const editBtn = canEdit() ? '<button class="edit-btn" onclick="toggleEditWorkerForm(\'' + '" data-x="' + '\')">✏️</button>' : '';
     c1.innerHTML = allWorkers.length ? allWorkers.map(w => {
       const du = calculateWorkDuration(w.startDate);
       const db2 = canDelete() ? '<button class="del-btn" onclick="deleteWorker(\'' + w.id + '\',\'' + w.name + '\')">حذف</button>' : '';
@@ -1626,7 +1649,7 @@ function updateDailyMarkList() {
     if (!canMark) {
       return '<div class="worker-row"><img src="' + (w.photo||'') + '" onerror="this.style.visibility=\'hidden\'"><span class="name">' + (w.type === 'driver' ? '🚗 ' : '👷 ') + w.name + '</span><span style="font-size:11px;color:#888;">(مشاهدة فقط)</span></div>';
     }
-    return '<div class="worker-row"><img src="' + (w.photo||'') + '" onerror="this.style.visibility=\'hidden\'"><span class="name">' + (w.type === 'driver' ? '🚗 ' : '👷 ') + w.name + '</span><button onclick="manualMark(\'' + w.id + '\',\'' + w.name + '\',\'present\')" style="width:auto;padding:6px 10px;margin:0;background:#388e3c;border-color:#388e3c;">✅</button><button onclick="manualMark(\'' + w.id + '\',\'' + w.name + '\',\'absent\')" style="width:auto;padding:6px 10px;margin:0;background:#c62828;border-color:#c62828;">✗</button><button onclick="manualMark(\'' + w.id + '\',\'' + w.name + '\',\'leave\')" style="width:auto;padding:6px 10px;margin:0;background:#7b1fa2;border-color:#7b1fa2;">📝</button><button onclick="manualMark(\'' + w.id + '\',\'' + w.name + '\',\'sick\')" style="width:auto;padding:6px 10px;margin:0;background:#ad1457;border-color:#ad1457;">🤒</button></div>';
+    return '<div class="worker-row"><img src="' + (w.photo||'') + '" onerror="this.style.visibility=\'hidden\'"><span class="name">' + (w.type === 'driver' ? '🚗 ' : '👷 ') + w.name + '</span><button class="manual-mark-btn" onclick="manualMark(\'' + w.id + '\',\'' + w.name + '\',\'present\')" style="width:auto;padding:6px 10px;margin:0;background:#388e3c;border-color:#388e3c;">✅</button><button class="manual-mark-btn" onclick="manualMark(\'' + w.id + '\',\'' + w.name + '\',\'absent\')" style="width:auto;padding:6px 10px;margin:0;background:#c62828;border-color:#c62828;">✗</button><button class="manual-mark-btn" onclick="manualMark(\'' + w.id + '\',\'' + w.name + '\',\'leave\')" style="width:auto;padding:6px 10px;margin:0;background:#7b1fa2;border-color:#7b1fa2;">📝</button><button class="manual-mark-btn" onclick="manualMark(\'' + w.id + '\',\'' + w.name + '\',\'sick\')" style="width:auto;padding:6px 10px;margin:0;background:#ad1457;border-color:#ad1457;">🤒</button></div>';
   }).join('') : '<p style="text-align:center;color:#666;">لا يوجد أشخاص</p>';
 }
 

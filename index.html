@@ -21,9 +21,7 @@
   }
   #mainApp { display: none; width: 100%; padding: 100px 20px 40px; min-height: 100vh; }
 
-  /* ============================================ */
   /* 🔒 مشاهدة فقط - نخفي كل الأزرار */
-  /* ============================================ */
   body.view-only-mode .edit-btn,
   body.view-only-mode .del-btn,
   body.view-only-mode .del-btn-inline,
@@ -49,7 +47,6 @@
     display: none !important;
   }
 
-  /* في التقارير: نخفي المدخلات ونُبقي القائمة */
   body.view-only-mode #tab-reports .card:first-child > input,
   body.view-only-mode #tab-reports .card:first-child > textarea,
   body.view-only-mode #tab-reports .card:first-child > label,
@@ -718,8 +715,8 @@
         </select>
         <div id="permissionsBox" class="permission-box">
           <h3 style="margin:0 0 10px;font-size:14px;color:#0f766e;">حدد الصلاحيات:</h3>
-          <div class="permission-item"><label>📊 نظرة عامة</label><input type="checkbox" id="perm-overview" checked></div>
-          <div class="permission-item"><label>✅ تسجيل الحضور</label><input type="checkbox" id="perm-attendance" checked></div>
+          <div class="permission-item"><label>📊 نظرة عامة</label><input type="checkbox" id="perm-overview"></div>
+          <div class="permission-item"><label>✅ تسجيل الحضور</label><input type="checkbox" id="perm-attendance"></div>
           <div class="permission-item"><label>📋 التقارير</label><input type="checkbox" id="perm-reports"></div>
           <div class="permission-item"><label>👷 إدارة العمال</label><input type="checkbox" id="perm-workers"></div>
           <div class="permission-item"><label>🚗 إدارة السائقين</label><input type="checkbox" id="perm-drivers"></div>
@@ -926,7 +923,7 @@ function checkEditPermission() { if (!canEdit()) { alert('🚫 لا تملك ص�
 function checkDeletePermission() { if (!canDelete()) { alert('🚫 لا تملك صلاحية الحذف.'); return false; } return true; }
 function checkExportPermission() { if (!canExport()) { alert('🚫 لا تملك صلاحية التصدير.'); return false; } return true; }
 
-// 🎯 تطبيق view-only-mode على body
+// 🎯 تطبيق view-only-mode
 function applyBodyClasses() {
   document.body.classList.remove('view-only-mode');
   if (isOwnerOrAdmin()) return;
@@ -1343,7 +1340,7 @@ function enterAdmin() {
   if (currentUserRole === 'owner') ui.innerHTML = '<span class="role-badge role-owner">👑</span> ' + currentUser.name;
   else if (currentUserRole === 'admin') ui.innerHTML = '<span class="role-badge role-admin">👤</span> ' + currentUser.name;
   else ui.innerHTML = '<span class="role-badge role-supervisor">👤</span> ' + currentUser.name;
-  if (currentUserPermissions.viewOnly) ui.innerHTML += ' <span class="view-only-badge">👁️ مشاهدة فقط</span>';
+  if (currentUserPermissions.viewOnly) ui.innerHTML += ' <span class="view-only-badge">👁️</span>';
   
   applyBodyClasses();
   
@@ -1374,10 +1371,13 @@ function logout() {
 function backToOverview() {
   document.querySelectorAll('#adminTabs .tab').forEach(t => t.classList.remove('active'));
   const ot = document.querySelector('#adminTabs .tab[data-tab="overview"]');
-  if (ot) ot.classList.add('active');
+  if (ot && ot.style.display !== 'none') {
+    ot.classList.add('active');
+    document.getElementById('tab-overview').style.display = 'block';
+  }
   ['overview','daily','reports','workers','drivers','overtime','deductions','inventory','vehicles','permissions'].forEach(t => {
     const el = document.getElementById('tab-' + t);
-    if (el) el.style.display = t === 'overview' ? 'block' : 'none';
+    if (el && t !== 'overview') el.style.display = 'none';
   });
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -1386,18 +1386,9 @@ function togglePermissionsBox() {
   document.getElementById('permissionsBox').style.display = document.getElementById('newUserRole').value === 'supervisor' ? 'block' : 'none';
 }
 
+// 🎯 دالة عرض التبويبات - تعرض حسب الصلاحيات المفعّلة فقط
 function applyPermissionsToTabs() {
   if (currentUserRole === 'owner') return;
-
-  if (currentUserPermissions.viewOnly === true) {
-    document.querySelectorAll('#adminTabs .tab').forEach(tab => {
-      const n = tab.dataset.tab;
-      tab.style.display = n === 'permissions' ? 'none' : 'block';
-    });
-    const sb = document.getElementById('settingsBtn');
-    if (sb) sb.classList.remove('visible');
-    return;
-  }
 
   document.querySelectorAll('#adminTabs .tab').forEach(tab => {
     const n = tab.dataset.tab;
@@ -1416,6 +1407,12 @@ function applyPermissionsToTabs() {
     }
     tab.style.display = show ? 'block' : 'none';
   });
+  
+  // إخفاء الإعدادات في view-only
+  if (currentUserPermissions.viewOnly === true) {
+    const sb = document.getElementById('settingsBtn');
+    if (sb) sb.classList.remove('visible');
+  }
 }
 
 function selectWorkerShift(s) { selectedShift = s; updateShiftButtons('#workerView', s); }
@@ -2109,39 +2106,33 @@ function deleteVehicle(id, number) {
   if (confirm('حذف ' + number + '؟')) db.collection('vehicles').doc(id).delete();
 }
 
+// 🎯 addUser - يحفظ الصلاحيات المختارة + يمنع canAdd/canEdit/canDelete/canExport عند viewOnly
 async function addUser() {
   const name = document.getElementById('newUserName').value.trim();
   const pin = document.getElementById('newUserPin').value.trim();
   const role = document.getElementById('newUserRole').value;
   if (!name || !pin || pin.length < 4) { alert('أدخل اسم ورقم سري'); return; }
   let perms = {}, vo = false;
-  if (role === 'admin') perms = { viewOverview:true, manageAttendance:true, manageReports:true, manageWorkers:true, manageDrivers:true, manageOvertime:true, viewDeductions:true, manageInventory:true, manageVehicles:true, canAdd:true, canEdit:true, canDelete:true, canExport:true };
-  else {
+  if (role === 'admin') {
+    perms = { viewOverview:true, manageAttendance:true, manageReports:true, manageWorkers:true, manageDrivers:true, manageOvertime:true, viewDeductions:true, manageInventory:true, manageVehicles:true, canAdd:true, canEdit:true, canDelete:true, canExport:true };
+    vo = false;
+  } else {
     vo = document.getElementById('perm-viewonly').checked;
-    if (vo) {
-      perms = {
-        viewOverview: true, manageAttendance: true, manageReports: true,
-        manageWorkers: true, manageDrivers: true, manageOvertime: true,
-        viewDeductions: true, manageInventory: true, manageVehicles: true,
-        canAdd: false, canEdit: false, canDelete: false, canExport: false
-      };
-    } else {
-      perms = {
-        viewOverview: document.getElementById('perm-overview').checked,
-        manageAttendance: document.getElementById('perm-attendance').checked,
-        manageReports: document.getElementById('perm-reports').checked,
-        manageWorkers: document.getElementById('perm-workers').checked,
-        manageDrivers: document.getElementById('perm-drivers').checked,
-        manageOvertime: document.getElementById('perm-overtime').checked,
-        viewDeductions: document.getElementById('perm-deductions').checked,
-        manageInventory: document.getElementById('perm-inventory').checked,
-        manageVehicles: document.getElementById('perm-vehicles').checked,
-        canAdd: document.getElementById('perm-add').checked,
-        canEdit: document.getElementById('perm-edit').checked,
-        canDelete: document.getElementById('perm-delete').checked,
-        canExport: document.getElementById('perm-export').checked
-      };
-    }
+    perms = {
+      viewOverview: document.getElementById('perm-overview').checked,
+      manageAttendance: document.getElementById('perm-attendance').checked,
+      manageReports: document.getElementById('perm-reports').checked,
+      manageWorkers: document.getElementById('perm-workers').checked,
+      manageDrivers: document.getElementById('perm-drivers').checked,
+      manageOvertime: document.getElementById('perm-overtime').checked,
+      viewDeductions: document.getElementById('perm-deductions').checked,
+      manageInventory: document.getElementById('perm-inventory').checked,
+      manageVehicles: document.getElementById('perm-vehicles').checked,
+      canAdd: vo ? false : document.getElementById('perm-add').checked,
+      canEdit: vo ? false : document.getElementById('perm-edit').checked,
+      canDelete: vo ? false : document.getElementById('perm-delete').checked,
+      canExport: vo ? false : document.getElementById('perm-export').checked
+    };
   }
   await db.collection('systemUsers').add({ name, pin, role, permissions: perms, viewOnly: vo, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
   showWorkNotification({ name, jobTitle: role === 'admin' ? 'مدير' : 'مشرف', startDate: getTodayISO(), photo: '' });
@@ -2207,39 +2198,33 @@ function toggleEditPermissionsBox(userId) {
   document.getElementById('editPermissionsBox-' + userId).style.display = role === 'supervisor' ? 'block' : 'none';
 }
 
+// 🎯 saveUserEdit - نفس المنطق
 async function saveUserEdit(userId) {
   const name = document.getElementById('editUserName-' + userId).value.trim();
   const pin = document.getElementById('editUserPin-' + userId).value.trim();
   const role = document.getElementById('editUserRole-' + userId).value;
   if (!name || !pin || pin.length < 4) { alert('⚠️ بيانات غير صحيحة'); return; }
   let perms = {}, vo = false;
-  if (role === 'admin') perms = { viewOverview:true, manageAttendance:true, manageReports:true, manageWorkers:true, manageDrivers:true, manageOvertime:true, viewDeductions:true, manageInventory:true, manageVehicles:true, canAdd:true, canEdit:true, canDelete:true, canExport:true };
-  else {
+  if (role === 'admin') {
+    perms = { viewOverview:true, manageAttendance:true, manageReports:true, manageWorkers:true, manageDrivers:true, manageOvertime:true, viewDeductions:true, manageInventory:true, manageVehicles:true, canAdd:true, canEdit:true, canDelete:true, canExport:true };
+    vo = false;
+  } else {
     vo = document.getElementById('edit-perm-viewonly-' + userId).checked;
-    if (vo) {
-      perms = {
-        viewOverview: true, manageAttendance: true, manageReports: true,
-        manageWorkers: true, manageDrivers: true, manageOvertime: true,
-        viewDeductions: true, manageInventory: true, manageVehicles: true,
-        canAdd: false, canEdit: false, canDelete: false, canExport: false
-      };
-    } else {
-      perms = {
-        viewOverview: document.getElementById('edit-perm-overview-' + userId).checked,
-        manageAttendance: document.getElementById('edit-perm-attendance-' + userId).checked,
-        manageReports: document.getElementById('edit-perm-reports-' + userId).checked,
-        manageWorkers: document.getElementById('edit-perm-workers-' + userId).checked,
-        manageDrivers: document.getElementById('edit-perm-drivers-' + userId).checked,
-        manageOvertime: document.getElementById('edit-perm-overtime-' + userId).checked,
-        viewDeductions: document.getElementById('edit-perm-deductions-' + userId).checked,
-        manageInventory: document.getElementById('edit-perm-inventory-' + userId).checked,
-        manageVehicles: document.getElementById('edit-perm-vehicles-' + userId).checked,
-        canAdd: document.getElementById('edit-perm-add-' + userId).checked,
-        canEdit: document.getElementById('edit-perm-edit-' + userId).checked,
-        canDelete: document.getElementById('edit-perm-delete-' + userId).checked,
-        canExport: document.getElementById('edit-perm-export-' + userId).checked
-      };
-    }
+    perms = {
+      viewOverview: document.getElementById('edit-perm-overview-' + userId).checked,
+      manageAttendance: document.getElementById('edit-perm-attendance-' + userId).checked,
+      manageReports: document.getElementById('edit-perm-reports-' + userId).checked,
+      manageWorkers: document.getElementById('edit-perm-workers-' + userId).checked,
+      manageDrivers: document.getElementById('edit-perm-drivers-' + userId).checked,
+      manageOvertime: document.getElementById('edit-perm-overtime-' + userId).checked,
+      viewDeductions: document.getElementById('edit-perm-deductions-' + userId).checked,
+      manageInventory: document.getElementById('edit-perm-inventory-' + userId).checked,
+      manageVehicles: document.getElementById('edit-perm-vehicles-' + userId).checked,
+      canAdd: vo ? false : document.getElementById('edit-perm-add-' + userId).checked,
+      canEdit: vo ? false : document.getElementById('edit-perm-edit-' + userId).checked,
+      canDelete: vo ? false : document.getElementById('edit-perm-delete-' + userId).checked,
+      canExport: vo ? false : document.getElementById('edit-perm-export-' + userId).checked
+    };
   }
   try {
     await db.collection('systemUsers').doc(userId).update({ name, pin, role, permissions: perms, viewOnly: vo, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });

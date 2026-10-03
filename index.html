@@ -21,7 +21,6 @@
   }
   #mainApp { display: none; width: 100%; padding: 100px 20px 40px; min-height: 100vh; }
 
-  /* 🔒 مشاهدة فقط - نخفي كل الأزرار */
   body.view-only-mode .edit-btn,
   body.view-only-mode .del-btn,
   body.view-only-mode .del-btn-inline,
@@ -226,7 +225,6 @@
   .stat .num { font-size: 26px; font-weight: 900; display: block; margin-bottom: 6px; color: #0f766e; }
   .row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid rgba(15,118,110,0.2); color: #333; font-size: 14px; }
 
-  /* ✅ بطاقة العامل - معدّلة لمنع نزول الأزرار لسطر جديد */
   .worker-row {
     display: flex;
     align-items: center;
@@ -265,7 +263,8 @@
   .worker-row .deduction-badge,
   .worker-row .salary-badge,
   .worker-row .edit-btn,
-  .worker-row .del-btn {
+  .worker-row .del-btn,
+  .worker-row .salary-countdown-badge {
     flex-shrink: 0;
     white-space: nowrap;
   }
@@ -285,7 +284,8 @@
       padding: 5px 8px;
       font-size: 11px;
     }
-    .worker-row .duration-badge {
+    .worker-row .duration-badge,
+    .worker-row .salary-countdown-badge {
       padding: 2px 6px;
       font-size: 10px;
     }
@@ -320,6 +320,33 @@
   .salary-badge { background: #9c27b0; color: #fff; padding: 3px 12px; border-radius: 12px; font-size: 11px; font-weight: 800; }
   .overtime-badge { background: #f57c00; color: #fff; padding: 3px 12px; border-radius: 12px; font-size: 11px; font-weight: 800; }
   .video-badge { background: #d32f2f; color: #fff; padding: 3px 12px; border-radius: 12px; font-size: 11px; font-weight: 800; }
+
+  .salary-countdown-badge {
+    background: linear-gradient(135deg, #9c27b0, #7b1fa2);
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 800;
+    white-space: nowrap;
+    flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(156,39,176,0.35);
+  }
+  .salary-countdown-badge.today {
+    background: linear-gradient(135deg, #4caf50, #2e7d32);
+    animation: pulseGlow 1.2s infinite;
+  }
+  .salary-countdown-badge.tomorrow {
+    background: linear-gradient(135deg, #ff9800, #f57c00);
+  }
+  .salary-countdown-badge.soon {
+    background: linear-gradient(135deg, #f44336, #c62828);
+  }
+  @keyframes pulseGlow {
+    0%, 100% { transform: scale(1); box-shadow: 0 2px 6px rgba(76,175,80,0.45); }
+    50% { transform: scale(1.08); box-shadow: 0 2px 15px rgba(76,175,80,0.85); }
+  }
+
   .date-display {
     text-align: center; color: #0f766e; font-size: 15px; font-weight: 800;
     margin-bottom: 15px; padding: 12px; background: rgba(255,255,255,0.38);
@@ -837,7 +864,6 @@
     <button class="save-settings-btn" onclick="saveAllSettings()">💾 حفظ جميع الإعدادات</button>
   </div>
 </div>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
@@ -1011,6 +1037,49 @@ function calculateWorkDuration(startDate) {
   if (m > 0) r += m + ' شهر ';
   if (d > 0 || r === '') r += d + ' يوم';
   return r.trim() || 'اليوم';
+}
+
+// 🗓️ حساب كم باقي يوم لراتب شخص
+// القاعدة: تاريخ المباشرة + شهر كامل
+// مثال: باشر 15 يناير → يستلم 15 فبراير
+// الشهور القصيرة (28) → نستخدم آخر يوم متاح
+function daysUntilSalaryFor(startDate) {
+  if (!startDate) return null;
+
+  const start = new Date(startDate);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const salaryDay = start.getDate();
+
+  // نبني تاريخ الشهر مع مراعاة الشهور القصيرة
+  function buildDate(year, month) {
+    const lastDay = new Date(year, month + 1, 0).getDate();
+    const targetDay = Math.min(salaryDay, lastDay);
+    return new Date(year, month, targetDay);
+  }
+
+  // أول راتب: بعد شهر من المباشرة
+  let nextSalary = buildDate(start.getFullYear(), start.getMonth() + 1);
+
+  // نضيف شهر لين نطلع بعد اليوم
+  while (nextSalary <= today) {
+    nextSalary = buildDate(nextSalary.getFullYear(), nextSalary.getMonth() + 1);
+  }
+
+  const diffTime = nextSalary - today;
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+}
+
+// 🏷️ بادج عرض الراتب
+function salaryBadgeHTML(startDate) {
+  const days = daysUntilSalaryFor(startDate);
+  if (days === null) return '';
+
+  if (days === 0) return '<span class="salary-countdown-badge today">💰 اليوم راتبه</span>';
+  if (days === 1) return '<span class="salary-countdown-badge tomorrow">💰 باقي يوم</span>';
+  if (days <= 3) return '<span class="salary-countdown-badge soon">💰 باقي ' + days + ' أيام</span>';
+  return '<span class="salary-countdown-badge">💰 باقي ' + days + ' يوم</span>';
 }
 
 function compressImage(file, maxWidth, quality) {
@@ -1348,7 +1417,8 @@ async function login() {
     if (!us.empty) {
       us.forEach(d => { currentUser = { id: d.id, ...d.data() }; });
       currentUserRole = currentUser.role || 'supervisor';
-      currentUserPermissions = currentUser.permissions || {};
+      currentUserPermissions = { ...(currentUser.permissions || {}) };
+      currentUserPermissions.viewOnly = currentUser.viewOnly === true;
       enterAdmin();
       return;
     }
@@ -1450,9 +1520,14 @@ function togglePermissionsBox() {
 function applyPermissionsToTabs() {
   if (currentUserRole === 'owner') return;
 
+  const isViewOnly = currentUserPermissions.viewOnly === true;
   document.querySelectorAll('#adminTabs .tab').forEach(tab => {
     const n = tab.dataset.tab;
     let show = false;
+    if (isViewOnly) {
+      // مشاهدة فقط: يرى جميع أقسام التشغيل والبيانات، ولا يدخل إدارة المستخدمين والصلاحيات.
+      show = n !== 'permissions';
+    } else {
     switch(n) {
       case 'overview': show = currentUserPermissions.viewOverview === true; break;
       case 'daily': show = currentUserPermissions.manageAttendance === true; break;
@@ -1464,6 +1539,7 @@ function applyPermissionsToTabs() {
       case 'inventory': show = currentUserPermissions.manageInventory === true; break;
       case 'vehicles': show = currentUserPermissions.manageVehicles === true; break;
       case 'permissions': show = currentUserRole === 'admin'; break;
+    }
     }
     tab.style.display = show ? 'block' : 'none';
   });
@@ -1505,6 +1581,10 @@ function initializeAdmin() {
   if (otMonth) otMonth.addEventListener('change', loadOvertimeList);
   document.querySelectorAll('.tab').forEach(tab => {
     tab.onclick = () => {
+      const tabName = tab.dataset.tab;
+      const isViewOnlyUser = currentUserPermissions.viewOnly === true;
+      if (isViewOnlyUser && tabName === 'permissions') return;
+      if (!isViewOnlyUser && (tab.style.display === 'none' || getComputedStyle(tab).display === 'none')) return;
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
       ['overview','daily','reports','workers','drivers','overtime','deductions','inventory','vehicles','permissions'].forEach(t => {
@@ -1683,7 +1763,7 @@ function renderWorkersList() {
     const du = calculateWorkDuration(w.startDate);
     const db2 = canDelete() ? '<button class="del-btn" onclick="deleteWorker(\'' + w.id + '\',\'' + w.name + '\')">حذف</button>' : '';
     const ed2 = canEdit() ? '<button class="edit-btn" onclick="toggleEditWorkerForm(\'' + w.id + '\')">✏️</button>' : '';
-    return '<div class="worker-row"><img src="' + (w.photo||'') + '" onerror="this.style.visibility=\'hidden\'"><span class="name">' + w.name + '</span><span style="font-size:11px;color:#666;flex-shrink:0;">' + teamLabel(w.team) + '</span><span class="duration-badge">' + du + '</span>' + ed2 + db2 + '<div id="editForm-' + w.id + '" class="edit-form"></div></div>';
+    return '<div class="worker-row"><img src="' + (w.photo||'') + '" onerror="this.style.visibility=\'hidden\'"><span class="name">' + w.name + '</span><span style="font-size:11px;color:#666;flex-shrink:0;">' + teamLabel(w.team) + '</span><span class="duration-badge">' + du + '</span>' + salaryBadgeHTML(w.startDate) + ed2 + db2 + '<div id="editForm-' + w.id + '" class="edit-form"></div></div>';
   }).join('') : '<p style="text-align:center;color:#666;">' + (s ? 'لا نتائج للبحث' : 'لا يوجد عمال') + '</p>';
 }
 
@@ -1819,7 +1899,7 @@ function renderDriversList() {
     const p = d.photoURL || d.photo || '';
     const db2 = canDelete() ? '<button class="del-btn" onclick="deleteDriver(\'' + d.id + '\',\'' + d.name + '\')">حذف</button>' : '';
     const ed2 = canEdit() ? '<button class="edit-btn" onclick="toggleEditDriverForm(\'' + d.id + '\')">✏️</button>' : '';
-    return '<div class="driver-card"><div class="driver-header"><img src="' + (d.photo||d.photoURL||'') + '" onerror="this.style.visibility=\'hidden\'"><div style="flex:1;"><strong>' + d.name + '</strong><div style="font-size:12px;color:#666;">' + tl + '</div></div></div><div class="driver-info"><span class="info-tag">📅 ' + (d.startDate || '—') + '</span><span class="duration-badge">⏱️ ' + du + '</span>' + (d.salary ? '<span class="salary-badge">💰 ' + d.salary + ' د</span>' : '') + '</div><div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;"><button class="view-btn" onclick="showWorkNotification({name:\'' + d.name + '\',jobTitle:\'' + tl + '\',startDate:\'' + d.startDate + '\',photo:\'' + p + '\'})" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">📋 إفادة</button>' + ed2 + db2 + '</div><div id="driverEditForm-' + d.id + '" class="edit-form"></div></div>';
+    return '<div class="driver-card"><div class="driver-header"><img src="' + (d.photo||d.photoURL||'') + '" onerror="this.style.visibility=\'hidden\'"><div style="flex:1;"><strong>' + d.name + '</strong><div style="font-size:12px;color:#666;">' + tl + '</div></div></div><div class="driver-info"><span class="info-tag">📅 ' + (d.startDate || '—') + '</span><span class="duration-badge">⏱️ ' + du + '</span>' + (d.salary ? '<span class="salary-badge">💰 ' + d.salary + ' د</span>' : '') + '</div><div style="margin-top:8px;">' + salaryBadgeHTML(d.startDate) + '</div><div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;"><button class="view-btn" onclick="showWorkNotification({name:\'' + d.name + '\',jobTitle:\'' + tl + '\',startDate:\'' + d.startDate + '\',photo:\'' + p + '\'})" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">📋 إفادة</button>' + ed2 + db2 + '</div><div id="driverEditForm-' + d.id + '" class="edit-form"></div></div>';
   }).join('');
 }
 
@@ -2196,6 +2276,7 @@ function deleteVehicle(id, number) {
 }
 
 async function addUser() {
+  if (!isOwnerOrAdmin()) { alert('🚫 لا تملك صلاحية إدارة المستخدمين.'); return; }
   const name = document.getElementById('newUserName').value.trim();
   const pin = document.getElementById('newUserPin').value.trim();
   const role = document.getElementById('newUserRole').value;
@@ -2230,6 +2311,7 @@ async function addUser() {
 }
 
 function loadUsersList() {
+  if (!isOwnerOrAdmin()) return;
   db.collection('systemUsers').onSnapshot(sn => {
     const list = document.getElementById('usersList');
     if (sn.empty) { list.innerHTML = '<p style="text-align:center;color:#666;">لا يوجد مستخدمين</p>'; return; }
@@ -2247,6 +2329,7 @@ function loadUsersList() {
 }
 
 function toggleUserEditForm(userId) {
+  if (!isOwnerOrAdmin()) { alert('🚫 لا تملك صلاحية إدارة المستخدمين.'); return; }
   const form = document.getElementById('userEditForm-' + userId);
   if (!form) return;
   if (form.style.display === 'block') { form.style.display = 'none'; form.innerHTML = ''; return; }
@@ -2287,6 +2370,7 @@ function toggleEditPermissionsBox(userId) {
 }
 
 async function saveUserEdit(userId) {
+  if (!isOwnerOrAdmin()) { alert('🚫 لا تملك صلاحية إدارة المستخدمين.'); return; }
   const name = document.getElementById('editUserName-' + userId).value.trim();
   const pin = document.getElementById('editUserPin-' + userId).value.trim();
   const role = document.getElementById('editUserRole-' + userId).value;

@@ -64,7 +64,7 @@
   }
   .top-bar-right { display: flex; gap: 8px; align-items: center; pointer-events: auto; }
   .top-bar-left { display: flex; gap: 8px; align-items: center; pointer-events: auto; }
-  
+
   .user-bar { max-width: 1200px; margin: 0 auto 15px; display: flex; gap: 10px; flex-wrap: wrap; padding: 0 15px; align-items: center; justify-content: center; }
   .user-bar .user-info {
     text-align: center; color: #0f766e; padding: 14px 30px;
@@ -98,7 +98,7 @@
     border-radius: 50%; pointer-events: none;
   }
   .logout-btn:hover { transform: scale(1.1) rotate(5deg); }
-  
+
   .settings-btn {
     width: 38px; height: 38px; padding: 6px; margin: 0;
     background: rgba(255, 255, 255, 0.9);
@@ -116,7 +116,7 @@
   .settings-btn svg { width: 100%; height: 100%; transition: transform 0.4s ease; fill: currentColor; }
   .settings-btn:hover svg { transform: rotate(60deg); }
   .settings-btn.visible { display: flex; }
-  
+
   .tabs-container { max-width: 1200px; margin: 0 auto 20px; padding: 0 15px; }
   .tabs { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
   .tab {
@@ -392,7 +392,7 @@
       <button onclick="logout()" class="logout-btn" title="خروج">⏻</button>
     </div>
   </div>
-  
+
   <div id="workerView" style="display:none;">
     <div class="user-bar">
       <div class="user-info"><span id="workerInfo"></span></div>
@@ -1273,7 +1273,7 @@ async function login() {
   const msg = document.getElementById('loginMsg');
   if (!name || !pin) { msg.innerHTML = '<p style="color:#c62828;">⚠️ أدخل اسمك والرقم السري</p>'; return; }
   if (!db) { msg.innerHTML = '<p style="color:#c62828;">❌ Firebase غير مهيأ</p>'; return; }
-  
+
   if (name === 'المدير' && pin === appSettings.ownerPin) {
     currentUser = { name: 'المدير', role: 'owner' };
     currentUserRole = 'owner';
@@ -1341,12 +1341,12 @@ function enterAdmin() {
   else if (currentUserRole === 'admin') ui.innerHTML = '<span class="role-badge role-admin">👤</span> ' + currentUser.name;
   else ui.innerHTML = '<span class="role-badge role-supervisor">👤</span> ' + currentUser.name;
   if (currentUserPermissions.viewOnly) ui.innerHTML += ' <span class="view-only-badge">👁️</span>';
-  
+
   applyBodyClasses();
-  
+
   if (isOwnerOrAdmin()) document.getElementById('settingsBtn').classList.add('visible');
   else document.getElementById('settingsBtn').classList.remove('visible');
-  
+
   clearLogin();
   initializeAdmin();
 }
@@ -1407,7 +1407,7 @@ function applyPermissionsToTabs() {
     }
     tab.style.display = show ? 'block' : 'none';
   });
-  
+
   // إخفاء الإعدادات في view-only
   if (currentUserPermissions.viewOnly === true) {
     const sb = document.getElementById('settingsBtn');
@@ -1690,6 +1690,26 @@ async function manualMark(workerId, workerName, status) {
   await db.collection('attendance').add({ workerId, workerName, timestamp: firebase.firestore.FieldValue.serverTimestamp(), date: getTodayISO(), time: getNowTime(), status, shift: adminSelectedShift, hasDeduction: status === 'absent' });
 }
 
+
+// ===== منع تكرار أسماء العمال والسائقين =====
+function normalizePersonName(name) {
+  return String(name || '').replace(/\s+/g, ' ').trim().replace(/[أإآ]/g, 'ا').replace(/ى/g, 'ي').toLowerCase();
+}
+function findDuplicatePersonName(name, excludeType, excludeId) {
+  const normalized = normalizePersonName(name);
+  if (!normalized) return null;
+  const worker = allWorkers.find(w => normalizePersonName(w.name) === normalized && !(excludeType === 'worker' && w.id === excludeId));
+  if (worker) return { type: 'worker', person: worker };
+  const driver = allDrivers.find(d => normalizePersonName(d.name) === normalized && !(excludeType === 'driver' && d.id === excludeId));
+  if (driver) return { type: 'driver', person: driver };
+  return null;
+}
+function showDuplicateNameAlert(name, duplicate) {
+  const kind = duplicate?.type === 'driver' ? 'سائق' : 'عامل';
+  const oldName = duplicate?.person?.name || name;
+  alert('⚠️ الاسم مسجل مسبقاً\n\n' + oldName + '\nالتصنيف: ' + kind + '\n\nلا يمكن إضافة شخص آخر بنفس الاسم.');
+}
+
 async function addWorker() {
   if (!checkAddPermission()) return;
   const name = document.getElementById('newWorkerName').value.trim();
@@ -1697,6 +1717,8 @@ async function addWorker() {
   const shift = document.getElementById('newWorkerShift').value;
   const startDate = document.getElementById('newWorkerStartDate').value;
   if (!name || !startDate) { alert('أكمل البيانات'); return; }
+  const duplicate = findDuplicatePersonName(name, 'worker', null);
+  if (duplicate) { showDuplicateNameAlert(name, duplicate); return; }
   let pU = '';
   if (workerPhotoBase64) pU = await uploadImageToImgBB(workerPhotoBase64);
   await db.collection('workers').add({ name, team, shift, startDate, photo: workerPhotoBase64, photoURL: pU || '', pin: '0000', createdDate: getTodayISO(), createdTime: getNowTime(), createdAt: firebase.firestore.FieldValue.serverTimestamp() });
@@ -1790,6 +1812,8 @@ async function addDriver() {
   const bankName = document.getElementById('newDriverBank').value;
   const licenseGrade = document.getElementById('newDriverLicense').value;
   if (!name || !startDate || !salary) { alert('أكمل البيانات'); return; }
+  const duplicate = findDuplicatePersonName(name, 'driver', null);
+  if (duplicate) { showDuplicateNameAlert(name, duplicate); return; }
   let pU = '';
   if (driverPhotoBase64) pU = await uploadImageToImgBB(driverPhotoBase64);
   await db.collection('drivers').add({ name, driverType, shift, startDate, salary, accountNumber, bankName, licenseGrade, photo: driverPhotoBase64, photoURL: pU || '', checkPhoto: driverCheckBase64, pin: '0000', createdDate: getTodayISO(), createdTime: getNowTime(), createdAt: firebase.firestore.FieldValue.serverTimestamp() });

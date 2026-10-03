@@ -215,6 +215,15 @@ $('deductionMonthSelect').addEventListener('change', () => window.loadDeductions
 /* ---------- PDF الإفادة: عبر الطباعة (حفظ كـ PDF) ليظهر العربي سليمًا ---------- */
 window.saveNotificationPDF = function () { printNotification(); };
 
+/* ---------- نموذج التعديل: يظهر تحت الصف بعرض كامل بدل أن يُقصّ ---------- */
+const fixCss = document.createElement('style');
+fixCss.textContent =
+  '.worker-row{flex-wrap:wrap !important;overflow:visible !important;}' +
+  '.worker-row .name{flex:1 1 0 !important;min-width:60px !important;}' +
+  '.worker-row .edit-form{flex:0 0 100% !important;width:100% !important;order:99;margin-top:8px;}' +
+  '.edit-form input,.edit-form select{max-width:100%;}';
+document.head.appendChild(fixCss);
+
 /* ---------- توحيد أسماء الآليات مع ما يُحفظ ---------- */
 const vl = { small_garbage_truck: 'صندوق قمامة صغير', dump_truck: 'قلاب' };
 document.querySelectorAll('#vehicleType option').forEach(o => { if (vl[o.value]) o.textContent = vl[o.value]; });

@@ -37,6 +37,7 @@
   body.view-only-mode .manual-mark-btn,
   body.view-only-mode .shift-btn,
   body.view-only-mode .photo-buttons,
+  body.view-only-mode .bulk-btn,
   body.view-only-mode #tab-workers .card:first-child,
   body.view-only-mode #tab-drivers .card:first-child,
   body.view-only-mode #tab-overtime .card:first-child,
@@ -199,6 +200,7 @@
   button.camera-btn { background: #f57c00; border-color: #f57c00; }
   button.file-btn { background: #388e3c; border-color: #388e3c; }
   button.edit-btn { background: #f57c00; border-color: #f57c00; width: auto; padding: 6px 12px; font-size: 12px; margin: 0; }
+  button.bulk-btn { background: #7b1fa2; border-color: #7b1fa2; }
   button.word-btn { background: #388e3c; border-color: #388e3c; }
   button.view-btn { background: #1976d2; border-color: #1976d2; }
   button.print-btn { background: #7b1fa2; border-color: #7b1fa2; }
@@ -359,6 +361,31 @@
   }
   .photo-buttons { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
   .photo-buttons button { margin-bottom: 0; flex: 1; min-width: 100px; }
+
+  .photo-section img.current-photo {
+    width: 90px !important;
+    height: 90px !important;
+    object-fit: cover !important;
+    border-radius: 12px !important;
+    border: 3px solid #0f766e !important;
+    display: block !important;
+    margin: 8px auto !important;
+  }
+  .photo-section .photo-buttons {
+    display: flex !important;
+    gap: 8px !important;
+    flex-wrap: nowrap !important;
+    margin-top: 8px !important;
+  }
+  .photo-section .photo-buttons button {
+    flex: 1 !important;
+    min-width: 0 !important;
+    padding: 10px 8px !important;
+    font-size: 13px !important;
+    margin: 0 !important;
+    width: auto !important;
+  }
+
   .user-card {
     background: rgba(255,255,255,0.55); border: 2px solid #0f766e;
     border-radius: 14px; padding: 12px; margin-bottom: 8px;
@@ -447,423 +474,482 @@
   }
 </style>
 </head>
-<body>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>نظام حضور سرت</title>
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0; padding: 0; min-height: 100vh;
+    background: url('background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #mainApp { display: none; width: 100%; padding: 100px 20px 40px; min-height: 100vh; }
 
-<div id="loginScreen">
-  <h1>🔐 <span id="companyNameLogin">منظومة شركة النظافة</span></h1>
-  <p class="subtitle">أدخل اسمك والرقم السري</p>
-  <div class="login-card">
-    <label>👤 الاسم</label>
-    <input id="loginName" placeholder="اكتب اسمك هنا">
-    <label>🔢 الرقم السري</label>
-    <input id="loginPin" type="password" class="pin-input" placeholder="••••" maxlength="6" inputmode="numeric">
-    <button onclick="login()">🔓 دخول</button>
-    <div id="loginMsg"></div>
-  </div>
-</div>
+  body.view-only-mode .edit-btn,
+  body.view-only-mode .del-btn,
+  body.view-only-mode .del-btn-inline,
+  body.view-only-mode .camera-btn,
+  body.view-only-mode .file-btn,
+  body.view-only-mode .video-btn,
+  body.view-only-mode .export-btn,
+  body.view-only-mode #settingsBtn,
+  body.view-only-mode .save-action-btn,
+  body.view-only-mode .overtime-btn,
+  body.view-only-mode .word-btn,
+  body.view-only-mode .backup-btn,
+  body.view-only-mode .save-settings-btn,
+  body.view-only-mode .manual-mark-btn,
+  body.view-only-mode .shift-btn,
+  body.view-only-mode .photo-buttons,
+  body.view-only-mode .bulk-btn,
+  body.view-only-mode #tab-workers .card:first-child,
+  body.view-only-mode #tab-drivers .card:first-child,
+  body.view-only-mode #tab-overtime .card:first-child,
+  body.view-only-mode #tab-inventory .card:first-child,
+  body.view-only-mode #tab-vehicles .card:first-child,
+  body.view-only-mode #tab-permissions .card:first-child {
+    display: none !important;
+  }
 
-<div id="mainApp">
-  <div class="top-bar" id="topBar" style="display:none;">
-    <div class="top-bar-left">
-      <button class="back-btn" id="topBackBtn" onclick="backToOverview()" title="رجوع">🔙</button>
-    </div>
-    <div class="top-bar-right">
-      <button class="settings-btn" id="settingsBtn" onclick="openSettings()" title="الإعدادات">
-        <svg viewBox="0 0 24 24">
-          <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
-        </svg>
-      </button>
-      <button onclick="logout()" class="logout-btn" title="خروج">⏻</button>
-    </div>
-  </div>
+  body.view-only-mode #tab-reports .card:first-child > input,
+  body.view-only-mode #tab-reports .card:first-child > textarea,
+  body.view-only-mode #tab-reports .card:first-child > label,
+  body.view-only-mode #tab-reports .card:first-child > .report-media-grid,
+  body.view-only-mode #tab-reports .card:first-child > .progress-bar,
+  body.view-only-mode #tab-reports .card:first-child > .progress-text,
+  body.view-only-mode #tab-reports .card:first-child > .photo-buttons {
+    display: none !important;
+  }
 
-  <div id="workerView" style="display:none;">
-    <div class="user-bar">
-      <div class="user-info"><span id="workerInfo"></span></div>
-    </div>
-    <div class="card">
-      <h1>📍 تسجيل الحضور</h1>
-      <div class="date-display" id="workerDateDisplay"></div>
-      <label>الوردية</label>
-      <div class="shift-selector">
-        <div class="shift-btn morning active" onclick="selectWorkerShift('morning')">🌅 صباح</div>
-        <div class="shift-btn night" onclick="selectWorkerShift('night')">🌙 ليل</div>
-      </div>
-      <button onclick="checkIn()">✅ تسجيل حضور</button>
-      <div style="text-align:center;color:#0f766e;font-size:12px;margin:8px 0;font-weight:800;">— أو —</div>
-      <button class="secondary" onclick="markAbsent()">✗ غائب (خصم)</button>
-      <button class="secondary" onclick="markLeave()">📝 إذن (لا خصم)</button>
-      <button class="secondary" onclick="markSick()">🤒 مريض (لا خصم)</button>
-      <div id="status" style="text-align:center;padding:10px;border-radius:10px;margin-top:10px;font-weight:bold;display:none;"></div>
-    </div>
-  </div>
+  .top-bar {
+    position: fixed; top: 15px; left: 15px; right: 15px;
+    display: flex; justify-content: space-between; align-items: center;
+    z-index: 1000; pointer-events: none;
+  }
+  .top-bar-right { display: flex; gap: 8px; align-items: center; pointer-events: auto; }
+  .top-bar-left { display: flex; gap: 8px; align-items: center; pointer-events: auto; }
 
-  <div id="adminView" style="display:none;">
-    <div class="user-bar">
-      <div class="user-info"><span id="currentUserInfo"></span></div>
-    </div>
+  .user-bar { max-width: 1200px; margin: 0 auto 15px; display: flex; gap: 10px; flex-wrap: wrap; padding: 0 15px; align-items: center; justify-content: center; }
+  .user-bar .user-info {
+    text-align: center; color: #0f766e; padding: 14px 30px;
+    background: rgba(255,255,255,0.20); border: 2px solid #fff; border-radius: 15px;
+    font-weight: 800; font-size: 18px; backdrop-filter: blur(15px);
+    box-shadow: 0 6px 25px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.8);
+    text-shadow: 0 1px 3px rgba(255,255,255,0.9); letter-spacing: 0.3px;
+  }
+  .back-btn {
+    width: 50px; height: 50px; padding: 0; margin: 0;
+    background: linear-gradient(135deg, #0f766e, #0d5c55);
+    border: 2px solid #fff; border-radius: 50%; color: #fff;
+    font-weight: bold; font-size: 24px; cursor: pointer;
+    box-shadow: 0 5px 18px rgba(15,118,110,0.4);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.3s; flex-shrink: 0;
+  }
+  .back-btn:hover { transform: scale(1.08); }
+  .logout-btn {
+    width: 50px; height: 50px; padding: 0; margin: 0;
+    background: linear-gradient(135deg, #ff4444, #c62828);
+    border: 3px solid #fff; border-radius: 50%; color: #fff;
+    font-weight: bold; font-size: 24px; cursor: pointer;
+    box-shadow: 0 6px 20px rgba(198,40,40,0.5), inset 0 -3px 10px rgba(0,0,0,0.15);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.3s; flex-shrink: 0; position: relative;
+  }
+  .logout-btn::before {
+    content: ''; position: absolute; top: 3px; left: 3px; right: 3px; height: 40%;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.35), transparent);
+    border-radius: 50%; pointer-events: none;
+  }
+  .logout-btn:hover { transform: scale(1.1) rotate(5deg); }
 
-    <div class="tabs-container">
-      <div class="tabs" id="adminTabs">
-        <div class="tab active" data-tab="overview">📊 نظرة</div>
-        <div class="tab" data-tab="daily">✅ حضور</div>
-        <div class="tab" data-tab="reports">📋 تقارير</div>
-        <div class="tab" data-tab="workers">👷 عمال</div>
-        <div class="tab" data-tab="drivers">🚗 السائقين</div>
-        <div class="tab" data-tab="overtime">⏰ وقت إضافي</div>
-        <div class="tab" data-tab="deductions">💰 خصومات</div>
-        <div class="tab" data-tab="inventory">📦 مخزن</div>
-        <div class="tab" data-tab="vehicles">🚛 آليات</div>
-        <div class="tab" data-tab="permissions">🔑 صلاحيات</div>
-      </div>
-    </div>
+  .settings-btn {
+    width: 38px; height: 38px; padding: 6px; margin: 0;
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid rgba(255,255,255,0.9);
+    border-radius: 50%; color: #5f6368; cursor: pointer;
+    display: none; align-items: center; justify-content: center;
+    transition: all 0.2s ease; flex-shrink: 0;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+  }
+  .settings-btn:hover {
+    background: #fff; color: #0f766e;
+    box-shadow: 0 4px 14px rgba(15,118,110,0.3);
+    transform: scale(1.08);
+  }
+  .settings-btn svg { width: 100%; height: 100%; transition: transform 0.4s ease; fill: currentColor; }
+  .settings-btn:hover svg { transform: rotate(60deg); }
+  .settings-btn.visible { display: flex; }
 
-    <div id="tab-overview">
-      <div class="card">
-        <h1>حضور اليوم</h1>
-        <div class="date-display" id="adminDateDisplay"></div>
-        <div class="stats">
-          <div class="stat"><span class="num" id="presentCount">0</span>حاضر</div>
-          <div class="stat"><span class="num" id="leaveCount">0</span>إذن</div>
-          <div class="stat"><span class="num" id="sickCount">0</span>مريض</div>
-          <div class="stat"><span class="num" id="absentCount">0</span>غائب</div>
-        </div>
-      </div>
-      <div class="card">
-        <h1>📊 إحصائيات شاملة</h1>
-        <h2>👷 العمال</h2>
-        <div id="workersStats" class="stats-grid"></div>
-        <div class="total-line">📌 إجمالي العمال: <span id="totalWorkers">0</span></div>
-        <h2>🚗 السائقين</h2>
-        <div id="driversStats" class="stats-grid"></div>
-        <div class="total-line">📌 إجمالي السائقين: <span id="totalDrivers">0</span></div>
-        <h2>👷 المشرفين</h2>
-        <div id="supervisorsStats" class="stats-grid"></div>
-        <div class="total-line">📌 إجمالي المشرفين: <span id="totalSupervisors">0</span></div>
-        <h2>🚛 الآليات</h2>
-        <div id="vehiclesStats" class="stats-grid"></div>
-        <div class="total-line">📌 إجمالي الآليات: <span id="totalVehicles">0</span></div>
-        <h2>📈 الإجمالي العام</h2>
-        <div class="grand-total">
-          <div>👥 إجمالي الموظفين: <strong id="grandTotalEmployees">0</strong></div>
-          <div>🚛 إجمالي الآليات: <strong id="grandTotalVehicles">0</strong></div>
-          <div class="money-line">💰 إجمالي الأجور الشهرية: <strong id="grandTotalSalaries">0</strong> دينار</div>
-          <div class="money-line">⏰ إجمالي ساعات الوقت الإضافي: <strong id="grandTotalOvertime">0</strong> ساعة</div>
-        </div>
-        <div class="supervisor-signature" id="overviewSignature">تحت متابعة وإشراف / علي الفتوري</div>
-      </div>
-      <div class="card">
-        <h2>سجل الحضور</h2>
-        <button class="export-btn" onclick="exportAttendanceExcel()">📊 تصدير Excel</button>
-        <div id="attendanceList">جاري التحميل...</div>
-      </div>
-    </div>
+  .tabs-container { max-width: 1200px; margin: 0 auto 20px; padding: 0 15px; }
+  .tabs { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+  .tab {
+    flex: 0 1 auto; text-align: center; padding: 10px 18px; border-radius: 12px;
+    background: rgba(255,255,255,0.16); color: #0f766e; font-weight: 800;
+    cursor: pointer; border: 2px solid rgba(255,255,255,0.6);
+    font-size: 14px; white-space: nowrap; transition: all 0.3s;
+    font-family: inherit; backdrop-filter: blur(10px);
+    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+  }
+  .tab:hover { transform: translateY(-3px); background: rgba(255,255,255,0.24); }
+  .tab.active {
+    background: #0f766e; color: #ffffff; border-color: #ffffff;
+    box-shadow: 0 6px 20px rgba(15,118,110,0.4);
+    transform: translateY(-2px) scale(1.03);
+  }
+  #loginScreen { width: 100%; max-width: 420px; padding: 20px; }
+  #loginScreen h1 {
+    text-align: center; color: #0f766e; font-size: 28px; margin: 0 0 8px 0;
+    text-shadow: 2px 2px 0 #fff, -2px -2px 0 #fff, 0 0 25px rgba(255,255,255,1);
+    font-weight: 900; letter-spacing: 0.5px;
+  }
+  #loginScreen .subtitle {
+    text-align: center; color: #0f766e; font-size: 15px;
+    margin-bottom: 30px; text-shadow: 1px 1px 0 #fff; font-weight: bold;
+  }
+  .login-card {
+    background: rgba(255,255,255,0.16);
+    backdrop-filter: blur(25px) saturate(180%);
+    border: 2px solid rgba(255,255,255,0.7);
+    border-radius: 24px; padding: 35px 28px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+  }
+  .login-card label { display: block; color: #0f766e; font-size: 15px; font-weight: 800; margin-bottom: 8px; }
+  .login-card input {
+    width: 100%; padding: 14px 18px; border-radius: 14px;
+    border: 2px solid #0f766e; font-size: 16px; margin-bottom: 18px;
+    background: rgba(255,255,255,0.95); color: #333;
+    font-family: inherit; font-weight: 500;
+  }
+  .login-card input:focus { background: #fff; box-shadow: 0 0 0 4px rgba(15,118,110,0.15); outline: none; }
+  .login-card input::placeholder { color: #999; }
+  .login-card .pin-input { letter-spacing: 15px; font-size: 26px; text-align: center; font-weight: bold; padding-left: 22px; }
+  .login-card button {
+    width: 100%; padding: 16px; border-radius: 14px;
+    border: 2px solid #0f766e; font-size: 18px; font-weight: 800;
+    background: #0f766e; color: white; cursor: pointer;
+    box-shadow: 0 6px 20px rgba(15,118,110,0.4);
+    font-family: inherit; letter-spacing: 0.5px;
+  }
+  .login-card button:hover { background: #0d5c55; transform: translateY(-2px); }
+  #loginMsg { text-align: center; margin-top: 15px; font-size: 14px; font-weight: bold; min-height: 22px; }
+  .card {
+    max-width: 600px; margin: 0 auto 16px;
+    background: rgba(255,255,255,0.20);
+    backdrop-filter: blur(20px) saturate(170%);
+    border: 2px solid rgba(255,255,255,0.7);
+    border-radius: 22px; padding: 22px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+  }
+  h1 {
+    font-size: 19px; text-align: center; color: #0f766e;
+    margin: 0 0 15px 0; font-weight: 900;
+    text-shadow: 1px 1px 0 #fff;
+  }
+  h2 {
+    font-size: 16px; color: #0f766e; font-weight: 800;
+    margin: 12px 0; text-shadow: 0.5px 0.5px 0 #fff;
+  }
+  select, button {
+    width: 100%; padding: 12px 16px; border-radius: 12px;
+    border: 2px solid #0f766e; font-size: 15px; margin-bottom: 10px;
+    background: rgba(255,255,255,0.95); color: #0f766e;
+    font-weight: 700; cursor: pointer; font-family: inherit;
+  }
+  select option { color: #111; }
+  button { background: #0f766e; color: #ffffff; box-shadow: 0 3px 12px rgba(15,118,110,0.3); }
+  button:hover { background: #0d5c55; transform: translateY(-1px); }
+  button.secondary { background: #c62828; border-color: #c62828; }
+  button.export-btn { background: #1976d2; border-color: #1976d2; }
+  button.camera-btn { background: #f57c00; border-color: #f57c00; }
+  button.file-btn { background: #388e3c; border-color: #388e3c; }
+  button.edit-btn { background: #f57c00; border-color: #f57c00; width: auto; padding: 6px 12px; font-size: 12px; margin: 0; }
+  button.bulk-btn { background: #7b1fa2; border-color: #7b1fa2; }
+  button.word-btn { background: #388e3c; border-color: #388e3c; }
+  button.view-btn { background: #1976d2; border-color: #1976d2; }
+  button.print-btn { background: #7b1fa2; border-color: #7b1fa2; }
+  button.del-btn-inline { background: #c62828; border-color: #c62828; width: 100%; padding: 12px; font-size: 15px; margin: 8px 0 0; }
+  button.overtime-btn { background: #f57c00; border-color: #f57c00; }
+  button.video-btn { background: #d32f2f; border-color: #d32f2f; }
+  button.backup-btn { background: #00897b; border-color: #00897b; }
+  button.save-settings-btn { background: #2e7d32; border-color: #2e7d32; padding: 16px; font-size: 17px; }
+  label { font-size: 14px; color: #0f766e; font-weight: 800; margin-bottom: 6px; display: block; }
+  input, textarea {
+    width: 100%; padding: 12px 16px; border-radius: 12px;
+    border: 2px solid #0f766e; font-size: 15px; margin-bottom: 10px;
+    background: rgba(255,255,255,0.95); color: #333; font-family: inherit;
+  }
+  input:focus, textarea:focus { outline: none; box-shadow: 0 0 0 4px rgba(15,118,110,0.15); }
+  input::placeholder, textarea::placeholder { color: #999; }
+  .stats { display: flex; flex-wrap: wrap; gap: 10px; }
+  .stat {
+    flex: 1; min-width: 85px; padding: 16px 10px; border-radius: 16px;
+    text-align: center; background: rgba(255,255,255,0.38);
+    border: 2px solid rgba(255,255,255,0.9); color: #0f766e;
+    font-weight: 800; font-size: 13px; backdrop-filter: blur(10px);
+  }
+  .stat .num { font-size: 26px; font-weight: 900; display: block; margin-bottom: 6px; color: #0f766e; }
+  .row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid rgba(15,118,110,0.2); color: #333; font-size: 14px; }
 
-    <div id="tab-daily" style="display:none;">
-      <div class="card">
-        <h2>✅ تسجيل يدوي</h2>
-        <div class="date-display" id="dailyDateDisplay"></div>
-        <div class="shift-selector">
-          <div class="shift-btn morning active" onclick="selectAdminShift('morning')">🌅 صباح</div>
-          <div class="shift-btn night" onclick="selectAdminShift('night')">🌙 ليل</div>
-        </div>
-        <div id="dailyMarkList">جاري التحميل...</div>
-      </div>
-    </div>
+  .worker-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(15,118,110,0.15);
+    font-size: 14px;
+    color: #333;
+    flex-wrap: nowrap;
+    background: rgba(255,255,255,0.30);
+    border-radius: 12px;
+    margin-bottom: 6px;
+    border: 1px solid rgba(255,255,255,0.7);
+    overflow: hidden;
+  }
+  .worker-row .name {
+    flex: 1 1 auto;
+    min-width: 0;
+    color: #0f766e;
+    font-weight: 800;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .worker-row img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #0f766e;
+    flex-shrink: 0;
+  }
+  .worker-row .duration-badge,
+  .worker-row .info-tag,
+  .worker-row .overtime-badge,
+  .worker-row .deduction-badge,
+  .worker-row .salary-badge,
+  .worker-row .edit-btn,
+  .worker-row .del-btn,
+  .worker-row .salary-countdown-badge {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
 
-    <div id="tab-reports" style="display:none;">
-      <div class="card">
-        <h2>📋 تقرير يومي</h2>
-        <label>📅 التاريخ</label>
-        <input type="date" id="reportDate">
-        <label>👷 اسم كاتب التقرير</label>
-        <input id="reportWorkerName" placeholder="اسم العامل أو المشرف">
-        <label>📍 موقع العمل</label>
-        <input id="reportLocation" placeholder="مكان العمل">
-        <label>📝 نص التقرير</label>
-        <textarea id="reportText" rows="4" placeholder="اكتب التقرير هنا..."></textarea>
-        <label>📸🎥 الصور والفيديوهات</label>
-        <div class="report-media-grid" id="reportPhotosPreview"></div>
-        <input type="file" id="reportPhotosInput" accept="image/*,video/*" multiple style="display:none;">
-        <input type="file" id="reportPhotosInputCamera" accept="image/*" capture="environment" multiple style="display:none;">
-        <input type="file" id="reportVideoInputCamera" accept="video/*" capture="environment" style="display:none;">
-        <div class="photo-buttons">
-          <button class="camera-btn" onclick="document.getElementById('reportPhotosInputCamera').click()">📷 كاميرا</button>
-          <button class="video-btn" onclick="document.getElementById('reportVideoInputCamera').click()">🎥 فيديو</button>
-          <button class="file-btn" onclick="document.getElementById('reportPhotosInput').click()">🖼️ من الملفات</button>
-        </div>
-        <div class="progress-bar" id="uploadProgress"><div class="progress-fill" id="progressFill"></div></div>
-        <div class="progress-text" id="progressText"></div>
-        <button class="word-btn save-action-btn" onclick="saveReport()">💾 حفظ التقرير</button>
-      </div>
-      <div class="card">
-        <h2>📄 التقارير المحفوظة</h2>
-        <div id="savedReportsList">لا توجد تقارير</div>
-      </div>
-    </div>
+  @media (max-width: 480px) {
+    .worker-row {
+      gap: 5px;
+      padding: 8px 8px;
+      font-size: 12px;
+    }
+    .worker-row img {
+      width: 32px;
+      height: 32px;
+    }
+    .worker-row .edit-btn,
+    .worker-row .del-btn {
+      padding: 5px 8px;
+      font-size: 11px;
+    }
+    .worker-row .duration-badge,
+    .worker-row .salary-countdown-badge {
+      padding: 2px 6px;
+      font-size: 10px;
+    }
+  }
 
-    <div id="tab-workers" style="display:none;">
-      <div class="card add-worker-form">
-        <h2>➕ إضافة عامل</h2>
-        <label>📸 صورة العامل</label>
-        <img id="workerPhotoPreview" class="photo-preview">
-        <input type="file" id="workerPhotoInput" accept="image/*" style="display:none;">
-        <input type="file" id="workerPhotoInputCamera" accept="image/*" capture="user" style="display:none;">
-        <div class="photo-buttons">
-          <button class="camera-btn" onclick="document.getElementById('workerPhotoInputCamera').click()">📷 كاميرا</button>
-          <button class="file-btn" onclick="document.getElementById('workerPhotoInput').click()">🖼️ من الملفات</button>
-        </div>
-        <label>👤 الاسم</label>
-        <input id="newWorkerName" placeholder="اسم العامل">
-        <label>🏢 الفريق</label>
-        <select id="newWorkerTeam"></select>
-        <label>🔄 الوردية</label>
-        <select id="newWorkerShift">
-          <option value="morning">🌅 صباح</option>
-          <option value="night">🌙 ليل</option>
-          <option value="both">🔄 كلاهما</option>
-        </select>
-        <label>📅 تاريخ مباشرة العمل</label>
-        <input type="date" id="newWorkerStartDate">
-        <button class="save-action-btn" onclick="addWorker()">✅ تسجيل العامل</button>
-      </div>
-      <div class="card">
-        <h2>👷 العمال</h2>
-        <input id="workersSearch" placeholder="🔍 ابحث بالاسم">
-        <button class="export-btn" onclick="exportWorkersExcel()">📊 Excel</button>
-        <div id="workersList">جاري التحميل...</div>
-      </div>
-    </div>
+  .badge { padding: 4px 10px; border-radius: 20px; color: white; font-size: 12px; font-weight: 800; }
+  .del-btn {
+    width: auto; padding: 6px 12px; background: #c62828;
+    color: #ffffff; border: 2px solid #c62828; margin: 0;
+    font-size: 12px; border-radius: 8px; font-weight: 700;
+  }
+  .shift-selector { display: flex; gap: 10px; margin-bottom: 12px; }
+  .shift-btn {
+    flex: 1; padding: 14px; border-radius: 14px;
+    border: 2px solid #0f766e; font-size: 15px; font-weight: 800;
+    cursor: pointer; text-align: center;
+    background: rgba(255,255,255,0.50); color: #0f766e;
+  }
+  .shift-btn.morning { background: rgba(255,249,196,0.95); color: #f57f17; border-color: #fbc02d; }
+  .shift-btn.morning.active { background: #fbc02d; color: #ffffff; }
+  .shift-btn.night { background: rgba(232,234,246,0.95); color: #283593; border-color: #3f51b5; }
+  .shift-btn.night.active { background: #3f51b5; color: #ffffff; }
+  .role-badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 800; }
+  .role-owner { background: #ffc107; color: #333; }
+  .role-admin { background: #9c27b0; color: #fff; }
+  .role-supervisor { background: #2196f3; color: #fff; }
+  .role-worker { background: #4caf50; color: #fff; }
+  .role-driver { background: #ff9800; color: #fff; }
+  .view-only-badge { background: #ffc107; color: #333; padding: 3px 12px; border-radius: 12px; font-size: 11px; font-weight: 800; }
+  .deduction-badge { background: #f44336; color: #fff; padding: 3px 12px; border-radius: 12px; font-size: 11px; font-weight: 800; }
+  .duration-badge { background: #4caf50; color: #fff; padding: 3px 12px; border-radius: 12px; font-size: 11px; font-weight: 800; }
+  .salary-badge { background: #9c27b0; color: #fff; padding: 3px 12px; border-radius: 12px; font-size: 11px; font-weight: 800; }
+  .overtime-badge { background: #f57c00; color: #fff; padding: 3px 12px; border-radius: 12px; font-size: 11px; font-weight: 800; }
+  .video-badge { background: #d32f2f; color: #fff; padding: 3px 12px; border-radius: 12px; font-size: 11px; font-weight: 800; }
 
-    <div id="tab-drivers" style="display:none;">
-      <div class="card add-driver-form">
-        <h2>➕ إضافة سائق / مشرف</h2>
-        <label>📸 الصورة الشخصية</label>
-        <img id="driverPhotoPreview" class="photo-preview">
-        <input type="file" id="driverPhotoInput" accept="image/*" style="display:none;">
-        <input type="file" id="driverPhotoInputCamera" accept="image/*" capture="user" style="display:none;">
-        <div class="photo-buttons">
-          <button class="camera-btn" onclick="document.getElementById('driverPhotoInputCamera').click()">📷 كاميرا</button>
-          <button class="file-btn" onclick="document.getElementById('driverPhotoInput').click()">🖼️ من الملفات</button>
-        </div>
-        <label>👤 الاسم</label>
-        <input id="newDriverName" placeholder="اسم الموظف">
-        <label>🚙 نوع السائق / الوظيفة</label>
-        <select id="newDriverType">
-          <option value="general_driver">🚗 سائق</option>
-          <option value="dump_truck">🚛 سائق دنبر</option>
-          <option value="container">📦 سائق صندوق كنتر</option>
-          <option value="small_box">📦 سائق صندوق صغير</option>
-          <option value="large_compactor">🚜 سائق كباسة كبيرة</option>
-          <option value="small_compactor">🚜 سائق كباسة صغيرة</option>
-          <option value="cleaning_supervisor">👷 مشرف نظافة</option>
-        </select>
-        <label>🔄 الوردية</label>
-        <select id="newDriverShift">
-          <option value="morning">🌅 صباح</option>
-          <option value="night">🌙 ليل</option>
-          <option value="both">🔄 كلاهما</option>
-        </select>
-        <label>📅 تاريخ مباشرة العمل</label>
-        <input type="date" id="newDriverStartDate">
-        <label>💰 المرتب الشهري (دينار)</label>
-        <input id="newDriverSalary" type="number" placeholder="مثال: 1500" min="0">
-        <label>🏦 رقم الحساب</label>
-        <input id="newDriverAccount" placeholder="رقم الحساب البنكي">
-        <label>🏛️ اسم المصرف</label>
-        <select id="newDriverBank">
-          <option value="">— اختر —</option>
-          <option value="الجمهورية">مصرف الجمهورية</option>
-          <option value="التجارة والتنمية">مصرف التجارة والتنمية</option>
-          <option value="الوحدة">مصرف الوحدة</option>
-          <option value="الصحاري">مصرف الصحاري</option>
-          <option value="التجاري الوطني">المصرف التجاري الوطني</option>
-          <option value="الادخار">مصرف الادخار</option>
-          <option value="أخرى">أخرى</option>
-        </select>
-        <label>🚗 درجة الرخصة</label>
-        <select id="newDriverLicense">
-          <option value="">— اختر —</option>
-          <option value="خاصة">رخصة خاصة</option>
-          <option value="عامة">رخصة عامة</option>
-          <option value="درجة أولى">درجة أولى</option>
-          <option value="درجة ثانية">درجة ثانية</option>
-          <option value="درجة ثالثة">درجة ثالثة</option>
-          <option value="معدات ثقيلة">معدات ثقيلة</option>
-        </select>
-        <label>📄 صورة الصك</label>
-        <img id="driverCheckPreview" class="photo-preview">
-        <input type="file" id="driverCheckInput" accept="image/*" style="display:none;">
-        <input type="file" id="driverCheckInputCamera" accept="image/*" capture="environment" style="display:none;">
-        <div class="photo-buttons">
-          <button class="camera-btn" onclick="document.getElementById('driverCheckInputCamera').click()">📷 كاميرا</button>
-          <button class="file-btn" onclick="document.getElementById('driverCheckInput').click()">🖼️ من الملفات</button>
-        </div>
-        <button class="save-action-btn" onclick="addDriver()">✅ تسجيل الموظف</button>
-      </div>
-      <div class="card">
-        <h2>🚗 السائقين والمشرفين</h2>
-        <input id="driversSearch" placeholder="🔍 ابحث بالاسم">
-        <button class="export-btn" onclick="exportDriversExcel()">📊 Excel</button>
-        <div id="driversList">جاري التحميل...</div>
-      </div>
-    </div>
+  .salary-countdown-badge {
+    background: linear-gradient(135deg, #9c27b0, #7b1fa2);
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 800;
+    white-space: nowrap;
+    flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(156,39,176,0.35);
+  }
+  .salary-countdown-badge.today {
+    background: linear-gradient(135deg, #4caf50, #2e7d32);
+    animation: pulseGlow 1.2s infinite;
+  }
+  .salary-countdown-badge.tomorrow {
+    background: linear-gradient(135deg, #ff9800, #f57c00);
+  }
+  .salary-countdown-badge.soon {
+    background: linear-gradient(135deg, #f44336, #c62828);
+  }
+  @keyframes pulseGlow {
+    0%, 100% { transform: scale(1); box-shadow: 0 2px 6px rgba(76,175,80,0.45); }
+    50% { transform: scale(1.08); box-shadow: 0 2px 15px rgba(76,175,80,0.85); }
+  }
 
-    <div id="tab-overtime" style="display:none;">
-      <div class="card">
-        <h2>⏰ تسجيل وقت إضافي</h2>
-        <div class="date-display" id="overtimeDateDisplay"></div>
-        <label>🚗 اختر السائق</label>
-        <select id="overtimeDriverSelect"></select>
-        <label>📅 التاريخ</label>
-        <input type="date" id="overtimeDate">
-        <label>⏱️ عدد الساعات الإضافية</label>
-        <input id="overtimeHours" type="number" placeholder="مثال: 2.5" step="0.5" min="0">
-        <label>📝 ملاحظة (اختياري)</label>
-        <input id="overtimeNote" placeholder="سبب الوقت الإضافي">
-        <button class="overtime-btn save-action-btn" onclick="saveOvertime()">💾 حفظ الوقت الإضافي</button>
-      </div>
-      <div class="card">
-        <h2>📊 سجل الأوقات الإضافية</h2>
-        <label>📅 اختر الشهر</label>
-        <select id="overtimeMonthSelect"></select>
-        <button class="export-btn" onclick="exportOvertimeExcel()">📊 تصدير Excel</button>
-        <div id="overtimeList">جاري التحميل...</div>
-      </div>
-    </div>
+  .date-display {
+    text-align: center; color: #0f766e; font-size: 15px; font-weight: 800;
+    margin-bottom: 15px; padding: 12px; background: rgba(255,255,255,0.38);
+    border-radius: 14px; border: 2px solid rgba(255,255,255,0.9);
+  }
+  .photo-preview {
+    width: 100%; max-height: 150px; object-fit: cover;
+    border-radius: 14px; margin-bottom: 10px; display: none;
+    border: 2px solid #0f766e;
+  }
+  .photo-buttons { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+  .photo-buttons button { margin-bottom: 0; flex: 1; min-width: 100px; }
 
-    <div id="tab-deductions" style="display:none;">
-      <div class="card">
-        <h2>💰 الخصومات</h2>
-        <select id="deductionMonthSelect"></select>
-        <button class="export-btn" onclick="exportDeductionsExcel()">📊 Excel</button>
-        <div id="deductionsList">جاري التحميل...</div>
-      </div>
-    </div>
+  .photo-section img.current-photo {
+    width: 90px !important;
+    height: 90px !important;
+    object-fit: cover !important;
+    border-radius: 12px !important;
+    border: 3px solid #0f766e !important;
+    display: block !important;
+    margin: 8px auto !important;
+  }
+  .photo-section .photo-buttons {
+    display: flex !important;
+    gap: 8px !important;
+    flex-wrap: nowrap !important;
+    margin-top: 8px !important;
+  }
+  .photo-section .photo-buttons button {
+    flex: 1 !important;
+    min-width: 0 !important;
+    padding: 10px 8px !important;
+    font-size: 13px !important;
+    margin: 0 !important;
+    width: auto !important;
+  }
 
-    <div id="tab-inventory" style="display:none;">
-      <div class="card add-item-form">
-        <h2>➕ إضافة صنف</h2>
-        <input id="newItemName" placeholder="اسم الصنف">
-        <input id="newItemQty" type="number" placeholder="الكمية">
-        <input id="newItemUnit" placeholder="الوحدة">
-        <button class="save-action-btn" onclick="addItem()">➕ إضافة</button>
-      </div>
-      <div class="card">
-        <h2>📦 المخزن</h2>
-        <button class="export-btn" onclick="exportInventoryExcel()">📊 Excel</button>
-        <div id="inventoryList">جاري التحميل...</div>
-      </div>
-    </div>
-
-    <div id="tab-vehicles" style="display:none;">
-      <div class="card add-vehicle-form">
-        <h2>➕ إضافة آلية</h2>
-        <select id="vehicleType">
-          <option value="small_compactor">كبس صغير</option>
-          <option value="large_compactor">كبس كبير</option>
-          <option value="small_garbage_truck">صندوق قمامة قلاب</option>
-          <option value="large_garbage_truck">صندوق قمامة كبير</option>
-          <option value="dump_truck">صندوق تبدولى</option>
-        </select>
-        <input id="vehicleNumber" placeholder="رقم الآلية">
-        <select id="vehicleStatus">
-          <option value="working">✅ تعمل</option>
-          <option value="maintenance">🔧 صيانة</option>
-          <option value="broken">❌ معطلة</option>
-        </select>
-        <label>📸 صورة الآلية</label>
-        <img id="vehiclePhotoPreview" class="photo-preview">
-        <input type="file" id="vehiclePhotoInput" accept="image/*" style="display:none;">
-        <input type="file" id="vehiclePhotoInputCamera" accept="image/*" capture="environment" style="display:none;">
-        <div class="photo-buttons">
-          <button class="camera-btn" onclick="document.getElementById('vehiclePhotoInputCamera').click()">📷 كاميرا</button>
-          <button class="file-btn" onclick="document.getElementById('vehiclePhotoInput').click()">🖼️ من الملفات</button>
-        </div>
-        <button class="save-action-btn" onclick="saveVehicle()">💾 حفظ</button>
-      </div>
-      <div class="card">
-        <h2>🚛 الآليات</h2>
-        <button class="export-btn" onclick="exportVehiclesExcel()">📊 Excel</button>
-        <div id="vehiclesList">جاري التحميل...</div>
-      </div>
-    </div>
-
-    <div id="tab-permissions" style="display:none;">
-      <div class="card add-user-form">
-        <h2>👥 إضافة مستخدم</h2>
-        <input id="newUserName" placeholder="اسم المستخدم">
-        <input id="newUserPin" type="password" placeholder="الرقم السري (4-6)" maxlength="6" style="text-align:center;letter-spacing:10px;">
-        <select id="newUserRole" onchange="togglePermissionsBox()">
-          <option value="supervisor">👤 مشرف (صلاحيات مخصصة)</option>
-          <option value="admin">👤 مدير (كل الصلاحيات)</option>
-        </select>
-        <div id="permissionsBox" class="permission-box">
-          <h3 style="margin:0 0 10px;font-size:14px;color:#0f766e;">حدد الصلاحيات:</h3>
-          <div class="permission-item"><label>📊 نظرة عامة</label><input type="checkbox" id="perm-overview"></div>
-          <div class="permission-item"><label>✅ تسجيل الحضور</label><input type="checkbox" id="perm-attendance"></div>
-          <div class="permission-item"><label>📋 التقارير</label><input type="checkbox" id="perm-reports"></div>
-          <div class="permission-item"><label>👷 إدارة العمال</label><input type="checkbox" id="perm-workers"></div>
-          <div class="permission-item"><label>🚗 إدارة السائقين</label><input type="checkbox" id="perm-drivers"></div>
-          <div class="permission-item"><label>⏰ الوقت الإضافي</label><input type="checkbox" id="perm-overtime"></div>
-          <div class="permission-item"><label>💰 الخصومات</label><input type="checkbox" id="perm-deductions"></div>
-          <div class="permission-item"><label>📦 المخزن</label><input type="checkbox" id="perm-inventory"></div>
-          <div class="permission-item"><label>🚛 الآليات</label><input type="checkbox" id="perm-vehicles"></div>
-          <div class="permission-item"><label>➕ صلاحية الإضافة</label><input type="checkbox" id="perm-add"></div>
-          <div class="permission-item"><label>✏️ صلاحية التعديل</label><input type="checkbox" id="perm-edit"></div>
-          <div class="permission-item"><label>🗑️ صلاحية الحذف</label><input type="checkbox" id="perm-delete"></div>
-          <div class="permission-item"><label>📊 تصدير Excel</label><input type="checkbox" id="perm-export"></div>
-          <div class="permission-item"><label>👁️ مشاهدة فقط</label><input type="checkbox" id="perm-viewonly"></div>
-        </div>
-        <button class="save-action-btn" onclick="addUser()">➕ إضافة</button>
-      </div>
-      <div class="card">
-        <h2>📋 المستخدمين (اضغط لتعديل الصلاحيات)</h2>
-        <div id="usersList">جاري التحميل...</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div id="settingsModal">
-  <div class="settings-content">
-    <button class="settings-close" onclick="closeSettings()">×</button>
-    <h2>⚙️ إعدادات المنظومة</h2>
-    <div class="settings-section">
-      <h3>🏢 بيانات الشركة</h3>
-      <label>اسم الشركة</label>
-      <input id="settingsCompanyName">
-      <label>✍️ اسم المشرف</label>
-      <input id="settingsSupervisorName">
-    </div>
-    <div class="settings-section">
-      <h3>💰 الخصومات</h3>
-      <label>قيمة الخصم اليومي (دينار)</label>
-      <input id="settingsDeductionAmount" type="number" min="0">
-    </div>
-    <div class="settings-section">
-      <h3>🎨 خلفية المنظومة</h3>
-      <div class="bg-preview" id="bgPreview">اضغط لتغيير الخلفية</div>
-      <input type="file" id="settingsBgInput" accept="image/*" style="display:none;">
-      <button class="camera-btn" onclick="document.getElementById('settingsBgInput').click()">📷 اختيار خلفية جديدة</button>
-      <button class="file-btn" onclick="resetBackground()" style="margin-top:8px;">🔄 استعادة الخلفية الأصلية</button>
-    </div>
-    <div class="settings-section">
-      <h3>🔐 تغيير الرقم السري للمدير</h3>
-      <label>الرقم الحالي</label>
-      <input id="settingsOldPin" type="password" maxlength="6" style="text-align:center;letter-spacing:8px;">
-      <label>الرقم الجديد</label>
-      <input id="settingsNewPin" type="password" maxlength="6" style="text-align:center;letter-spacing:8px;">
-      <label>تأكيد الرقم الجديد</label>
-      <input id="settingsConfirmPin" type="password" maxlength="6" style="text-align:center;letter-spacing:8px;">
-    </div>
-    <div class="settings-section">
-      <h3>💾 النسخ الاحتياطي</h3>
-      <button class="backup-btn" onclick="downloadFullBackup()">⬇️ تحميل نسخة كاملة</button>
-    </div>
-    <button class="save-settings-btn" onclick="saveAllSettings()">💾 حفظ جميع الإعدادات</button>
-  </div>
-</div>
+  .user-card {
+    background: rgba(255,255,255,0.55); border: 2px solid #0f766e;
+    border-radius: 14px; padding: 12px; margin-bottom: 8px;
+  }
+  .permission-box {
+    background: rgba(255,255,255,0.55); border: 2px solid #0f766e;
+    border-radius: 14px; padding: 12px; margin-bottom: 10px;
+  }
+  .permission-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #e0e0e0; }
+  .permission-item:last-child { border-bottom: none; }
+  .permission-item label { flex: 1; margin: 0; font-size: 13px; cursor: pointer; color: #0f766e; font-weight: 700; }
+  .permission-item input[type="checkbox"] { width: 20px; height: 20px; margin: 0; accent-color: #0f766e; }
+  .edit-form {
+    display: none; width: 100%; background: rgba(255,255,255,0.98);
+    border-radius: 14px; padding: 16px; margin-top: 10px;
+    border: 2px solid #f57c00;
+  }
+  .edit-form h3 { margin: 0 0 15px; font-size: 16px; color: #f57c00; text-align: center; font-weight: 900; }
+  .photo-section {
+    background: rgba(240,253,244,0.95); border-radius: 14px;
+    padding: 14px; margin: 12px 0; border: 2px solid #4caf50;
+  }
+  .photo-section h3 { color: #0f766e !important; margin: 0 0 10px 0 !important; font-size: 14px; text-align: right; font-weight: 800; }
+  .current-photo { width: 90px; height: 90px; object-fit: cover; border-radius: 10px; border: 2px solid #0f766e; cursor: pointer; display: block; }
+  .no-photo-text { font-size: 12px; color: #c62828; padding: 8px 12px; background: rgba(198,40,40,0.1); border-radius: 8px; display: inline-block; font-weight: 700; }
+  .report-media-grid { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .report-media-grid img { width: 80px; height: 80px; object-fit: cover; border-radius: 10px; border: 2px solid #0f766e; }
+  .report-media-grid video { width: 100px; height: 80px; object-fit: cover; border-radius: 10px; border: 2px solid #d32f2f; background: #000; }
+  .progress-bar { width: 100%; height: 10px; background: rgba(255,255,255,0.24); border-radius: 6px; overflow: hidden; margin-bottom: 10px; display: none; }
+  .progress-fill { height: 100%; background: #4caf50; width: 0%; transition: width 0.3s; }
+  .progress-text { text-align: center; font-size: 13px; color: #0f766e; margin-bottom: 10px; font-weight: 800; }
+  .driver-card { background: rgba(255,255,255,0.55); border: 2px solid #ff9800; border-radius: 16px; padding: 14px; margin-bottom: 10px; }
+  .driver-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .driver-header img { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; border: 2px solid #0f766e; }
+  .driver-info { font-size: 12px; color: #333; line-height: 1.8; }
+  .check-photo { width: 100%; max-height: 180px; object-fit: cover; border-radius: 12px; margin-top: 8px; border: 2px solid #0f766e; cursor: pointer; }
+  .info-tag { display: inline-block; background: rgba(15,118,110,0.15); padding: 4px 10px; border-radius: 10px; font-size: 11px; margin: 3px; color: #0f766e; font-weight: 800; }
+  .overtime-summary { margin-bottom: 15px; padding: 12px; background: rgba(255,255,255,0.6); border-radius: 12px; border: 2px solid #0f766e; }
+  .overtime-summary h3 { margin: 0 0 10px; color: #0f766e; font-size: 14px; }
+  .overtime-summary .row-total { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #ddd; }
+  .overtime-summary .row-total:last-child { border-bottom: none; }
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 10px; }
+  .stats-grid .stat-item { background: rgba(255,255,255,0.6); border: 2px solid #0f766e; border-radius: 12px; padding: 10px; text-align: center; font-weight: 800; font-size: 13px; color: #0f766e; }
+  .stats-grid .stat-item .count { display: block; font-size: 24px; color: #c62828; margin-top: 4px; font-weight: 900; }
+  .stats-grid .stat-item.empty { opacity: 0.5; font-size: 12px; }
+  .total-line { text-align: center; padding: 10px; background: rgba(15,118,110,0.15); border-radius: 10px; font-weight: 800; color: #0f766e; font-size: 14px; margin-bottom: 15px; }
+  .total-line span { color: #c62828; font-size: 20px; margin-right: 6px; font-weight: 900; }
+  .grand-total { background: linear-gradient(135deg, #0f766e, #0d5c55); color: #fff; padding: 16px; border-radius: 14px; display: flex; flex-direction: column; gap: 8px; text-align: center; font-size: 15px; font-weight: 800; margin-bottom: 12px; }
+  .grand-total strong { font-size: 24px; color: #ffc107; margin-right: 8px; }
+  .grand-total .money-line { background: rgba(255,255,255,0.15); padding: 8px; border-radius: 10px; margin-top: 4px; }
+  .user-perm-card { background: rgba(255,255,255,0.65); border: 2px solid #0f766e; border-radius: 14px; padding: 14px; margin-bottom: 10px; cursor: pointer; }
+  .user-perm-card:hover { transform: translateY(-2px); border-color: #f57c00; }
+  .user-perm-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+  .user-perm-name { font-size: 16px; font-weight: 900; color: #0f766e; }
+  .user-perm-pin { font-size: 12px; color: #666; background: rgba(15,118,110,0.1); padding: 3px 8px; border-radius: 6px; margin-right: 8px; }
+  .perm-badge { display: inline-block; padding: 4px 10px; margin: 3px; border-radius: 8px; font-size: 11px; font-weight: 800; }
+  .perm-badge.active { background: #4caf50; color: #fff; }
+  .perm-badge.inactive { background: rgba(200,200,200,0.4); color: #999; text-decoration: line-through; }
+  .perm-badges-container { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+  .click-hint { text-align: center; font-size: 11px; color: #0f766e; margin-top: 8px; font-weight: 800; padding: 6px; background: rgba(15,118,110,0.1); border-radius: 8px; }
+  .supervisor-signature { text-align: center; color: #0f766e; font-weight: 800; font-size: 13px; margin-top: 12px; padding: 10px; background: rgba(15,118,110,0.1); border-radius: 10px; border: 2px dashed #0f766e; }
+  #settingsModal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 9999; align-items: center; justify-content: center; padding: 20px; overflow-y: auto; }
+  #settingsModal.show { display: flex; }
+  .settings-content { background: #fff; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; border-radius: 20px; padding: 24px; direction: rtl; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+  .settings-content h2 { text-align: center; color: #0f766e; margin: 0 0 20px; font-size: 22px; font-weight: 900; padding-bottom: 15px; border-bottom: 2px solid #0f766e; }
+  .settings-close { position: absolute; top: 12px; left: 12px; width: 40px; height: 40px; border-radius: 50%; background: #f44336; color: #fff; border: none; font-size: 22px; cursor: pointer; font-weight: bold; }
+  .settings-section { background: rgba(15,118,110,0.05); border: 2px solid rgba(15,118,110,0.2); border-radius: 14px; padding: 16px; margin-bottom: 16px; }
+  .settings-section h3 { color: #0f766e; font-size: 15px; font-weight: 900; margin: 0 0 12px 0; }
+  .settings-section label { font-size: 13px; color: #0f766e; font-weight: 800; margin-bottom: 6px; display: block; }
+  .settings-section input, .settings-section select { width: 100%; padding: 11px 14px; border-radius: 10px; border: 2px solid #0f766e; font-size: 14px; font-family: inherit; margin-bottom: 10px; background: #fff; }
+  .bg-preview { width: 100%; height: 120px; background: url('background.jpg') center/cover; border-radius: 12px; border: 2px solid #0f766e; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; text-shadow: 0 2px 8px rgba(0,0,0,0.8); }
+  #loginScreen { background: transparent; }
+  @media (max-width: 768px) {
+    #mainApp { padding: 60px 15px 30px; }
+    .user-info { font-size: 15px !important; padding: 10px 18px !important; }
+    .back-btn, .logout-btn { width: 42px !important; height: 42px !important; font-size: 20px !important; }
+    .settings-btn { width: 34px !important; height: 34px !important; padding: 5px !important; }
+    .tab { padding: 8px 14px; font-size: 12px; }
+    .card { padding: 18px; }
+    h1 { font-size: 17px; }
+    .stats-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
+    .settings-content { padding: 18px; }
+  }
+  @media (min-width: 769px) {
+    .tab { padding: 12px 22px; font-size: 15px; }
+  }
+</style>
+</head>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
@@ -1039,30 +1125,20 @@ function calculateWorkDuration(startDate) {
   return r.trim() || 'اليوم';
 }
 
-// 🗓️ حساب كم باقي يوم لراتب شخص
-// القاعدة: تاريخ المباشرة + شهر كامل
-// مثال: باشر 15 يناير → يستلم 15 فبراير
-// الشهور القصيرة (28) → نستخدم آخر يوم متاح
 function daysUntilSalaryFor(startDate) {
   if (!startDate) return null;
-
   const start = new Date(startDate);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-
   const salaryDay = start.getDate();
 
-  // نبني تاريخ الشهر مع مراعاة الشهور القصيرة
   function buildDate(year, month) {
     const lastDay = new Date(year, month + 1, 0).getDate();
     const targetDay = Math.min(salaryDay, lastDay);
     return new Date(year, month, targetDay);
   }
 
-  // أول راتب: بعد شهر من المباشرة
   let nextSalary = buildDate(start.getFullYear(), start.getMonth() + 1);
-
-  // نضيف شهر لين نطلع بعد اليوم
   while (nextSalary <= today) {
     nextSalary = buildDate(nextSalary.getFullYear(), nextSalary.getMonth() + 1);
   }
@@ -1071,11 +1147,9 @@ function daysUntilSalaryFor(startDate) {
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 }
 
-// 🏷️ بادج عرض الراتب
 function salaryBadgeHTML(startDate) {
   const days = daysUntilSalaryFor(startDate);
   if (days === null) return '';
-
   if (days === 0) return '<span class="salary-countdown-badge today">💰 اليوم راتبه</span>';
   if (days === 1) return '<span class="salary-countdown-badge tomorrow">💰 باقي يوم</span>';
   if (days <= 3) return '<span class="salary-countdown-badge soon">💰 باقي ' + days + ' أيام</span>';
@@ -1417,8 +1491,7 @@ async function login() {
     if (!us.empty) {
       us.forEach(d => { currentUser = { id: d.id, ...d.data() }; });
       currentUserRole = currentUser.role || 'supervisor';
-      currentUserPermissions = { ...(currentUser.permissions || {}) };
-      currentUserPermissions.viewOnly = currentUser.viewOnly === true;
+      currentUserPermissions = currentUser.permissions || {};
       enterAdmin();
       return;
     }
@@ -1474,10 +1547,8 @@ function enterAdmin() {
   if (currentUserPermissions.viewOnly) ui.innerHTML += ' <span class="view-only-badge">👁️</span>';
 
   applyBodyClasses();
-
   if (isOwnerOrAdmin()) document.getElementById('settingsBtn').classList.add('visible');
   else document.getElementById('settingsBtn').classList.remove('visible');
-
   clearLogin();
   initializeAdmin();
 }
@@ -1519,15 +1590,9 @@ function togglePermissionsBox() {
 
 function applyPermissionsToTabs() {
   if (currentUserRole === 'owner') return;
-
-  const isViewOnly = currentUserPermissions.viewOnly === true;
   document.querySelectorAll('#adminTabs .tab').forEach(tab => {
     const n = tab.dataset.tab;
     let show = false;
-    if (isViewOnly) {
-      // مشاهدة فقط: يرى جميع أقسام التشغيل والبيانات، ولا يدخل إدارة المستخدمين والصلاحيات.
-      show = n !== 'permissions';
-    } else {
     switch(n) {
       case 'overview': show = currentUserPermissions.viewOverview === true; break;
       case 'daily': show = currentUserPermissions.manageAttendance === true; break;
@@ -1540,10 +1605,8 @@ function applyPermissionsToTabs() {
       case 'vehicles': show = currentUserPermissions.manageVehicles === true; break;
       case 'permissions': show = currentUserRole === 'admin'; break;
     }
-    }
     tab.style.display = show ? 'block' : 'none';
   });
-
   if (currentUserPermissions.viewOnly === true) {
     const sb = document.getElementById('settingsBtn');
     if (sb) sb.classList.remove('visible');
@@ -1581,10 +1644,6 @@ function initializeAdmin() {
   if (otMonth) otMonth.addEventListener('change', loadOvertimeList);
   document.querySelectorAll('.tab').forEach(tab => {
     tab.onclick = () => {
-      const tabName = tab.dataset.tab;
-      const isViewOnlyUser = currentUserPermissions.viewOnly === true;
-      if (isViewOnlyUser && tabName === 'permissions') return;
-      if (!isViewOnlyUser && (tab.style.display === 'none' || getComputedStyle(tab).display === 'none')) return;
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
       ['overview','daily','reports','workers','drivers','overtime','deductions','inventory','vehicles','permissions'].forEach(t => {
@@ -1742,7 +1801,6 @@ function updateStats() {
     document.getElementById('grandTotalOvertime').textContent = th.toFixed(1);
   }).catch(() => {});
 }
-
 function watchWorkers() {
   db.collection('workers').orderBy('name').onSnapshot(sn => {
     allWorkers = sn.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -1787,24 +1845,33 @@ function toggleEditWorkerForm(workerId) {
   if (form.style.display === 'block') { form.style.display = 'none'; form.innerHTML = ''; return; }
   const w = allWorkers.find(x => x.id === workerId);
   const dB = canDelete() ? '<button class="del-btn-inline" onclick="deleteWorkerWithConfirm(\'' + workerId + '\',\'' + w.name + '\')">🗑️ حذف</button>' : '';
+
+  const currentPhoto = w.photo && w.photo.length > 50
+    ? '<img src="' + w.photo + '" class="current-photo" onerror="this.style.display=\'none\'">'
+    : '<div class="no-photo-text">📷 لا توجد صورة</div>';
+
   form.innerHTML = '<h3>✏️ تعديل: ' + w.name + '</h3>' +
-    '<label>الاسم</label><input id="editName-' + workerId + '" value="' + w.name + '">' +
-    '<label>الفريق</label><select id="editTeam-' + workerId + '">' + TEAMS.map(t => '<option value="' + t.id + '" ' + (t.id === w.team ? 'selected' : '') + '>' + t.label + '</option>').join('') + '</select>' +
-    '<label>الوردية</label><select id="editShift-' + workerId + '"><option value="morning" ' + (w.shift === 'morning' ? 'selected' : '') + '>🌅 صباح</option><option value="night" ' + (w.shift === 'night' ? 'selected' : '') + '>🌙 ليل</option><option value="both" ' + (w.shift === 'both' ? 'selected' : '') + '>🔄 كلاهما</option></select>' +
+    '<label>👤 الاسم</label><input id="editName-' + workerId + '" value="' + w.name + '">' +
+    '<label>🏢 الفريق</label><select id="editTeam-' + workerId + '">' + TEAMS.map(t => '<option value="' + t.id + '" ' + (t.id === w.team ? 'selected' : '') + '>' + t.label + '</option>').join('') + '</select>' +
+    '<label>🔄 الوردية</label><select id="editShift-' + workerId + '"><option value="morning" ' + (w.shift === 'morning' ? 'selected' : '') + '>🌅 صباح</option><option value="night" ' + (w.shift === 'night' ? 'selected' : '') + '>🌙 ليل</option><option value="both" ' + (w.shift === 'both' ? 'selected' : '') + '>🔄 كلاهما</option></select>' +
     '<label>📅 تاريخ المباشرة</label><input id="editStartDate-' + workerId + '" type="date" value="' + (w.startDate || '') + '">' +
-    '<div class="photo-section"><h3>📸 الصورة</h3>' + (w.photo ? '<img src="' + w.photo + '" class="current-photo">' : '<div class="no-photo-text">لا توجد صورة</div>') +
+    '<div class="photo-section"><h3>📸 الصورة</h3>' + currentPhoto +
     '<input type="file" id="editWorkerPhoto-' + workerId + '" accept="image/*" style="display:none;">' +
     '<input type="file" id="editWorkerPhotoCam-' + workerId + '" accept="image/*" capture="user" style="display:none;">' +
-    '<div class="photo-buttons"><button type="button" class="camera-btn" onclick="document.getElementById(\'editWorkerPhotoCam-' + workerId + '\').click()">📷</button><button type="button" class="file-btn" onclick="document.getElementById(\'editWorkerPhoto-' + workerId + '\').click()">🖼️</button></div>' +
-    '<img id="editWorkerPhotoPreview-' + workerId + '" style="width:100%;max-height:120px;object-fit:cover;border-radius:8px;display:none;margin-top:8px;"></div>' +
-    '<button onclick="saveEditWorker(\'' + workerId + '\')">💾 حفظ</button>' + dB;
+    '<img id="editWorkerPhotoPreview-' + workerId + '" style="width:90px;height:90px;object-fit:cover;border-radius:12px;border:3px solid #4caf50;display:none;margin:8px auto;">' +
+    '<div class="photo-buttons">' +
+      '<button type="button" class="camera-btn" onclick="document.getElementById(\'editWorkerPhotoCam-' + workerId + '\').click()">📷 كاميرا</button>' +
+      '<button type="button" class="file-btn" onclick="document.getElementById(\'editWorkerPhoto-' + workerId + '\').click()">🖼️ ملفات</button>' +
+    '</div></div>' +
+    '<button onclick="saveEditWorker(\'' + workerId + '\')" style="background:#2e7d32;border-color:#2e7d32;">💾 حفظ</button>' + dB;
+
   form.style.display = 'block';
   let np = '';
   const ap = async (e) => {
     const file = e.target.files[0]; if (!file) return;
     np = await compressImage(file);
     const p = document.getElementById('editWorkerPhotoPreview-' + workerId);
-    p.src = np; p.style.display = 'block';
+    if (p) { p.src = np; p.style.display = 'block'; }
   };
   document.getElementById('editWorkerPhoto-' + workerId).addEventListener('change', ap);
   document.getElementById('editWorkerPhotoCam-' + workerId).addEventListener('change', ap);
@@ -1911,17 +1978,41 @@ function toggleEditDriverForm(driverId) {
   if (form.style.display === 'block') { form.style.display = 'none'; form.innerHTML = ''; return; }
   const d = allDrivers.find(x => x.id === driverId);
   const dB = canDelete() ? '<button class="del-btn-inline" onclick="deleteDriverWithConfirm(\'' + driverId + '\',\'' + d.name + '\')">🗑️ حذف</button>' : '';
+
+  const currentPhoto = (d.photo || d.photoURL) && (d.photo || d.photoURL).length > 50
+    ? '<img src="' + (d.photo || d.photoURL) + '" class="current-photo" onerror="this.style.display=\'none\'">'
+    : '<div class="no-photo-text">📷 لا توجد صورة</div>';
+
   form.innerHTML = '<h3>✏️ تعديل: ' + d.name + '</h3>' +
-    '<label>الاسم</label><input id="editDriverName-' + driverId + '" value="' + d.name + '">' +
-    '<label>الوظيفة</label><select id="editDriverType-' + driverId + '">' + Object.keys(DRIVER_TYPES).map(k => '<option value="' + k + '" ' + (k === d.driverType ? 'selected' : '') + '>' + DRIVER_TYPES[k] + '</option>').join('') + '</select>' +
-    '<label>الوردية</label><select id="editDriverShift-' + driverId + '"><option value="morning" ' + (d.shift === 'morning' ? 'selected' : '') + '>🌅 صباح</option><option value="night" ' + (d.shift === 'night' ? 'selected' : '') + '>🌙 ليل</option><option value="both" ' + (d.shift === 'both' ? 'selected' : '') + '>🔄 كلاهما</option></select>' +
+    '<label>👤 الاسم</label><input id="editDriverName-' + driverId + '" value="' + d.name + '">' +
+    '<label>🚙 الوظيفة</label><select id="editDriverType-' + driverId + '">' + Object.keys(DRIVER_TYPES).map(k => '<option value="' + k + '" ' + (k === d.driverType ? 'selected' : '') + '>' + DRIVER_TYPES[k] + '</option>').join('') + '</select>' +
+    '<label>🔄 الوردية</label><select id="editDriverShift-' + driverId + '"><option value="morning" ' + (d.shift === 'morning' ? 'selected' : '') + '>🌅 صباح</option><option value="night" ' + (d.shift === 'night' ? 'selected' : '') + '>🌙 ليل</option><option value="both" ' + (d.shift === 'both' ? 'selected' : '') + '>🔄 كلاهما</option></select>' +
     '<label>📅 تاريخ المباشرة</label><input id="editDriverStartDate-' + driverId + '" type="date" value="' + (d.startDate || '') + '">' +
     '<label>💰 المرتب</label><input id="editDriverSalary-' + driverId + '" type="number" value="' + (d.salary || '') + '">' +
     '<label>🏦 رقم الحساب</label><input id="editDriverAccount-' + driverId + '" value="' + (d.accountNumber || '') + '">' +
     '<label>🏛️ المصرف</label><input id="editDriverBank-' + driverId + '" value="' + (d.bankName || '') + '">' +
     '<label>🚗 الرخصة</label><input id="editDriverLicense-' + driverId + '" value="' + (d.licenseGrade || '') + '">' +
-    '<button onclick="saveEditDriver(\'' + driverId + '\')">💾 حفظ</button>' + dB;
+    '<div class="photo-section"><h3>📸 الصورة</h3>' + currentPhoto +
+    '<input type="file" id="editDriverPhoto-' + driverId + '" accept="image/*" style="display:none;">' +
+    '<input type="file" id="editDriverPhotoCam-' + driverId + '" accept="image/*" capture="user" style="display:none;">' +
+    '<img id="editDriverPhotoPreview-' + driverId + '" style="width:90px;height:90px;object-fit:cover;border-radius:12px;border:3px solid #4caf50;display:none;margin:8px auto;">' +
+    '<div class="photo-buttons">' +
+      '<button type="button" class="camera-btn" onclick="document.getElementById(\'editDriverPhotoCam-' + driverId + '\').click()">📷 كاميرا</button>' +
+      '<button type="button" class="file-btn" onclick="document.getElementById(\'editDriverPhoto-' + driverId + '\').click()">🖼️ ملفات</button>' +
+    '</div></div>' +
+    '<button onclick="saveEditDriver(\'' + driverId + '\')" style="background:#2e7d32;border-color:#2e7d32;">💾 حفظ</button>' + dB;
+
   form.style.display = 'block';
+  let np = '';
+  const ap = async (e) => {
+    const file = e.target.files[0]; if (!file) return;
+    np = await compressImage(file);
+    const p = document.getElementById('editDriverPhotoPreview-' + driverId);
+    if (p) { p.src = np; p.style.display = 'block'; }
+  };
+  document.getElementById('editDriverPhoto-' + driverId).addEventListener('change', ap);
+  document.getElementById('editDriverPhotoCam-' + driverId).addEventListener('change', ap);
+  window['newDriverPhotoFor_' + driverId] = () => np;
 }
 
 async function saveEditDriver(driverId) {
@@ -1936,6 +2027,12 @@ async function saveEditDriver(driverId) {
     bankName: document.getElementById('editDriverBank-' + driverId).value,
     licenseGrade: document.getElementById('editDriverLicense-' + driverId).value
   };
+  const np = window['newDriverPhotoFor_' + driverId] ? window['newDriverPhotoFor_' + driverId]() : '';
+  if (np) {
+    data.photo = np;
+    const u = await uploadImageToImgBB(np);
+    if (u) data.photoURL = u;
+  }
   await db.collection('drivers').doc(driverId).update(data);
   document.getElementById('driverEditForm-' + driverId).style.display = 'none';
   alert('✅ تم التعديل');
@@ -1976,6 +2073,130 @@ function deleteDriver(id, name) {
   if (confirm('حذف ' + name + '؟')) db.collection('drivers').doc(id).delete();
 }
 
+// ============================================
+// 📅 تسوية تواريخ المباشرة الجماعية
+// ============================================
+let bulkDateType = 'workers';
+let bulkDateSelectedIds = new Set();
+
+function openBulkDateModal(type) {
+  if (!checkEditPermission()) return;
+  bulkDateType = type;
+  bulkDateSelectedIds.clear();
+  const title = type === 'workers' ? '📅 تسوية تواريخ العمال' : '📅 تسوية تواريخ السائقين';
+  document.getElementById('bulkDateTitle').textContent = title;
+  document.getElementById('bulkDateSearch').value = '';
+  document.getElementById('bulkDateNewDate').value = '';
+  renderBulkDateList();
+  document.getElementById('bulkDateModal').style.display = 'flex';
+}
+
+function closeBulkDateModal() {
+  document.getElementById('bulkDateModal').style.display = 'none';
+  bulkDateSelectedIds.clear();
+}
+
+function getBulkList() {
+  return bulkDateType === 'workers' ? allWorkers : allDrivers;
+}
+
+function renderBulkDateList() {
+  const c = document.getElementById('bulkDateList');
+  const s = (document.getElementById('bulkDateSearch')?.value || '').trim();
+  const all = getBulkList();
+  const filtered = s
+    ? all.filter(w => normalizePersonName(w.name).includes(normalizePersonName(s)))
+    : all;
+
+  if (!filtered.length) {
+    c.innerHTML = '<p style="text-align:center;color:#666;padding:15px;font-size:13px;">' + (s ? 'لا نتائج للبحث' : 'لا يوجد بيانات') + '</p>';
+    updateBulkDateCount();
+    return;
+  }
+
+  c.innerHTML = filtered.map(w => {
+    const checked = bulkDateSelectedIds.has(w.id) ? 'checked' : '';
+    const dateStr = w.startDate || '—';
+    return '<label style="display:flex;align-items:center;gap:8px;padding:10px 8px;border-bottom:1px solid #eee;cursor:pointer;font-size:13px;">' +
+      '<input type="checkbox" ' + checked + ' onchange="toggleBulkDateSelect(\'' + w.id + '\', this.checked)" style="width:20px;height:20px;margin:0;accent-color:#7b1fa2;flex-shrink:0;">' +
+      '<span style="flex:1;color:#0f766e;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + w.name + '</span>' +
+      '<span style="font-size:11px;color:#666;background:rgba(123,31,162,0.1);padding:3px 8px;border-radius:6px;flex-shrink:0;">📅 ' + dateStr + '</span>' +
+    '</label>';
+  }).join('');
+  updateBulkDateCount();
+}
+
+function toggleBulkDateSelect(id, checked) {
+  if (checked) bulkDateSelectedIds.add(id);
+  else bulkDateSelectedIds.delete(id);
+  updateBulkDateCount();
+}
+
+function updateBulkDateCount() {
+  const el = document.getElementById('bulkDateCount');
+  if (el) el.textContent = '✅ محدد: ' + bulkDateSelectedIds.size;
+}
+
+function bulkDateSelectAll(select) {
+  const s = (document.getElementById('bulkDateSearch')?.value || '').trim();
+  const all = getBulkList();
+  const filtered = s
+    ? all.filter(w => normalizePersonName(w.name).includes(normalizePersonName(s)))
+    : all;
+
+  if (select) filtered.forEach(w => bulkDateSelectedIds.add(w.id));
+  else bulkDateSelectedIds.clear();
+
+  renderBulkDateList();
+}
+
+function setBulkDateQuick(day) {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const d = String(day).padStart(2, '0');
+  document.getElementById('bulkDateNewDate').value = year + '-' + month + '-' + d;
+}
+
+function setBulkDateLastDay() {
+  const now = new Date();
+  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  setBulkDateQuick(lastDay);
+}
+
+async function saveBulkDate() {
+  if (!checkEditPermission()) return;
+  const newDate = document.getElementById('bulkDateNewDate').value;
+  if (!newDate) { alert('⚠️ اختر التاريخ الجديد'); return; }
+  if (bulkDateSelectedIds.size === 0) { alert('⚠️ حدد شخص واحد على الأقل'); return; }
+
+  const count = bulkDateSelectedIds.size;
+  const kind = bulkDateType === 'workers' ? 'عامل' : 'سائق';
+  if (!confirm('⚠️ تأكيد التسوية:\n\n' +
+    '• عدد المحددين: ' + count + ' ' + kind + '\n' +
+    '• التاريخ الجديد: ' + newDate + '\n\n' +
+    'هل أنت متأكد؟')) return;
+
+  try {
+    const collectionName = bulkDateType === 'workers' ? 'workers' : 'drivers';
+    const batch = db.batch();
+    bulkDateSelectedIds.forEach(id => {
+      const ref = db.collection(collectionName).doc(id);
+      batch.update(ref, { startDate: newDate });
+    });
+    await batch.commit();
+    alert('✅ تم تحديث تاريخ ' + count + ' ' + kind + ' بنجاح');
+    closeBulkDateModal();
+  } catch (err) {
+    alert('❌ خطأ: ' + err.message);
+  }
+}
+
+document.getElementById('bulkDateSearch')?.addEventListener('input', renderBulkDateList);
+
+// ============================================
+// ⏰ الأوقات الإضافية
+// ============================================
 function populateOvertimeMonthSelect() {
   const sel = document.getElementById('overtimeMonthSelect');
   if (!sel) return;
@@ -2082,6 +2303,9 @@ function exportOvertimeExcel() {
   });
 }
 
+// ============================================
+// 📋 التقارير
+// ============================================
 async function saveReport() {
   if (!checkAddPermission()) return;
   const date = document.getElementById('reportDate').value;
@@ -2204,6 +2428,9 @@ async function deleteReport(reportId) {
   alert('✅ تم الحذف');
 }
 
+// ============================================
+// 💰 الخصومات
+// ============================================
 async function loadDeductionSettings() { deductionAmountValue = appSettings.deductionAmount; }
 
 async function loadDeductions() {
@@ -2218,6 +2445,9 @@ async function loadDeductions() {
   c.innerHTML = Object.keys(ded).map(name => { const d = ded[name], a = d * deductionAmountValue; tot += a; return '<div class="worker-row"><span class="name">' + name + '</span><span class="deduction-badge">' + d + ' يوم</span><span class="deduction-badge">-' + a + ' د</span></div>'; }).join('') + '<div style="margin-top:10px;text-align:center;font-weight:bold;color:#0f766e;">الإجمالي: ' + tot + ' دينار</div>';
 }
 
+// ============================================
+// 📦 المخزن
+// ============================================
 function watchInventory() {
   db.collection('inventory').orderBy('name').onSnapshot(sn => {
     allInventory = sn.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -2245,6 +2475,9 @@ function deleteItem(id, name) {
   if (confirm('حذف ' + name + '؟')) db.collection('inventory').doc(id).delete();
 }
 
+// ============================================
+// 🚛 الآليات
+// ============================================
 function loadVehicles() {
   db.collection('vehicles').onSnapshot(sn => {
     document.getElementById('vehiclesList').innerHTML = sn.empty ? '<p style="text-align:center;color:#666;">لا توجد آليات</p>' : sn.docs.map(doc => {
@@ -2275,8 +2508,10 @@ function deleteVehicle(id, number) {
   if (confirm('حذف ' + number + '؟')) db.collection('vehicles').doc(id).delete();
 }
 
+// ============================================
+// 🔑 المستخدمين
+// ============================================
 async function addUser() {
-  if (!isOwnerOrAdmin()) { alert('🚫 لا تملك صلاحية إدارة المستخدمين.'); return; }
   const name = document.getElementById('newUserName').value.trim();
   const pin = document.getElementById('newUserPin').value.trim();
   const role = document.getElementById('newUserRole').value;
@@ -2311,7 +2546,6 @@ async function addUser() {
 }
 
 function loadUsersList() {
-  if (!isOwnerOrAdmin()) return;
   db.collection('systemUsers').onSnapshot(sn => {
     const list = document.getElementById('usersList');
     if (sn.empty) { list.innerHTML = '<p style="text-align:center;color:#666;">لا يوجد مستخدمين</p>'; return; }
@@ -2329,7 +2563,6 @@ function loadUsersList() {
 }
 
 function toggleUserEditForm(userId) {
-  if (!isOwnerOrAdmin()) { alert('🚫 لا تملك صلاحية إدارة المستخدمين.'); return; }
   const form = document.getElementById('userEditForm-' + userId);
   if (!form) return;
   if (form.style.display === 'block') { form.style.display = 'none'; form.innerHTML = ''; return; }
@@ -2370,7 +2603,6 @@ function toggleEditPermissionsBox(userId) {
 }
 
 async function saveUserEdit(userId) {
-  if (!isOwnerOrAdmin()) { alert('🚫 لا تملك صلاحية إدارة المستخدمين.'); return; }
   const name = document.getElementById('editUserName-' + userId).value.trim();
   const pin = document.getElementById('editUserPin-' + userId).value.trim();
   const role = document.getElementById('editUserRole-' + userId).value;
@@ -2415,6 +2647,9 @@ function deleteUser(id, name) {
   if (confirm('حذف ' + name + '؟')) db.collection('systemUsers').doc(id).delete();
 }
 
+// ============================================
+// 📊 التصدير Excel
+// ============================================
 function exportAttendanceExcel() {
   if (!checkExportPermission()) return;
   if (!latestAttendanceRecords.length) { alert('لا يوجد حضور'); return; }

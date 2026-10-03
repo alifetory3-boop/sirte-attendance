@@ -1,26 +1,394 @@
-<script>
-  // دالة تسجيل الدخول المحلية
-  function handleLogin(event) {
-    event.preventDefault();
-    
-    const username = document.getElementById('loginName').value.trim();
-    const pin = document.getElementById('loginPin').value.trim();
+```html
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    // التحقق من اسم المستخدم والرقم السري
-    if (username === "المدير" && pin === "12345") {
-      alert("تم تسجيل الدخول بنجاح!");
-      // توجيه المستخدم إلى لوحة التحكم
-      window.location.href = "dashboard.html"; // استبدل باسم صفحة المنظومة الرئيسية
-    } else {
-      alert("اسم المستخدم أو الرقم السري غير صحيح!");
-    }
-  }
+  <title>تسجيل الدخول - منظومة شركة النظافة</title>
 
-  // ربط الدالة بنموذج الدخول عند تحميل الصفحة
-  document.addEventListener("DOMContentLoaded", () => {
-    const loginForm = document.querySelector('form') || document.getElementById('loginForm');
-    if (loginForm) {
-      loginForm.addEventListener('submit', handleLogin);
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
     }
-  });
-</script>
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background:
+        linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)),
+        linear-gradient(135deg, #1b5e20, #2e7d32, #43a047);
+      direction: rtl;
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 430px;
+      padding: 20px;
+    }
+
+    .login-box {
+      background: rgba(255, 255, 255, 0.96);
+      border-radius: 20px;
+      padding: 40px 35px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+      text-align: center;
+    }
+
+    .logo {
+      width: 90px;
+      height: 90px;
+      margin: 0 auto 20px;
+      border-radius: 50%;
+      background: #2e7d32;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-size: 40px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    h1 {
+      color: #1b5e20;
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: #666;
+      font-size: 15px;
+      margin-bottom: 30px;
+    }
+
+    .form-group {
+      text-align: right;
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: bold;
+      font-size: 15px;
+    }
+
+    .form-group input {
+      width: 100%;
+      height: 50px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 0 15px;
+      font-size: 16px;
+      outline: none;
+      transition: 0.3s;
+      text-align: right;
+      direction: rtl;
+    }
+
+    .form-group input:focus {
+      border-color: #2e7d32;
+      box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.12);
+    }
+
+    .login-button {
+      width: 100%;
+      height: 52px;
+      border: none;
+      border-radius: 10px;
+      background: #2e7d32;
+      color: white;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+      margin-top: 5px;
+    }
+
+    .login-button:hover {
+      background: #1b5e20;
+      transform: translateY(-1px);
+    }
+
+    .login-button:active {
+      transform: translateY(0);
+    }
+
+    .error-message {
+      display: none;
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 8px;
+      background: #ffebee;
+      color: #c62828;
+      font-size: 14px;
+    }
+
+    .success-message {
+      display: none;
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 8px;
+      background: #e8f5e9;
+      color: #2e7d32;
+      font-size: 14px;
+    }
+
+    .footer {
+      margin-top: 25px;
+      color: #777;
+      font-size: 13px;
+    }
+
+    @media (max-width: 500px) {
+      .login-container {
+        padding: 15px;
+      }
+
+      .login-box {
+        padding: 30px 20px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="login-container">
+
+    <div class="login-box">
+
+      <!-- الشعار -->
+      <div class="logo">
+        🧹
+      </div>
+
+      <h1>منظومة شركة النظافة</h1>
+
+      <p class="subtitle">
+        تسجيل الدخول إلى النظام
+      </p>
+
+      <!-- نموذج تسجيل الدخول -->
+      <form id="loginForm">
+
+        <!-- اسم المستخدم -->
+        <div class="form-group">
+          <label for="loginName">اسم المستخدم</label>
+
+          <input
+            type="text"
+            id="loginName"
+            name="username"
+            placeholder="أدخل اسم المستخدم"
+            autocomplete="username"
+            required
+          >
+        </div>
+
+        <!-- الرقم السري -->
+        <div class="form-group">
+          <label for="loginPin">الرقم السري</label>
+
+          <input
+            type="password"
+            id="loginPin"
+            name="password"
+            placeholder="أدخل الرقم السري"
+            autocomplete="current-password"
+            required
+          >
+        </div>
+
+        <!-- زر تسجيل الدخول -->
+        <button
+          type="submit"
+          class="login-button"
+          id="loginButton"
+        >
+          تسجيل الدخول
+        </button>
+
+        <!-- رسالة الخطأ -->
+        <div
+          class="error-message"
+          id="errorMessage"
+        >
+          اسم المستخدم أو الرقم السري غير صحيح!
+        </div>
+
+        <!-- رسالة النجاح -->
+        <div
+          class="success-message"
+          id="successMessage"
+        >
+          تم تسجيل الدخول بنجاح...
+        </div>
+
+      </form>
+
+      <div class="footer">
+        جميع الحقوق محفوظة © شركة النظافة
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <script>
+    // ==========================================
+    // إعدادات تسجيل الدخول
+    // ==========================================
+
+    const CORRECT_USERNAME = "المدير";
+    const CORRECT_PASSWORD = "12345";
+
+    const DASHBOARD_PAGE = "dashboard.html";
+
+
+    // ==========================================
+    // تنفيذ تسجيل الدخول
+    // ==========================================
+
+    function handleLogin(event) {
+
+      // منع إعادة تحميل الصفحة
+      event.preventDefault();
+
+      // الحصول على العناصر
+      const usernameInput = document.getElementById("loginName");
+      const passwordInput = document.getElementById("loginPin");
+
+      const errorMessage = document.getElementById("errorMessage");
+      const successMessage = document.getElementById("successMessage");
+      const loginButton = document.getElementById("loginButton");
+
+
+      // قراءة البيانات
+      const username = usernameInput.value.trim();
+      const password = passwordInput.value.trim();
+
+
+      // إخفاء الرسائل السابقة
+      errorMessage.style.display = "none";
+      successMessage.style.display = "none";
+
+
+      // التحقق من الحقول
+      if (username === "" || password === "") {
+
+        errorMessage.textContent =
+          "يرجى إدخال اسم المستخدم والرقم السري.";
+
+        errorMessage.style.display = "block";
+
+        return;
+      }
+
+
+      // التحقق من اسم المستخدم والرقم السري
+      if (
+        username === CORRECT_USERNAME &&
+        password === CORRECT_PASSWORD
+      ) {
+
+        // إظهار رسالة النجاح
+        successMessage.textContent =
+          "تم تسجيل الدخول بنجاح...";
+
+        successMessage.style.display = "block";
+
+
+        // تعطيل الزر مؤقتًا
+        loginButton.disabled = true;
+
+        loginButton.textContent =
+          "جاري الدخول...";
+
+
+        // حفظ حالة تسجيل الدخول
+        sessionStorage.setItem(
+          "isLoggedIn",
+          "true"
+        );
+
+        sessionStorage.setItem(
+          "username",
+          username
+        );
+
+
+        // الانتقال إلى لوحة التحكم
+        setTimeout(function () {
+
+          window.location.href = DASHBOARD_PAGE;
+
+        }, 700);
+
+
+      } else {
+
+        // بيانات الدخول خاطئة
+        errorMessage.textContent =
+          "اسم المستخدم أو الرقم السري غير صحيح!";
+
+        errorMessage.style.display = "block";
+
+
+        // مسح الرقم السري
+        passwordInput.value = "";
+
+        // إعادة التركيز على الرقم السري
+        passwordInput.focus();
+      }
+    }
+
+
+    // ==========================================
+    // ربط النموذج بدالة تسجيل الدخول
+    // ==========================================
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      function () {
+
+        const loginForm =
+          document.getElementById("loginForm");
+
+        if (loginForm) {
+
+          loginForm.addEventListener(
+            "submit",
+            handleLogin
+          );
+
+        }
+
+      }
+    );
+  </script>
+
+</body>
+</html>
+```
+
+### بيانات الدخول الحالية
+
+* **اسم المستخدم:** `المدير`
+* **الرقم السري:** `12345`
+* بعد الدخول يتم الانتقال إلى: `dashboard.html`
+
+**ملاحظة مهمة:** هذا تسجيل دخول محلي داخل JavaScript، لذلك هو مناسب كنموذج أولي للمنظومة وليس نظام حماية حقيقي؛ أي شخص يستطيع فحص الكود واستخراج كلمة المرور. إذا كانت المنظومة ستستخدم فعليًا، الأفضل لاحقًا ربط الصلاحيات وتسجيل الدخول بقاعدة بيانات/خادم.
+
+إذا أرسلت لي **كود `dashboard.html` الحالي** أقدر أعدله أيضًا بحيث يمنع الدخول إلى لوحة التحكم مباشرة بدون تسجيل دخول.

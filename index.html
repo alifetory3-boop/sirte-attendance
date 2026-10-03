@@ -8,7 +8,7 @@ window.esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&
 const safeName = s => String(s == null ? '' : s).replace(/[<>"'`\\&]/g, '').replace(/\s+/g, ' ').trim();
 window.safeName = safeName;
 
-/* ---------- تاريخ اليوم بالتوقيت المحلي (بدل UTC) ---------- */
+/* ---------- تاريخ اليوم بالتوقيت المحلي ---------- */
 window.getTodayISO = function () {
   const d = new Date();
   return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
@@ -17,96 +17,116 @@ window.getTodayISO = function () {
 /* ---------- تتبّع المستمعات لإلغائها عند الخروج ---------- */
 const unsubs = [];
 try {
-  [firebase.firestore.Query, firebase.firestore.CollectionReference].forEach(C => {
-    if (C && Object.prototype.hasOwnProperty.call(C.prototype, 'onSnapshot')) {
-      const orig = C.prototype.onSnapshot;
-      C.prototype.onSnapshot = function () { const u = orig.apply(this, arguments); unsubs.push(u); return u; };
-    }
-  });
+  if (typeof firebase !== 'undefined' && firebase.firestore) {
+    [firebase.firestore.Query, firebase.firestore.CollectionReference].forEach(C => {
+      if (C && Object.prototype.hasOwnProperty.call(C.prototype, 'onSnapshot')) {
+        const orig = C.prototype.onSnapshot;
+        C.prototype.onSnapshot = function () { const u = orig.apply(this, arguments); unsubs.push(u); return u; };
+      }
+    });
+  }
 } catch (e) { console.warn('onSnapshot patch', e); }
 
 const origLoadReports = window.loadReports;
 let repUnsub = null;
 window.loadReports = function () {
   if (repUnsub) { try { repUnsub(); } catch (e) {} }
-  origLoadReports();
+  if (typeof origLoadReports === 'function') origLoadReports();
   repUnsub = unsubs[unsubs.length - 1];
 };
 
-/* ---------- قوائم العمال والسائقين بأسماء منظّفة ---------- */
+/* ---------- قوائم العمال والسائقين ---------- */
 window.watchWorkers = function () {
+  if (typeof db === 'undefined' || !db) return;
   db.collection('workers').orderBy('name').onSnapshot(sn => {
-    allWorkers = sn.docs.map(d => { const x = d.data(); return Object.assign({ id: d.id }, x, { name: safeName(x.name) }); });
-    renderWorkersList(); updateDailyMarkList(); updateStats();
+    window.allWorkers = sn.docs.map(d => { const x = d.data(); return Object.assign({ id: d.id }, x, { name: safeName(x.name) }); });
+    if (typeof renderWorkersList === 'function') renderWorkersList();
+    if (typeof updateDailyMarkList === 'function') updateDailyMarkList();
+    if (typeof updateStats === 'function') updateStats();
   });
 };
 window.watchDrivers = function () {
+  if (typeof db === 'undefined' || !db) return;
   db.collection('drivers').orderBy('name').onSnapshot(sn => {
-    allDrivers = sn.docs.map(d => { const x = d.data(); return Object.assign({ id: d.id }, x, { name: safeName(x.name) }); });
-    renderDriversList(); updateDailyMarkList(); populateOvertimeDriverSelect(); updateStats();
+    window.allDrivers = sn.docs.map(d => { const x = d.data(); return Object.assign({ id: d.id }, x, { name: safeName(x.name) }); });
+    if (typeof renderDriversList === 'function') renderDriversList();
+    if (typeof updateDailyMarkList === 'function') updateDailyMarkList();
+    if (typeof populateOvertimeDriverSelect === 'function') populateOvertimeDriverSelect();
+    if (typeof updateStats === 'function') updateStats();
   });
 };
 
-/* ---------- تسجيل الدخول: الرقم السري للجميع ---------- */
+/* ---------- تسجيل الدخول ---------- */
 window.login = async function () {
-  const name = $('loginName').value.trim(), pin = $('loginPin').value.trim(), msg = $('loginMsg');
-  const err = t => { msg.innerHTML = '<p style="color:#c62828;">' + t + '</p>'; };
+  const loginNameEl = $('loginName'), loginPinEl = $('loginPin'), msg = $('loginMsg');
+  const name = loginNameEl ? loginNameEl.value.trim() : '';
+  const pin = loginPinEl ? loginPinEl.value.trim() : '';
+  
+  const err = t => { if (msg) msg.innerHTML = '<p style="color:#c62828;">' + t + '</p>'; };
   if (!name || !pin) return err('⚠️ أدخل اسمك والرقم السري');
-  if (!db) return err('❌ Firebase غير مهيأ');
-  if (name === 'المدير' && pin === appSettings.ownerPin) {
-    currentUser = { name: 'المدير', role: 'owner' };
-    currentUserRole = 'owner'; currentUserPermissions = { all: true };
-    enterAdmin(); return;
+  if (typeof db === 'undefined' || !db) return err('❌ Firebase غير مهيأ');
+  
+  if (name === 'المدير' && window.appSettings && pin === appSettings.ownerPin) {
+    window.currentUser = { name: 'المدير', role: 'owner' };
+    window.currentUserRole = 'owner';
+    window.currentUserPermissions = { all: true };
+    if (typeof enterAdmin === 'function') enterAdmin();
+    return;
   }
-  msg.innerHTML = '<p style="color:#f57c00;">⏳ جاري التحقق...</p>';
+  if (msg) msg.innerHTML = '<p style="color:#f57c00;">⏳ جاري التحقق...</p>';
+  
   try {
     const us = await db.collection('systemUsers').where('name', '==', name).where('pin', '==', pin).get();
     if (!us.empty) {
       const d = us.docs[0];
-      currentUser = Object.assign({ id: d.id }, d.data());
-      currentUser.name = safeName(currentUser.name);
-      currentUserRole = currentUser.role || 'supervisor';
-      currentUserPermissions = Object.assign({}, currentUser.permissions || {});
-      if (currentUser.viewOnly === true) currentUserPermissions.viewOnly = true; // كان يُخزَّن خارج permissions فلا يُطبَّق
-      enterAdmin(); return;
+      window.currentUser = Object.assign({ id: d.id }, d.data());
+      window.currentUser.name = safeName(window.currentUser.name);
+      window.currentUserRole = window.currentUser.role || 'supervisor';
+      window.currentUserPermissions = Object.assign({}, window.currentUser.permissions || {});
+      if (window.currentUser.viewOnly === true) window.currentUserPermissions.viewOnly = true;
+      if (typeof enterAdmin === 'function') enterAdmin();
+      return;
     }
   } catch (e) { console.warn(e); }
+  
   try {
     for (const [col, role] of [['workers', 'worker'], ['drivers', 'driver']]) {
       const s = await db.collection(col).where('name', '==', name).get();
       const d = s.docs.find(x => String(x.data().pin || '0000') === pin);
       if (d) {
-        currentUser = Object.assign({ id: d.id }, d.data(), { role });
-        currentUser.name = safeName(currentUser.name);
-        currentUserRole = role; currentUserPermissions = {};
-        enterWorker(); return;
+        window.currentUser = Object.assign({ id: d.id }, d.data(), { role });
+        window.currentUser.name = safeName(window.currentUser.name);
+        window.currentUserRole = role;
+        window.currentUserPermissions = {};
+        if (typeof enterWorker === 'function') enterWorker();
+        return;
       }
     }
   } catch (e) { return err('❌ ' + esc(e.message)); }
   err('❌ الاسم أو الرقم السري غير صحيح');
 };
 
-/* ---------- الخروج: إلغاء المستمعات وتصفير الصلاحيات ---------- */
+/* ---------- الخروج ---------- */
 window.logout = function () {
   if (!confirm('هل تريد الخروج؟')) return;
   unsubs.splice(0).forEach(u => { try { u(); } catch (e) {} });
   document.body.classList.remove('view-only-mode');
-  currentUser = null; currentUserRole = ''; currentUserPermissions = {};
-  allWorkers = []; allDrivers = []; allInventory = []; latestAttendanceRecords = [];
-  ['mainApp', 'workerView', 'adminView', 'topBar'].forEach(i => { $(i).style.display = 'none'; });
-  $('loginScreen').style.display = 'block';
+  window.currentUser = null; window.currentUserRole = ''; window.currentUserPermissions = {};
+  window.allWorkers = []; window.allDrivers = []; window.allInventory = []; window.latestAttendanceRecords = [];
+  ['mainApp', 'workerView', 'adminView', 'topBar'].forEach(i => { const el = $(i); if (el) el.style.display = 'none'; });
+  const loginEl = $('loginScreen'); if (loginEl) loginEl.style.display = 'block';
 };
 
-/* ---------- التبويبات: إظهار أول تبويب مسموح وإعادة ضبطها ---------- */
+/* ---------- التبويبات ---------- */
 const visibleTabs = () => [...document.querySelectorAll('#adminTabs .tab')].filter(t => t.style.display !== 'none');
 const origInit = window.initializeAdmin;
 window.initializeAdmin = function () {
   const tabs = [...document.querySelectorAll('#adminTabs .tab')];
   tabs.forEach(t => { t.style.display = ''; t.classList.remove('active'); });
-  origInit();
+  if (typeof origInit === 'function') origInit();
   const vis = visibleTabs();
   if (vis[0] && vis[0].onclick) vis[0].onclick();
-  else $('tab-overview').style.display = 'none';
+  else { const tabOv = $('tab-overview'); if (tabOv) tabOv.style.display = 'none'; }
 };
 window.backToOverview = function () {
   const vis = visibleTabs();
@@ -114,14 +134,15 @@ window.backToOverview = function () {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
-/* ---------- الحضور: personType + منع التكرار + أخطاء الموقع ---------- */
-const LATE_HOUR = { morning: 8, night: null }; // عدّل ساعة التأخير؛ null = بدون تأخير
-const setStatus = (t, bg) => { const s = $('status'); s.textContent = t; s.style.display = 'block'; s.style.background = bg || ''; };
+/* ---------- الحضور ---------- */
+const LATE_HOUR = { morning: 8, night: null };
+const setStatus = (t, bg) => { const s = $('status'); if (s) { s.textContent = t; s.style.display = 'block'; s.style.background = bg || ''; } };
 
 async function saveAtt(id, name, type, status, shift, replace) {
+  if (typeof db === 'undefined' || !db) return false;
   const date = getTodayISO();
   const q = await db.collection('attendance').where('date', '==', date).where('workerId', '==', id).where('shift', '==', shift).get();
-  const rec = { workerId: id, workerName: safeName(name), personType: type, timestamp: firebase.firestore.FieldValue.serverTimestamp(), date, time: getNowTime(), status, shift, hasDeduction: status === 'absent' };
+  const rec = { workerId: id, workerName: safeName(name), personType: type, timestamp: firebase.firestore.FieldValue.serverTimestamp(), date, time: typeof getNowTime === 'function' ? getNowTime() : '', status, shift, hasDeduction: status === 'absent' };
   if (q.empty) { await db.collection('attendance').add(rec); return true; }
   if (!replace) return false;
   const b = db.batch(); let first = true;
@@ -130,11 +151,12 @@ async function saveAtt(id, name, type, status, shift, replace) {
   return true;
 }
 async function selfMark(status, okMsg, bg) {
-  if (!currentUser || !currentUser.id) return setStatus('❌ سجّل الدخول من جديد');
+  if (!window.currentUser || !window.currentUser.id) return setStatus('❌ سجّل الدخول من جديد');
   try {
-    const ok = await saveAtt(currentUser.id, currentUser.name, currentUserRole === 'driver' ? 'driver' : 'worker', status, selectedShift, false);
+    const shift = typeof selectedShift !== 'undefined' ? selectedShift : '';
+    const ok = await saveAtt(window.currentUser.id, window.currentUser.name, window.currentUserRole === 'driver' ? 'driver' : 'worker', status, shift, false);
     if (ok) setStatus(okMsg, bg);
-    else setStatus('⚠️ لديك تسجيل لهذه الوردية اليوم، للتعديل راجع المشرف', 'rgba(255,193,7,0.35)');
+    else setStatus('⚠️️ لديك تسجيل لهذه الوردية اليوم، للتعديل راجع المشرف', 'rgba(255,193,7,0.35)');
   } catch (e) { setStatus('❌ ' + e.message, 'rgba(239,83,80,0.35)'); }
 }
 window.markAbsent = () => selfMark('absent', '✗ تم تسجيل غيابك', 'rgba(239,83,80,0.35)');
@@ -144,7 +166,8 @@ window.checkIn = function () {
   setStatus('⏳ جاري تحديد موقعك...');
   if (!navigator.geolocation) return setStatus('❌ المتصفح لا يدعم الموقع');
   navigator.geolocation.getCurrentPosition(() => {
-    const h = LATE_HOUR[selectedShift], now = new Date();
+    const shift = typeof selectedShift !== 'undefined' ? selectedShift : 'morning';
+    const h = LATE_HOUR[shift], now = new Date();
     let late = false;
     if (h != null) { const cut = new Date(); cut.setHours(h, 0, 0, 0); late = now > cut; }
     selfMark(late ? 'late' : 'present', '✅ تم تسجيل حضورك' + (late ? ' (متأخر)' : ''), 'rgba(76,175,80,0.35)');
@@ -152,30 +175,39 @@ window.checkIn = function () {
   { enableHighAccuracy: true, timeout: 15000 });
 };
 window.manualMark = async function (id, name, status) {
-  if (!checkAddPermission()) return;
-  try { await saveAtt(id, name, allDrivers.some(d => d.id === id) ? 'driver' : 'worker', status, adminSelectedShift, true); }
-  catch (e) { alert('❌ ' + e.message); }
-};
-
-/* ---------- الوقت الإضافي: حسب التاريخ المُدخل لا وقت الإدخال ---------- */
-window.saveOvertime = async function () {
-  if (!checkAddPermission()) return;
-  const sel = $('overtimeDriverSelect'), driverId = sel.value;
-  const opt = sel.options[sel.selectedIndex];
-  const driverName = safeName(opt ? opt.dataset.name : '');
-  const date = $('overtimeDate').value, hours = Number($('overtimeHours').value) || 0, note = $('overtimeNote').value.trim();
-  if (!driverId || !date || hours <= 0) { alert('أكمل البيانات'); return; }
-  try {
-    await db.collection('overtime').add({ driverId, driverName, date, hours, note, createdBy: currentUser ? currentUser.name : '', createdTime: getNowTime(), createdAt: new Date(date + 'T12:00:00'), recordedAt: firebase.firestore.FieldValue.serverTimestamp() });
-    alert('✅ تم التسجيل');
-    sel.value = ''; $('overtimeHours').value = ''; $('overtimeNote').value = '';
-    loadOvertimeList(); updateStats();
+  if (typeof checkAddPermission === 'function' && !checkAddPermission()) return;
+  try { 
+    const drivers = window.allDrivers || [];
+    const shift = typeof adminSelectedShift !== 'undefined' ? adminSelectedShift : '';
+    await saveAtt(id, name, drivers.some(d => d.id === id) ? 'driver' : 'worker', status, shift, true); 
   } catch (e) { alert('❌ ' + e.message); }
 };
 
-/* ---------- الخصومات: يوم غياب واحد = خصم واحد + تصدير فعلي ---------- */
+/* ---------- الوقت الإضافي ---------- */
+window.saveOvertime = async function () {
+  if (typeof checkAddPermission === 'function' && !checkAddPermission()) return;
+  const sel = $('overtimeDriverSelect');
+  if (!sel) return;
+  const driverId = sel.value;
+  const opt = sel.options[sel.selectedIndex];
+  const driverName = safeName(opt ? opt.dataset.name : '');
+  const dateEl = $('overtimeDate'), hoursEl = $('overtimeHours'), noteEl = $('overtimeNote');
+  const date = dateEl ? dateEl.value : '', hours = hoursEl ? Number(hoursEl.value) || 0 : 0, note = noteEl ? noteEl.value.trim() : '';
+  if (!driverId || !date || hours <= 0) { alert('أكمل البيانات'); return; }
+  try {
+    await db.collection('overtime').add({ driverId, driverName, date, hours, note, createdBy: window.currentUser ? window.currentUser.name : '', createdTime: typeof getNowTime === 'function' ? getNowTime() : '', createdAt: new Date(date + 'T12:00:00'), recordedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    alert('✅ تم التسجيل');
+    sel.value = ''; if (hoursEl) hoursEl.value = ''; if (noteEl) noteEl.value = '';
+    if (typeof loadOvertimeList === 'function') loadOvertimeList();
+    if (typeof updateStats === 'function') updateStats();
+  } catch (e) { alert('❌ ' + e.message); }
+};
+
+/* ---------- الخصومات ---------- */
 async function dedData() {
-  const v = $('deductionMonthSelect').value, [y, m] = v.split('-').map(Number);
+  const sel = $('deductionMonthSelect');
+  if (!sel || !sel.value) return [];
+  const v = sel.value, [y, m] = v.split('-').map(Number);
   const nx = new Date(y, m, 1);
   const to = nx.getFullYear() + '-' + String(nx.getMonth() + 1).padStart(2, '0') + '-01';
   const sn = await db.collection('attendance').where('date', '>=', v + '-01').where('date', '<', to).get();
@@ -185,11 +217,12 @@ async function dedData() {
     const k = r.workerId || r.workerName;
     (map[k] = map[k] || { name: r.workerName, days: new Set() }).days.add(r.date);
   });
-  const amt = Number(appSettings.deductionAmount) || 0;
+  const amt = window.appSettings ? Number(appSettings.deductionAmount) || 0 : 0;
   return Object.values(map).map(o => ({ name: o.name, days: o.days.size, amount: o.days.size * amt }));
 }
 window.loadDeductions = async function () {
   const c = $('deductionsList');
+  if (!c) return;
   try {
     const rows = await dedData();
     if (!rows.length) { c.innerHTML = '<p style="text-align:center;color:#666;">✅ لا يوجد خصومات</p>'; return; }
@@ -199,22 +232,31 @@ window.loadDeductions = async function () {
   } catch (e) { c.innerHTML = '<p style="text-align:center;color:#c62828;">⚠️ ' + esc(e.message) + '</p>'; }
 };
 window.exportDeductionsExcel = async function () {
-  if (!checkExportPermission()) return;
+  if (typeof checkExportPermission === 'function' && !checkExportPermission()) return;
   try {
     const rows = await dedData();
     if (!rows.length) { alert('لا يوجد خصومات'); return; }
+    if (typeof XLSX === 'undefined') return alert('مكتبة XLSX غير معرفة');
     const ws = XLSX.utils.aoa_to_sheet([['الاسم', 'أيام الغياب', 'قيمة الخصم (د)']].concat(rows.map(r => [r.name, r.days, r.amount])));
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'الخصومات');
-    XLSX.writeFile(wb, 'خصومات-' + $('deductionMonthSelect').value + '.xlsx');
+    const sel = $('deductionMonthSelect');
+    XLSX.writeFile(wb, 'خصومات-' + (sel ? sel.value : '') + '.xlsx');
   } catch (e) { alert('❌ ' + e.message); }
 };
-$('deductionMonthSelect').addEventListener('change', () => window.loadDeductions());
 
-/* ---------- PDF الإفادة: عبر الطباعة (حفظ كـ PDF) ليظهر العربي سليمًا ---------- */
-window.saveNotificationPDF = function () { printNotification(); };
+// فحص أمان عند إضافة المستمع لحدث التغيير
+document.addEventListener('DOMContentLoaded', () => {
+  const dedMonthSel = $('deductionMonthSelect');
+  if (dedMonthSel) {
+    dedMonthSel.addEventListener('change', () => window.loadDeductions());
+  }
+});
 
-/* ---------- نموذج التعديل: يظهر تحت الصف بعرض كامل بدل أن يُقصّ ---------- */
+/* ---------- PDF ---------- */
+window.saveNotificationPDF = function () { if (typeof printNotification === 'function') printNotification(); };
+
+/* ---------- تنسيقات CSS ---------- */
 const fixCss = document.createElement('style');
 fixCss.textContent =
   '.worker-row{flex-wrap:wrap !important;overflow:visible !important;}' +
@@ -223,7 +265,7 @@ fixCss.textContent =
   '.edit-form input,.edit-form select{max-width:100%;}';
 document.head.appendChild(fixCss);
 
-/* ---------- توحيد أسماء الآليات مع ما يُحفظ ---------- */
+/* ---------- الآليات ---------- */
 const vl = { small_garbage_truck: 'صندوق قمامة صغير', dump_truck: 'قلاب' };
 document.querySelectorAll('#vehicleType option').forEach(o => { if (vl[o.value]) o.textContent = vl[o.value]; });
 })();

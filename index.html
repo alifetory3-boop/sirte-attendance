@@ -430,6 +430,17 @@
   .settings-section label { font-size: 13px; color: #0f766e; font-weight: 800; margin-bottom: 6px; display: block; }
   .settings-section input, .settings-section select { width: 100%; padding: 11px 14px; border-radius: 10px; border: 2px solid #0f766e; font-size: 14px; font-family: inherit; margin-bottom: 10px; background: #fff; }
   .bg-preview { width: 100%; height: 120px; background: url('background.jpg') center/cover; border-radius: 12px; border: 2px solid #0f766e; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; text-shadow: 0 2px 8px rgba(0,0,0,0.8); }
+  .org-chart-wrap { width: 100%; overflow-x: auto; padding: 8px 2px 18px; }
+  .org-chart { min-width: 620px; display: flex; flex-direction: column; align-items: center; gap: 18px; padding: 12px; }
+  .org-node { background: #fff; border: 2px solid #0f766e; border-radius: 13px; padding: 12px 16px; min-width: 190px; max-width: 280px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,.08); color: #164e49; }
+  .org-node.root { background: #0f766e; color: #fff; font-size: 17px; font-weight: 900; }
+  .org-connector { height: 20px; border-right: 2px solid #0f766e; margin-top: -18px; }
+  .org-branches { display: grid; grid-template-columns: repeat(3, minmax(180px, 1fr)); gap: 16px; width: 100%; align-items: start; }
+  .org-branch { border-top: 2px solid #0f766e; padding-top: 14px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .org-branch-title { background: #e0f2f1; border: 1px solid #80cbc4; border-radius: 10px; padding: 10px; font-weight: 900; color: #0f766e; width: 100%; text-align: center; }
+  .org-person { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 9px; padding: 8px; text-align: center; width: 100%; overflow-wrap: anywhere; }
+  .org-person small { display: block; color: #64748b; margin-top: 4px; }
+  @media (max-width: 768px) { .org-chart-wrap { margin: 0 -8px; width: calc(100% + 16px); } }
   #loginScreen { background: transparent; }
   @media (max-width: 768px) {
     #mainApp { padding: 60px 15px 30px; }
@@ -510,6 +521,7 @@
         <div class="tab" data-tab="reports">📋 تقارير</div>
         <div class="tab" data-tab="workers">👷 عمال</div>
         <div class="tab" data-tab="drivers">🚗 السائقين</div>
+        <div class="tab" data-tab="orgchart">🏢 الهيكل الوظيفي</div>
         <div class="tab" data-tab="overtime">⏰ وقت إضافي</div>
         <div class="tab" data-tab="deductions">💰 خصومات</div>
         <div class="tab" data-tab="inventory">📦 مخزن</div>
@@ -706,6 +718,18 @@
         <input id="driversSearch" placeholder="🔍 ابحث بالاسم">
         <button class="export-btn" onclick="exportDriversExcel()">📊 Excel</button>
         <div id="driversList">جاري التحميل...</div>
+      </div>
+    </div>
+
+    <div id="tab-orgchart" style="display:none;">
+      <div class="card">
+        <h1>🏢 الهيكل الوظيفي لشركة الخدمات</h1>
+        <p style="text-align:center;color:#475569;line-height:1.8;">عرض تنظيمي للموظفين والسائقين والمشرفين المسجلين في المنظومة.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="export-btn" onclick="renderOrgChart()">🔄 تحديث الهيكل</button>
+          <button class="print-btn" onclick="printOrgChart()">🖨️ طباعة / حفظ PDF</button>
+        </div>
+        <div id="orgChartContent" class="org-chart-wrap"><p style="text-align:center;">جاري تجهيز الهيكل الوظيفي...</p></div>
       </div>
     </div>
 
@@ -1270,7 +1294,6 @@ function showWorkNotification(data) {
     '<div style="margin:15px 0;"><strong>الاسم:</strong> <span style="border-bottom:1px dotted #000;padding:0 30px;">' + data.name + '</span></div>' +
     '<div style="margin:15px 0;"><strong>الصفة:</strong> <span style="border-bottom:1px dotted #000;padding:0 30px;">' + data.jobTitle + '</span></div>' +
     '<div style="margin:15px 0;"><strong>التوقيع:</strong> <span style="border-bottom:1px dotted #000;padding:0 60px;">&nbsp;</span></div></div>' +
-    '<div style="text-align:center;margin-top:30px;font-weight:bold;color:#0f766e;">تحت متابعة وإشراف / ' + appSettings.supervisorName + '</div>' +
     '</div>' +
     '<div style="display:flex;gap:8px;margin-top:30px;justify-content:center;flex-wrap:wrap;">' +
     '<button onclick="printNotification()" style="padding:12px 20px;background:#9c27b0;color:#fff;border:none;border-radius:10px;font-weight:bold;cursor:pointer;">🖨️ طباعة</button>' +
@@ -1506,7 +1529,7 @@ function backToOverview() {
     ot.classList.add('active');
     document.getElementById('tab-overview').style.display = 'block';
   }
-  ['overview','daily','reports','workers','drivers','overtime','deductions','inventory','vehicles','permissions'].forEach(t => {
+  ['overview','daily','reports','workers','drivers','orgchart','overtime','deductions','inventory','vehicles','permissions'].forEach(t => {
     const el = document.getElementById('tab-' + t);
     if (el && t !== 'overview') el.style.display = 'none';
   });
@@ -1534,6 +1557,7 @@ function applyPermissionsToTabs() {
       case 'reports': show = currentUserPermissions.manageReports === true; break;
       case 'workers': show = currentUserPermissions.manageWorkers === true; break;
       case 'drivers': show = currentUserPermissions.manageDrivers === true; break;
+      case 'orgchart': show = currentUserPermissions.manageWorkers === true || currentUserPermissions.manageDrivers === true || currentUserPermissions.viewOverview === true; break;
       case 'overtime': show = currentUserPermissions.manageOvertime === true; break;
       case 'deductions': show = currentUserPermissions.viewDeductions === true; break;
       case 'inventory': show = currentUserPermissions.manageInventory === true; break;
@@ -1587,17 +1611,73 @@ function initializeAdmin() {
       if (!isViewOnlyUser && (tab.style.display === 'none' || getComputedStyle(tab).display === 'none')) return;
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
-      ['overview','daily','reports','workers','drivers','overtime','deductions','inventory','vehicles','permissions'].forEach(t => {
+      ['overview','daily','reports','workers','drivers','orgchart','overtime','deductions','inventory','vehicles','permissions'].forEach(t => {
         const el = document.getElementById('tab-' + t);
         if (el) el.style.display = tab.dataset.tab === t ? 'block' : 'none';
       });
       if (tab.dataset.tab === 'deductions') loadDeductions();
       if (tab.dataset.tab === 'reports') loadReports();
+      if (tab.dataset.tab === 'orgchart') renderOrgChart();
       if (tab.dataset.tab === 'overtime') { populateOvertimeDriverSelect(); loadOvertimeList(); }
       applyBodyClasses();
     };
   });
   setTimeout(updateStats, 1500);
+}
+
+function escapeOrgText(value) {
+  return String(value == null ? '' : value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+
+function renderOrgChart() {
+  const host = document.getElementById('orgChartContent');
+  if (!host) return;
+  const workers = Array.isArray(allWorkers) ? allWorkers.slice() : [];
+  const drivers = Array.isArray(allDrivers) ? allDrivers.slice() : [];
+  const supervisors = drivers.filter(d => d.driverType === 'cleaning_supervisor');
+  const ordinaryDrivers = drivers.filter(d => d.driverType !== 'cleaning_supervisor');
+  const workerGroups = {};
+  workers.forEach(w => {
+    const label = teamLabel(w.team) || 'أخرى';
+    if (!workerGroups[label]) workerGroups[label] = [];
+    workerGroups[label].push(w);
+  });
+  const driverGroups = {};
+  ordinaryDrivers.forEach(d => {
+    const label = DRIVER_TYPES[d.driverType] || 'سائق';
+    if (!driverGroups[label]) driverGroups[label] = [];
+    driverGroups[label].push(d);
+  });
+  const people = (items, jobFn) => items.length ? items.slice().sort((a,b) => String(a.name||'').localeCompare(String(b.name||''), 'ar')).map(person =>
+    '<div class="org-person">' + escapeOrgText(person.name || 'بدون اسم') + '<small>' + escapeOrgText(jobFn(person)) + '</small></div>'
+  ).join('') : '<div class="org-person">لا توجد أسماء مسجلة</div>';
+  const supervisorHtml = people(supervisors, d => DRIVER_TYPES[d.driverType] || 'مشرف');
+  const driverHtml = Object.keys(driverGroups).sort().map(label =>
+    '<div class="org-branch-title">' + escapeOrgText(label) + ' (' + driverGroups[label].length + ')</div>' + people(driverGroups[label], d => (d.shift === 'night' ? 'وردية ليلية' : d.shift === 'both' ? 'كلتا الورديتين' : 'وردية صباحية'))
+  ).join('') || '<div class="org-person">لا يوجد سائقون مسجلون</div>';
+  const workerHtml = Object.keys(workerGroups).sort().map(label =>
+    '<div class="org-branch-title">' + escapeOrgText(label) + ' (' + workerGroups[label].length + ')</div>' + people(workerGroups[label], w => (w.shift === 'night' ? 'وردية ليلية' : w.shift === 'both' ? 'كلتا الورديتين' : 'وردية صباحية'))
+  ).join('') || '<div class="org-person">لا يوجد عمال مسجلون</div>';
+  host.innerHTML = '<div class="org-chart"><div class="org-node root">الإدارة العامة<br><small style="font-weight:normal">شركة الخدمات</small></div><div class="org-connector"></div>' +
+    '<div class="org-branches">' +
+    '<section class="org-branch"><div class="org-branch-title">👷 الإشراف الميداني (' + supervisors.length + ')</div>' + supervisorHtml + '</section>' +
+    '<section class="org-branch"><div class="org-branch-title">🚗 السائقون (' + ordinaryDrivers.length + ')</div>' + driverHtml + '</section>' +
+    '<section class="org-branch"><div class="org-branch-title">🧹 العمال (' + workers.length + ')</div>' + workerHtml + '</section>' +
+    '</div></div>';
+}
+
+function printOrgChart() {
+  renderOrgChart();
+  const content = document.getElementById('orgChartContent');
+  if (!content) return;
+  const printWindow = window.open('', '_blank');
+  if (!printWindow) { alert('يرجى السماح بفتح النوافذ المنبثقة لطباعة الهيكل الوظيفي.'); return; }
+  const title = 'الهيكل الوظيفي - شركة الخدمات';
+  printWindow.document.open();
+  printWindow.document.write('<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>' + title + '</title><style>' +
+    'body{font-family:Arial,sans-serif;direction:rtl;padding:18px;color:#1f2937}h1{text-align:center;color:#0f766e;font-size:22px;margin:0 0 24px}.org-chart-wrap{width:100%;overflow:visible}.org-chart{display:flex;flex-direction:column;align-items:center;gap:18px;padding:10px}.org-node{background:#fff;border:2px solid #0f766e;border-radius:10px;padding:12px 16px;min-width:180px;text-align:center;box-shadow:none}.org-node.root{background:#e0f2f1;color:#0f766e;font-size:18px;font-weight:bold}.org-connector{height:20px;border-right:2px solid #0f766e;margin-top:-18px}.org-branches{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;width:100%;align-items:start}.org-branch{border-top:2px solid #0f766e;padding-top:12px;display:flex;flex-direction:column;align-items:center;gap:7px;break-inside:avoid}.org-branch-title{background:#e0f2f1;border:1px solid #80cbc4;border-radius:8px;padding:8px;font-weight:bold;color:#0f766e;width:100%;text-align:center}.org-person{border:1px solid #cbd5e1;border-radius:7px;padding:7px;text-align:center;width:100%;overflow-wrap:anywhere;break-inside:avoid}.org-person small{display:block;color:#64748b;margin-top:3px}@page{size:A4 landscape;margin:12mm}@media print{body{padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}}' +
+    '</style></head><body><h1>' + title + '</h1>' + content.outerHTML + '<script>window.onload=function(){setTimeout(function(){window.print();},500)};<\/script></body></html>');
+  printWindow.document.close();
 }
 
 function displayDates() {
@@ -1826,7 +1906,8 @@ async function saveEditWorker(workerId) {
     if (u) data.photoURL = u;
   }
   await db.collection('workers').doc(workerId).update(data);
-  document.getElementById('editForm-' + workerId).style.display = 'none';
+  const editForm = document.getElementById('editForm-' + workerId);
+  if (editForm) { editForm.style.display = 'none'; editForm.innerHTML = ''; }
   alert('✅ تم التعديل');
 }
 
@@ -1937,7 +2018,8 @@ async function saveEditDriver(driverId) {
     licenseGrade: document.getElementById('editDriverLicense-' + driverId).value
   };
   await db.collection('drivers').doc(driverId).update(data);
-  document.getElementById('driverEditForm-' + driverId).style.display = 'none';
+  const editForm = document.getElementById('driverEditForm-' + driverId);
+  if (editForm) { editForm.style.display = 'none'; editForm.innerHTML = ''; }
   alert('✅ تم التعديل');
 }
 

@@ -902,7 +902,40 @@
         <div id="inventoryList">جاري التحميل...</div>
       </div>
     </div>
+<div id="tab-statuses" style="display:none;">
+  <div class="card">
+    <h1>📊 حالة الموظفين</h1>
+    <p style="text-align:center;color:#475569;font-size:13px;margin-bottom:15px;">تقرير شامل لمجلس الإدارة</p>
 
+    <div class="status-report-row group-active">
+      <span style="font-size:20px;">🟢</span>
+      <span style="flex:1;font-weight:800;">يعملون فعلياً</span>
+      <strong id="statusActiveCount" style="color:#4caf50;font-size:18px;">0</strong>
+    </div>
+    <div class="status-report-row group-vacation">
+      <span style="font-size:20px;">🔵</span>
+      <span style="flex:1;font-weight:800;">في إجازة</span>
+      <strong id="statusVacationCount" style="color:#2196f3;font-size:18px;">0</strong>
+    </div>
+    <div class="status-report-row group-absconded">
+      <span style="font-size:20px;">🚨</span>
+      <span style="flex:1;font-weight:800;">هاربون (بدون إشعار)</span>
+      <strong id="statusAbscondedCount" style="color:#f44336;font-size:18px;">0</strong>
+    </div>
+    <div class="status-report-row group-resigned">
+      <span style="font-size:20px;">⚪</span>
+      <span style="flex:1;font-weight:800;">مستقيلون رسمياً</span>
+      <strong id="statusResignedCount" style="color:#9e9e9e;font-size:18px;">0</strong>
+    </div>
+
+    <button class="export-btn" onclick="exportStatusesExcel()" style="margin-top:12px;">📊 تصدير Excel للتقرير</button>
+  </div>
+
+  <div class="card">
+    <h2>📋 تفاصيل الموظفين حسب الحالة</h2>
+    <div id="statusesReportList">جاري التحميل...</div>
+  </div>
+</div>
     <div id="tab-vehicles" style="display:none;">
       <div class="card add-vehicle-form">
         <h2>➕ إضافة آلية</h2>

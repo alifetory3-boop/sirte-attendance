@@ -546,7 +546,7 @@
   .settings-section h3 { color: #0f766e; font-size: 15px; font-weight: 900; margin: 0 0 12px 0; }
   .settings-section label { font-size: 13px; color: #0f766e; font-weight: 800; margin-bottom: 6px; display: block; }
   .settings-section input, .settings-section select { width: 100%; padding: 11px 14px; border-radius: 10px; border: 2px solid #0f766e; font-size: 14px; font-family: inherit; margin-bottom: 10px; background: #fff; }
-  .bg-preview { width: 100%; height: 120px; background: url('background.jpg') center/cover; border-radius: 12px; border: 2px solid #0f766e; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; text-shadow: 0 2px 8px rgba(0,0,0,0.8); }
+  .bg-preview { width: 100%; height:    120px; background: url('background.jpg') center/cover; border-radius: 12px; border: 2px solid #0f766e; margin-bottom:  .back-btn, .10px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; text-shadow: 0 2px 8px rgba(0,0,0,0.8); }
   .org-chart-wrap { width: 100%; overflow-x: auto; padding: 8px 2px 18px; }
   .org-chart { min-width: 620px; display: flex; flex-direction: column; align-items: center; gap: 18px; padding: 12px; }
   .org-node { background: #fff; border: 2px solid #0f766e; border-radius: 13px; padding: 12px 16px; min-width: 190px; max-width: 280px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,.08); color: #164e49; }
@@ -562,7 +562,7 @@
   @media (max-width: 768px) {
     #mainApp { padding: 60px 15px 30px; }
     .user-info { font-size: 15px !important; padding: 10px 18px !important; }
-    .back-btn, .logout-btn { width: 42px !important; height: 42px !important; font-size: 20px !important; }
+logout-btn { width: 42px !important; height: 42px !important; font-size: 20px !important; }
     .settings-btn { width: 34px !important; height: 34px !important; padding: 5px !important; }
     .tab { padding: 8px 14px; font-size: 12px; }
     .card { padding: 18px; }
@@ -766,7 +766,10 @@
           <button class="filter-btn filter-archive-btn" data-filter="archive" onclick="setWorkerFilter('archive', this)">📦 الأرشيف</button>
           <button class="filter-btn" data-filter="all" onclick="setWorkerFilter('all', this)">👥 الكل</button>
         </div>
-        <button class="export-btn" onclick="exportWorkersExcel()">📊 Excel</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="export-btn" onclick="exportWorkersExcel()" style="flex:1;margin:0;">📊 Excel</button>
+          <button class="bulk-btn" onclick="openBulkDateModal('workers')" style="flex:1;margin:0;padding:12px;font-size:14px;">📅 تسوية التواريخ</button>
+        </div>
         <div id="workersList">جاري التحميل...</div>
       </div>
     </div>
@@ -793,7 +796,7 @@
           <option value="large_compactor">🚜 سائق كباسة كبيرة</option>
           <option value="small_compactor">🚜 سائق كباسة صغيرة</option>
           <option value="cleaning_supervisor">👷 مشرف نظافة</option>
-          <option value="executive_manager">👷 مدير التنفيذي</option>
+          <option value="executive_manager">👷 مدير تنفيذي</option>
           <option value="municipal_cooperative_supervisor">🏛️ مشرف متعاون من البلدية</option>
         </select>
         <label>🔄 الوردية</label>
@@ -849,7 +852,10 @@
           <button class="filter-btn filter-archive-btn" data-filter="archive" onclick="setDriverFilter('archive', this)">📦 الأرشيف</button>
           <button class="filter-btn" data-filter="all" onclick="setDriverFilter('all', this)">👥 الكل</button>
         </div>
-        <button class="export-btn" onclick="exportDriversExcel()">📊 Excel</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="export-btn" onclick="exportDriversExcel()" style="flex:1;margin:0;">📊 Excel</button>
+          <button class="bulk-btn" onclick="openBulkDateModal('drivers')" style="flex:1;margin:0;padding:12px;font-size:14px;">📅 تسوية التواريخ</button>
+        </div>
         <div id="driversList">جاري التحميل...</div>
       </div>
     </div>
@@ -1043,8 +1049,11 @@
       <span style="flex:1;font-weight:800;color:#616161;">⚪ استقال رسمياً</span>
     </label>
 
-    <label style="font-size:14px;color:#0f766e;font-weight:800;margin-bottom:6px;display:block;">📅 تاريخ التغيير:</label>
-    <input type="date" id="statusChangeDate" style="width:100%;padding:12px;border:2px solid #0f766e;border-radius:10px;margin-bottom:12px;font-size:15px;">
+    <div style="text-align:center;padding:12px;background:rgba(15,118,110,0.15);border-radius:10px;margin-bottom:12px;font-weight:800;color:#0f766e;font-size:14px;border:2px solid #0f766e;">
+      📅 تاريخ التغيير: <span id="statusChangeDateDisplay" style="color:#c62828;font-weight:900;">—</span>
+      <div style="font-size:11px;color:#666;margin-top:4px;font-weight:700;">(يُسجل تلقائياً - غير قابل للتعديل)</div>
+    </div>
+    <input type="hidden" id="statusChangeDate">
 
     <label style="font-size:14px;color:#0f766e;font-weight:800;margin-bottom:6px;display:block;">📝 ملاحظة (اختياري):</label>
     <textarea id="statusNote" rows="3" placeholder="مثال: استقالة نهائية / إجازة سنوية / غياب 15 يوم..." style="width:100%;padding:12px;border:2px solid #0f766e;border-radius:10px;margin-bottom:12px;font-size:14px;"></textarea>
@@ -1546,7 +1555,6 @@ function showWorkNotification(data) {
     '<div style="margin:15px 0;"><strong>الاسم:</strong> <span style="border-bottom:1px dotted #000;padding:0 30px;">' + data.name + '</span></div>' +
     '<div style="margin:15px 0;"><strong>الصفة:</strong> <span style="border-bottom:1px dotted #000;padding:0 30px;">' + data.jobTitle + '</span></div>' +
     '<div style="margin:15px 0;"><strong>التوقيع:</strong> <span style="border-bottom:1px dotted #000;padding:0 60px;">&nbsp;</span></div></div>' +
-    '<div style="text-align:center;margin-top:30px;font-weight:bold;color:#0f766e;">تحت متابعة وإشراف / ' + appSettings.supervisorName + '</div>' +
     '</div>' +
     '<div style="display:flex;gap:8px;margin-top:30px;justify-content:center;flex-wrap:wrap;">' +
     '<button onclick="printNotification()" style="padding:12px 20px;background:#9c27b0;color:#fff;border:none;border-radius:10px;font-weight:bold;cursor:pointer;">🖨️ طباعة</button>' +
@@ -1595,9 +1603,6 @@ function saveNotificationPDF() {
   pdf.text('الصفة: ' + currentNotificationData.jobTitle, 190, yPos, { align: 'right' });
   yPos += 12;
   pdf.text('التوقيع: ________________________', 190, yPos, { align: 'right' });
-  yPos += 20;
-  pdf.setFont('helvetica', 'bold');
-  pdf.text('تحت متابعة وإشراف / ' + appSettings.supervisorName, 105, yPos, { align: 'center' });
   pdf.save('افادة-' + currentNotificationData.name + '.pdf');
 }
 
@@ -2076,7 +2081,7 @@ function updateStats() {
     document.getElementById('grandTotalOvertime').textContent = th.toFixed(1);
   }).catch(() => {});
 }
-function watchWorkers() {
+ function watchWorkers() {
   db.collection('workers').orderBy('name').onSnapshot(sn => {
     allWorkers = sn.docs.map(d => ({ id: d.id, ...d.data() }));
     renderWorkersList();
@@ -2146,7 +2151,22 @@ function openStatusModal(personId, personName, collection) {
     r.checked = r.value === currentStatus;
   });
 
-  document.getElementById('statusChangeDate').value = getTodayISO();
+  // 🎯 التاريخ تلقائي = اليوم (غير قابل للتعديل)
+  const todayISO = getTodayISO();
+  document.getElementById('statusChangeDate').value = todayISO;
+
+  const dateDisplay = document.getElementById('statusChangeDateDisplay');
+  if (dateDisplay) {
+    const date = new Date(todayISO);
+    const formatted = date.toLocaleDateString('ar-LY', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+    dateDisplay.textContent = formatted;
+  }
+
   document.getElementById('statusNote').value = person && person.statusNote ? person.statusNote : '';
 
   document.getElementById('statusModal').style.display = 'flex';
@@ -2162,10 +2182,9 @@ async function saveStatusChange() {
   const newStatus = document.querySelector('input[name="newStatus"]:checked');
   if (!newStatus) { alert('⚠️ اختر الحالة'); return; }
 
-  const date = document.getElementById('statusChangeDate').value;
+  // 🎯 استخدام تاريخ اليوم دائماً (مش من الحقل)
+  const date = getTodayISO();
   const note = document.getElementById('statusNote').value.trim();
-
-  if (!date) { alert('⚠️ اختر التاريخ'); return; }
 
   try {
     await db.collection(currentStatusPerson.collection).doc(currentStatusPerson.id).update({
@@ -2745,7 +2764,7 @@ function loadReports() {
       const photos = (r.photos || []).slice(0, 3).map(p => '<img src="' + p + '" style="width:50px;height:50px;object-fit:cover;border-radius:6px;margin:2px;" onerror="this.style.display=\'none\'">').join('');
       const vc = (r.videos || []).length;
       const db2 = canDelete() ? '<button class="del-btn" onclick="deleteReport(\'' + doc.id + '\')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">حذف</button>' : '';
-      return '<div class="user-card"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;"><strong>' + r.workerName + '</strong><span style="font-size:12px;color:#666;">' + r.date + '</span></div>' + (r.location ? '<div style="font-size:12px;color:#666;">📍 ' + r.location + '</div>' : '') + '<div style="font-size:13px;margin-top:5px;">' + r.text.substring(0, 100) + '</div>' + (photos ? '<div style="display:flex;margin-top:5px;">' + photos + '</div>' : '') + (vc > 0 ? '<div style="margin-top:5px;"><span class="video-badge">🎥 ' + vc + ' فيديو</span></div>' : '') + '<div class="supervisor-signature">تحت متابعة وإشراف / ' + appSettings.supervisorName + '</div><div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;"><button class="view-btn" onclick="viewReport(\'' + doc.id + '\')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">👁️ عرض</button><button class="word-btn" onclick="exportReportWord(\'' + doc.id + '\')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">📄 Word</button><button class="print-btn" onclick="printReport(\'' + doc.id + '\')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">🖨️ طباعة</button>' + db2 + '</div></div>';
+      return '<div class="user-card"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;"><strong>' + r.workerName + '</strong><span style="font-size:12px;color:#666;">' + r.date + '</span></div>' + (r.location ? '<div style="font-size:12px;color:#666;">📍 ' + r.location + '</div>' : '') + '<div style="font-size:13px;margin-top:5px;">' + r.text.substring(0, 100) + '</div>' + (photos ? '<div style="display:flex;margin-top:5px;">' + photos + '</div>' : '') + (vc > 0 ? '<div style="margin-top:5px;"><span class="video-badge">🎥 ' + vc + ' فيديو</span></div>' : '') + '<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;"><button class="view-btn" onclick="viewReport(\'' + doc.id + '\')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">👁️ عرض</button><button class="word-btn" onclick="exportReportWord(\'' + doc.id + '\')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">📄 Word</button><button class="print-btn" onclick="printReport(\'' + doc.id + '\')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">🖨️ طباعة</button>' + db2 + '</div></div>';
     }).join('');
   });
 }
@@ -2759,7 +2778,7 @@ function viewReport(reportId) {
     const modal = document.createElement('div');
     modal.id = 'reportModal';
     modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;';
-    modal.innerHTML = '<div style="background:#fff;color:#000;max-width:700px;width:100%;max-height:90vh;overflow-y:auto;border-radius:16px;padding:24px;direction:rtl;position:relative;"><button onclick="closeReportModal()" style="position:absolute;top:10px;left:10px;width:35px;height:35px;border-radius:50%;background:#f44336;color:#fff;border:none;font-size:20px;cursor:pointer;font-weight:bold;">×</button><h1 style="text-align:center;color:#0f766e;">📋 تقرير يومي</h1><hr><div style="padding:15px;background:#f5f5f5;border-radius:10px;"><p><strong>📅 التاريخ:</strong> ' + r.date + '</p><p><strong>👷 الكاتب:</strong> ' + r.workerName + '</p>' + (r.location ? '<p><strong>📍 الموقع:</strong> ' + r.location + '</p>' : '') + '</div><h2>📝 نص التقرير:</h2><div style="padding:15px;background:#fafafa;border-right:4px solid #0f766e;border-radius:8px;white-space:pre-wrap;">' + r.text + '</div>' + (photosHTML ? '<h2>📸 الصور:</h2><div style="display:flex;flex-wrap:wrap;gap:10px;">' + photosHTML + '</div>' : '') + (videosHTML ? '<h2>🎥 الفيديوهات:</h2><div style="display:flex;flex-wrap:wrap;gap:10px;">' + videosHTML + '</div>' : '') + '<div style="text-align:center;margin-top:20px;padding:10px;background:rgba(15,118,110,0.1);border-radius:10px;font-weight:800;color:#0f766e;">تحت متابعة وإشراف / ' + appSettings.supervisorName + '</div><div style="display:flex;gap:10px;margin-top:20px;justify-content:center;flex-wrap:wrap;"><button onclick="printReport(\'' + reportId + '\')" style="padding:12px 20px;background:#9c27b0;color:#fff;border:none;border-radius:10px;font-weight:bold;cursor:pointer;">🖨️ طباعة</button><button onclick="exportReportWord(\'' + reportId + '\')" style="padding:12px 20px;background:#4caf50;color:#fff;border:none;border-radius:10px;font-weight:bold;cursor:pointer;">📄 Word</button><button onclick="closeReportModal()" style="padding:12px 20px;background:#607d8b;color:#fff;border:none;border-radius:10px;font-weight:bold;cursor:pointer;">إغلاق</button></div></div>';
+    modal.innerHTML = '<div style="background:#fff;color:#000;max-width:700px;width:100%;max-height:90vh;overflow-y:auto;border-radius:16px;padding:24px;direction:rtl;position:relative;"><button onclick="closeReportModal()" style="position:absolute;top:10px;left:10px;width:35px;height:35px;border-radius:50%;background:#f44336;color:#fff;border:none;font-size:20px;cursor:pointer;font-weight:bold;">×</button><h1 style="text-align:center;color:#0f766e;">📋 تقرير يومي</h1><hr><div style="padding:15px;background:#f5f5f5;border-radius:10px;"><p><strong>📅 التاريخ:</strong> ' + r.date + '</p><p><strong>👷 الكاتب:</strong> ' + r.workerName + '</p>' + (r.location ? '<p><strong>📍 الموقع:</strong> ' + r.location + '</p>' : '') + '</div><h2>📝 نص التقرير:</h2><div style="padding:15px;background:#fafafa;border-right:4px solid #0f766e;border-radius:8px;white-space:pre-wrap;">' + r.text + '</div>' + (photosHTML ? '<h2>📸 الصور:</h2><div style="display:flex;flex-wrap:wrap;gap:10px;">' + photosHTML + '</div>' : '') + (videosHTML ? '<h2>🎥 الفيديوهات:</h2><div style="display:flex;flex-wrap:wrap;gap:10px;">' + videosHTML + '</div>' : '') + '<div style="display:flex;gap:10px;margin-top:20px;justify-content:center;flex-wrap:wrap;"><button onclick="printReport(\'' + reportId + '\')" style="padding:12px 20px;background:#9c27b0;color:#fff;border:none;border-radius:10px;font-weight:bold;cursor:pointer;">🖨️ طباعة</button><button onclick="exportReportWord(\'' + reportId + '\')" style="padding:12px 20px;background:#4caf50;color:#fff;border:none;border-radius:10px;font-weight:bold;cursor:pointer;">📄 Word</button><button onclick="closeReportModal()" style="padding:12px 20px;background:#607d8b;color:#fff;border:none;border-radius:10px;font-weight:bold;cursor:pointer;">إغلاق</button></div></div>';
     document.body.appendChild(modal);
   });
 }
@@ -2772,7 +2791,7 @@ function printReport(reportId) {
     const r = doc.data();
     const photosHTML = (r.photos || []).map(p => '<img src="' + p + '" style="max-width:400px;display:block;margin:15px auto;border-radius:8px;">').join('');
     const w = window.open('', '_blank');
-    w.document.write('<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>تقرير</title><style>body { font-family: Arial, sans-serif; direction: rtl; padding: 20px; }h1 { text-align: center; color: #0f766e; }.info { padding: 15px; background: #f5f5f5; border-radius: 10px; }.text-content { padding: 15px; background: #fafafa; border-right: 4px solid #0f766e; border-radius: 8px; white-space: pre-wrap; }.signature { text-align: center; color: #0f766e; font-weight: bold; margin-top: 30px; padding: 15px; border-top: 2px solid #0f766e; }</style></head><body><h1>📋 تقرير يومي</h1><hr><div class="info"><p><strong>📅 التاريخ:</strong> ' + r.date + '</p><p><strong>👷 الكاتب:</strong> ' + r.workerName + '</p>' + (r.location ? '<p><strong>📍 الموقع:</strong> ' + r.location + '</p>' : '') + '</div><h2>📝 نص التقرير:</h2><div class="text-content">' + r.text + '</div>' + (photosHTML ? '<h2>📸 الصور:</h2>' + photosHTML : '') + '<div class="signature">تحت متابعة وإشراف / ' + appSettings.supervisorName + '</div><script>window.onload = function() { setTimeout(function() { window.print(); }, 1000); };<\/script></body></html>');
+    w.document.write('<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>تقرير</title><style>body { font-family: Arial, sans-serif; direction: rtl; padding: 20px; }h1 { text-align: center; color: #0f766e; }.info { padding: 15px; background: #f5f5f5; border-radius: 10px; }.text-content { padding: 15px; background: #fafafa; border-right: 4px solid #0f766e; border-radius: 8px; white-space: pre-wrap; }</style></head><body><h1>📋 تقرير يومي</h1><hr><div class="info"><p><strong>📅 التاريخ:</strong> ' + r.date + '</p><p><strong>👷 الكاتب:</strong> ' + r.workerName + '</p>' + (r.location ? '<p><strong>📍 الموقع:</strong> ' + r.location + '</p>' : '') + '</div><h2>📝 نص التقرير:</h2><div class="text-content">' + r.text + '</div>' + (photosHTML ? '<h2>📸 الصور:</h2>' + photosHTML : '') + '<script>window.onload = function() { setTimeout(function() { window.print(); }, 1000); };<\/script></body></html>');
     w.document.close();
   });
 }
@@ -2781,7 +2800,7 @@ function exportReportWord(reportId) {
   db.collection('dailyReports').doc(reportId).get().then(doc => {
     if (!doc.exists) return;
     const r = doc.data();
-    let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" dir="rtl"><head><meta charset="UTF-8"><style>body { font-family: Arial, sans-serif; direction: rtl; }.signature { text-align: center; color: #0f766e; font-weight: bold; margin-top: 30px; padding: 15px; border-top: 2px solid #0f766e; }</style></head><body>';
+    let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" dir="rtl"><head><meta charset="UTF-8"><style>body { font-family: Arial, sans-serif; direction: rtl; }</style></head><body>';
     html += '<h1 style="text-align:center;color:#0f766e;">📋 تقرير يومي</h1><hr>';
     html += '<p><strong>📅 التاريخ:</strong> ' + r.date + '</p>';
     html += '<p><strong>👷 الكاتب:</strong> ' + r.workerName + '</p>';
@@ -2795,7 +2814,6 @@ function exportReportWord(reportId) {
       html += '<h2>🎥 الفيديوهات:</h2>';
       for (let i = 0; i < r.videos.length; i++) html += '<p><a href="' + r.videos[i] + '">فيديو ' + (i+1) + '</a></p>';
     }
-    html += '<div class="signature">تحت متابعة وإشراف / ' + appSettings.supervisorName + '</div>';
     html += '</body></html>';
     const blob = new Blob(['\ufeff' + html], { type: 'application/msword' });
     const url = URL.createObjectURL(blob);

@@ -213,6 +213,7 @@
     border: 2px solid #0f766e; font-size: 15px; margin-bottom: 10px;
     background: rgba(255,255,255,0.95); color: #333; font-family: inherit;
   }
+  input[type="date"] { display:block; width:100%; max-width:100%; min-width:0; min-height:50px; height:50px; box-sizing:border-box; padding:12px 16px; margin:0 0 10px; font:inherit; border:2px solid #0f766e; border-radius:12px; background:rgba(255,255,255,0.95); color:#333; -webkit-appearance:none; appearance:none; }
   input:focus, textarea:focus { outline: none; box-shadow: 0 0 0 4px rgba(15,118,110,0.15); }
   input::placeholder, textarea::placeholder { color: #999; }
   .stats { display: flex; flex-wrap: wrap; gap: 10px; }
@@ -691,6 +692,7 @@
           <option value="large_compactor">🚜 سائق كباسة كبيرة</option>
           <option value="small_compactor">🚜 سائق كباسة صغيرة</option>
           <option value="cleaning_supervisor">👷 مشرف نظافة</option>
+          <option value="municipal_cooperative_supervisor">🏛️ مشرف متعاون من البلدية</option>
         </select>
         <label>🔄 الوردية</label>
         <select id="newDriverShift">
@@ -1012,7 +1014,8 @@ const DRIVER_TYPES = {
   small_box: 'سائق صندوق صغير',
   large_compactor: 'سائق كباسة كبيرة',
   small_compactor: 'سائق كباسة صغيرة',
-  cleaning_supervisor: 'مشرف نظافة'
+  cleaning_supervisor: 'مشرف نظافة',
+  municipal_cooperative_supervisor: 'مشرف متعاون من البلدية'
 };
 
 const VEHICLE_TYPES = {

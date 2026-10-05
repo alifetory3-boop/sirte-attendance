@@ -37,6 +37,8 @@
   body.view-only-mode .manual-mark-btn,
   body.view-only-mode .shift-btn,
   body.view-only-mode .photo-buttons,
+  body.view-only-mode .status-btn,
+  body.view-only-mode .bulk-btn,
   body.view-only-mode #tab-workers .card:first-child,
   body.view-only-mode #tab-drivers .card:first-child,
   body.view-only-mode #tab-overtime .card:first-child,
@@ -199,6 +201,8 @@
   button.camera-btn { background: #f57c00; border-color: #f57c00; }
   button.file-btn { background: #388e3c; border-color: #388e3c; }
   button.edit-btn { background: #f57c00; border-color: #f57c00; width: auto; padding: 6px 12px; font-size: 12px; margin: 0; }
+  button.bulk-btn { background: #7b1fa2; border-color: #7b1fa2; }
+  button.status-btn { background: #ff9800; border-color: #ff9800; width: auto; padding: 6px 12px; font-size: 12px; margin: 0; }
   button.word-btn { background: #388e3c; border-color: #388e3c; }
   button.view-btn { background: #1976d2; border-color: #1976d2; }
   button.print-btn { background: #7b1fa2; border-color: #7b1fa2; }
@@ -284,6 +288,8 @@
   .worker-row .salary-badge,
   .worker-row .edit-btn,
   .worker-row .del-btn,
+  .worker-row .status-btn,
+  .worker-row .status-badge,
   .worker-row .salary-countdown-badge {
     flex-shrink: 0;
     white-space: nowrap;
@@ -300,11 +306,50 @@
       height: 32px;
     }
     .worker-row .edit-btn,
-    .worker-row .del-btn {
+    .worker-row .del-btn,
+    .worker-row .status-btn {
       padding: 5px 8px;
       font-size: 11px;
     }
-    /* 🎯 بادجات حالة الموظف */
+    .worker-row .duration-badge,
+    .worker-row .salary-countdown-badge,
+    .worker-row .status-badge {
+      padding: 2px 6px;
+      font-size: 10px;
+    }
+  }
+
+  .badge { padding: 4px 10px; border-radius: 20px; color: white; font-size: 12px; font-weight: 800; }
+  .del-btn {
+    width: auto; padding: 6px 12px; background: #c62828;
+    color: #ffffff; border: 2px solid #c62828; margin: 0;
+    font-size: 12px; border-radius: 8px; font-weight: 700;
+  }
+  .shift-selector { display: flex; gap: 10px; margin-bottom: 12px; }
+  .shift-btn {
+    flex: 1; padding: 14px; border-radius: 14px;
+    border: 2px solid #0f766e; font-size: 15px; font-weight: 800;
+    cursor: pointer; text-align: center;
+    background: rgba(255,255,255,0.50); color: #0f766e;
+  }
+  .shift-btn.morning { background: rgba(255,249,196,0.95); color: #f57f17; border-color: #fbc02d; }
+  .shift-btn.morning.active { background: #fbc02d; color: #ffffff; }
+  .shift-btn.night { background: rgba(232,234,246,0.95); color: #283593; border-color: #3f51b5; }
+  .shift-btn.night.active { background: #3f51b5; color: #ffffff; }
+  .role-badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 800; }
+  .role-owner { background: #ffc107; color: #333; }
+  .role-admin { background: #9c27b0; color: #fff; }
+  .role-supervisor { background: #2196f3; color: #fff; }
+  .role-worker { background: #4caf50; color: #fff; }
+  .role-driver { background: #ff9800; color: #fff; }
+  .view-only-badge { background: #ffc107; color: #333; padding: 3px 12px; border-radius: 12px; font-size: 11px; font-weight: 800; }
+  .deduction-badge { background: #f44336; color: #fff; padding: 3px 12px; border-radius: 12px; font-size: 11px; font-weight: 800; }
+  .duration-badge { background: #4caf50; color: #fff; padding: 3px 12px; border-radius: 12px; font-size: 11px; font-weight: 800; }
+  .salary-badge { background: #9c27b0; color: #fff; padding: 3px 12px; border-radius: 12px; font-size: 11px; font-weight: 800; }
+  .overtime-badge { background: #f57c00; color: #fff; padding: 3px 12px; border-radius: 12px; font-size: 11px; font-weight: 800; }
+  .video-badge { background: #d32f2f; color: #fff; padding: 3px 12px; border-radius: 12px; font-size: 11px; font-weight: 800; }
+
+  /* 🎯 بادجات حالة الموظف */
   .status-badge {
     display: inline-block;
     padding: 3px 10px;
@@ -375,17 +420,6 @@
   .filter-btn.filter-vacation-btn.active { background: #2196f3; border-color: #2196f3; }
   .filter-btn.filter-archive-btn.active { background: #9e9e9e; border-color: #9e9e9e; }
 
-  /* 🎯 زر تغيير الحالة */
-  button.status-btn {
-    background: #ff9800;
-    border-color: #ff9800;
-    width: auto;
-    padding: 6px 12px;
-    font-size: 12px;
-    margin: 0;
-  }
-  button.status-btn:hover { background: #f57c00; border-color: #f57c00; }
-
   /* 🎯 تقرير حالة الموظفين */
   .status-report-row {
     display: flex;
@@ -400,42 +434,6 @@
   .status-report-row.group-vacation { background: rgba(33,150,243,0.15); }
   .status-report-row.group-absconded { background: rgba(244,67,54,0.15); }
   .status-report-row.group-resigned { background: rgba(158,158,158,0.15); }
-    .worker-row .duration-badge,
-    .worker-row .salary-countdown-badge {
-      padding: 2px 6px;
-      font-size: 10px;
-    }
-  }
-
-  .badge { padding: 4px 10px; border-radius: 20px; color: white; font-size: 12px; font-weight: 800; }
-  .del-btn {
-    width: auto; padding: 6px 12px; background: #c62828;
-    color: #ffffff; border: 2px solid #c62828; margin: 0;
-    font-size: 12px; border-radius: 8px; font-weight: 700;
-  }
-  .shift-selector { display: flex; gap: 10px; margin-bottom: 12px; }
-  .shift-btn {
-    flex: 1; padding: 14px; border-radius: 14px;
-    border: 2px solid #0f766e; font-size: 15px; font-weight: 800;
-    cursor: pointer; text-align: center;
-    background: rgba(255,255,255,0.50); color: #0f766e;
-  }
-  .shift-btn.morning { background: rgba(255,249,196,0.95); color: #f57f17; border-color: #fbc02d; }
-  .shift-btn.morning.active { background: #fbc02d; color: #ffffff; }
-  .shift-btn.night { background: rgba(232,234,246,0.95); color: #283593; border-color: #3f51b5; }
-  .shift-btn.night.active { background: #3f51b5; color: #ffffff; }
-  .role-badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 800; }
-  .role-owner { background: #ffc107; color: #333; }
-  .role-admin { background: #9c27b0; color: #fff; }
-  .role-supervisor { background: #2196f3; color: #fff; }
-  .role-worker { background: #4caf50; color: #fff; }
-  .role-driver { background: #ff9800; color: #fff; }
-  .view-only-badge { background: #ffc107; color: #333; padding: 3px 12px; border-radius: 12px; font-size: 11px; font-weight: 800; }
-  .deduction-badge { background: #f44336; color: #fff; padding: 3px 12px; border-radius: 12px; font-size: 11px; font-weight: 800; }
-  .duration-badge { background: #4caf50; color: #fff; padding: 3px 12px; border-radius: 12px; font-size: 11px; font-weight: 800; }
-  .salary-badge { background: #9c27b0; color: #fff; padding: 3px 12px; border-radius: 12px; font-size: 11px; font-weight: 800; }
-  .overtime-badge { background: #f57c00; color: #fff; padding: 3px 12px; border-radius: 12px; font-size: 11px; font-weight: 800; }
-  .video-badge { background: #d32f2f; color: #fff; padding: 3px 12px; border-radius: 12px; font-size: 11px; font-weight: 800; }
 
   .salary-countdown-badge {
     background: linear-gradient(135deg, #9c27b0, #7b1fa2);
@@ -644,8 +642,8 @@
         <div class="tab" data-tab="overtime">⏰ وقت إضافي</div>
         <div class="tab" data-tab="deductions">💰 خصومات</div>
         <div class="tab" data-tab="inventory">📦 مخزن</div>
-       <div class="tab" data-tab="vehicles">🚛 آليات</div>
-<div class="tab" data-tab="statuses">📊 حالة الموظفين</div>
+        <div class="tab" data-tab="vehicles">🚛 آليات</div>
+        <div class="tab" data-tab="statuses">📊 حالة الموظفين</div>
         <div class="tab" data-tab="permissions">🔑 صلاحيات</div>
       </div>
     </div>
@@ -762,6 +760,12 @@
       <div class="card">
         <h2>👷 العمال</h2>
         <input id="workersSearch" placeholder="🔍 ابحث بالاسم">
+        <div class="filter-bar">
+          <button class="filter-btn active" data-filter="working" onclick="setWorkerFilter('working', this)">🟢 يعملون + إجازة</button>
+          <button class="filter-btn filter-active-btn" data-filter="active" onclick="setWorkerFilter('active', this)">🟢 يعمل فقط</button>
+          <button class="filter-btn filter-archive-btn" data-filter="archive" onclick="setWorkerFilter('archive', this)">📦 الأرشيف</button>
+          <button class="filter-btn" data-filter="all" onclick="setWorkerFilter('all', this)">👥 الكل</button>
+        </div>
         <button class="export-btn" onclick="exportWorkersExcel()">📊 Excel</button>
         <div id="workersList">جاري التحميل...</div>
       </div>
@@ -789,7 +793,7 @@
           <option value="large_compactor">🚜 سائق كباسة كبيرة</option>
           <option value="small_compactor">🚜 سائق كباسة صغيرة</option>
           <option value="cleaning_supervisor">👷 مشرف نظافة</option>
-          <option value="cleaning_supervisor">👷 مدير التنفيذي</option>
+          <option value="executive_manager">👷 مدير التنفيذي</option>
           <option value="municipal_cooperative_supervisor">🏛️ مشرف متعاون من البلدية</option>
         </select>
         <label>🔄 الوردية</label>
@@ -810,8 +814,8 @@
           <option value="الجمهورية">مصرف الجمهورية</option>
           <option value="التجارة والتنمية">مصرف التجارة والتنمية</option>
           <option value="الوحدة">مصرف الوحدة</option>
-            <option value="الصحاري">مصرف الصحاري</option>
-              <option value="النوران">مصرف النوران</option>
+          <option value="الصحاري">مصرف الصحاري</option>
+          <option value="النوران">مصرف النوران</option>
           <option value="التجاري الوطني">المصرف التجاري الوطني</option>
           <option value="شمال افريقيا">مصرف شمال افريقيا</option>
           <option value="أخرى">أخرى</option>
@@ -839,6 +843,12 @@
       <div class="card">
         <h2>🚗 السائقين والمشرفين</h2>
         <input id="driversSearch" placeholder="🔍 ابحث بالاسم">
+        <div class="filter-bar">
+          <button class="filter-btn active" data-filter="working" onclick="setDriverFilter('working', this)">🟢 يعملون + إجازة</button>
+          <button class="filter-btn filter-active-btn" data-filter="active" onclick="setDriverFilter('active', this)">🟢 يعمل فقط</button>
+          <button class="filter-btn filter-archive-btn" data-filter="archive" onclick="setDriverFilter('archive', this)">📦 الأرشيف</button>
+          <button class="filter-btn" data-filter="all" onclick="setDriverFilter('all', this)">👥 الكل</button>
+        </div>
         <button class="export-btn" onclick="exportDriversExcel()">📊 Excel</button>
         <div id="driversList">جاري التحميل...</div>
       </div>
@@ -902,40 +912,7 @@
         <div id="inventoryList">جاري التحميل...</div>
       </div>
     </div>
-<div id="tab-statuses" style="display:none;">
-  <div class="card">
-    <h1>📊 حالة الموظفين</h1>
-    <p style="text-align:center;color:#475569;font-size:13px;margin-bottom:15px;">تقرير شامل لمجلس الإدارة</p>
 
-    <div class="status-report-row group-active">
-      <span style="font-size:20px;">🟢</span>
-      <span style="flex:1;font-weight:800;">يعملون فعلياً</span>
-      <strong id="statusActiveCount" style="color:#4caf50;font-size:18px;">0</strong>
-    </div>
-    <div class="status-report-row group-vacation">
-      <span style="font-size:20px;">🔵</span>
-      <span style="flex:1;font-weight:800;">في إجازة</span>
-      <strong id="statusVacationCount" style="color:#2196f3;font-size:18px;">0</strong>
-    </div>
-    <div class="status-report-row group-absconded">
-      <span style="font-size:20px;">🚨</span>
-      <span style="flex:1;font-weight:800;">هاربون (بدون إشعار)</span>
-      <strong id="statusAbscondedCount" style="color:#f44336;font-size:18px;">0</strong>
-    </div>
-    <div class="status-report-row group-resigned">
-      <span style="font-size:20px;">⚪</span>
-      <span style="flex:1;font-weight:800;">مستقيلون رسمياً</span>
-      <strong id="statusResignedCount" style="color:#9e9e9e;font-size:18px;">0</strong>
-    </div>
-
-    <button class="export-btn" onclick="exportStatusesExcel()" style="margin-top:12px;">📊 تصدير Excel للتقرير</button>
-  </div>
-
-  <div class="card">
-    <h2>📋 تفاصيل الموظفين حسب الحالة</h2>
-    <div id="statusesReportList">جاري التحميل...</div>
-  </div>
-</div>
     <div id="tab-vehicles" style="display:none;">
       <div class="card add-vehicle-form">
         <h2>➕ إضافة آلية</h2>
@@ -966,6 +943,41 @@
         <h2>🚛 الآليات</h2>
         <button class="export-btn" onclick="exportVehiclesExcel()">📊 Excel</button>
         <div id="vehiclesList">جاري التحميل...</div>
+      </div>
+    </div>
+
+    <div id="tab-statuses" style="display:none;">
+      <div class="card">
+        <h1>📊 حالة الموظفين</h1>
+        <p style="text-align:center;color:#475569;font-size:13px;margin-bottom:15px;">تقرير شامل لمجلس الإدارة</p>
+
+        <div class="status-report-row group-active">
+          <span style="font-size:20px;">🟢</span>
+          <span style="flex:1;font-weight:800;">يعملون فعلياً</span>
+          <strong id="statusActiveCount" style="color:#4caf50;font-size:18px;">0</strong>
+        </div>
+        <div class="status-report-row group-vacation">
+          <span style="font-size:20px;">🔵</span>
+          <span style="flex:1;font-weight:800;">في إجازة</span>
+          <strong id="statusVacationCount" style="color:#2196f3;font-size:18px;">0</strong>
+        </div>
+        <div class="status-report-row group-absconded">
+          <span style="font-size:20px;">🚨</span>
+          <span style="flex:1;font-weight:800;">هاربون (بدون إشعار)</span>
+          <strong id="statusAbscondedCount" style="color:#f44336;font-size:18px;">0</strong>
+        </div>
+        <div class="status-report-row group-resigned">
+          <span style="font-size:20px;">⚪</span>
+          <span style="flex:1;font-weight:800;">مستقيلون رسمياً</span>
+          <strong id="statusResignedCount" style="color:#9e9e9e;font-size:18px;">0</strong>
+        </div>
+
+        <button class="export-btn" onclick="exportStatusesExcel()" style="margin-top:12px;">📊 تصدير Excel للتقرير</button>
+      </div>
+
+      <div class="card">
+        <h2>📋 تفاصيل الموظفين حسب الحالة</h2>
+        <div id="statusesReportList">جاري التحميل...</div>
       </div>
     </div>
 
@@ -1001,6 +1013,83 @@
         <h2>📋 المستخدمين (اضغط لتعديل الصلاحيات)</h2>
         <div id="usersList">جاري التحميل...</div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- نافذة تغيير حالة الموظف -->
+<div id="statusModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:99999;align-items:center;justify-content:center;padding:20px;overflow-y:auto;">
+  <div style="background:#fff;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;border-radius:20px;padding:24px;direction:rtl;position:relative;">
+    <button onclick="closeStatusModal()" style="position:absolute;top:12px;left:12px;width:38px;height:38px;border-radius:50%;background:#f44336;color:#fff;border:none;font-size:20px;cursor:pointer;font-weight:bold;">×</button>
+    <h2 style="text-align:center;color:#f57c00;margin:0 0 15px;font-size:19px;font-weight:900;">🔄 تغيير حالة الموظف</h2>
+    <p style="text-align:center;color:#0f766e;font-size:16px;font-weight:800;margin-bottom:15px;" id="statusPersonName">—</p>
+
+    <label style="font-size:14px;color:#0f766e;font-weight:800;margin-bottom:6px;display:block;">اختر الحالة الجديدة:</label>
+
+    <label style="display:flex;align-items:center;gap:10px;padding:12px;background:rgba(76,175,80,0.1);border-radius:10px;margin-bottom:8px;cursor:pointer;">
+      <input type="radio" name="newStatus" value="active" style="width:20px;height:20px;margin:0;accent-color:#4caf50;">
+      <span style="flex:1;font-weight:800;color:#2e7d32;">🟢 يعمل</span>
+    </label>
+    <label style="display:flex;align-items:center;gap:10px;padding:12px;background:rgba(33,150,243,0.1);border-radius:10px;margin-bottom:8px;cursor:pointer;">
+      <input type="radio" name="newStatus" value="vacation" style="width:20px;height:20px;margin:0;accent-color:#2196f3;">
+      <span style="flex:1;font-weight:800;color:#1565c0;">🔵 إجازة</span>
+    </label>
+    <label style="display:flex;align-items:center;gap:10px;padding:12px;background:rgba(244,67,54,0.1);border-radius:10px;margin-bottom:8px;cursor:pointer;">
+      <input type="radio" name="newStatus" value="absconded" style="width:20px;height:20px;margin:0;accent-color:#f44336;">
+      <span style="flex:1;font-weight:800;color:#c62828;">🚨 هارب (غائب بدون إشعار)</span>
+    </label>
+    <label style="display:flex;align-items:center;gap:10px;padding:12px;background:rgba(158,158,158,0.1);border-radius:10px;margin-bottom:15px;cursor:pointer;">
+      <input type="radio" name="newStatus" value="resigned" style="width:20px;height:20px;margin:0;accent-color:#616161;">
+      <span style="flex:1;font-weight:800;color:#616161;">⚪ استقال رسمياً</span>
+    </label>
+
+    <label style="font-size:14px;color:#0f766e;font-weight:800;margin-bottom:6px;display:block;">📅 تاريخ التغيير:</label>
+    <input type="date" id="statusChangeDate" style="width:100%;padding:12px;border:2px solid #0f766e;border-radius:10px;margin-bottom:12px;font-size:15px;">
+
+    <label style="font-size:14px;color:#0f766e;font-weight:800;margin-bottom:6px;display:block;">📝 ملاحظة (اختياري):</label>
+    <textarea id="statusNote" rows="3" placeholder="مثال: استقالة نهائية / إجازة سنوية / غياب 15 يوم..." style="width:100%;padding:12px;border:2px solid #0f766e;border-radius:10px;margin-bottom:12px;font-size:14px;"></textarea>
+
+    <div style="display:flex;gap:8px;">
+      <button onclick="closeStatusModal()" style="flex:1;background:#607d8b;border-color:#607d8b;padding:14px;margin:0;">❌ إلغاء</button>
+      <button onclick="saveStatusChange()" style="flex:2;background:#2e7d32;border-color:#2e7d32;padding:14px;margin:0;">💾 حفظ الحالة</button>
+    </div>
+  </div>
+</div>
+
+<!-- نافذة تسوية التواريخ الجماعية -->
+<div id="bulkDateModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:99999;align-items:center;justify-content:center;padding:15px;overflow-y:auto;">
+  <div style="background:#fff;max-width:620px;width:100%;max-height:92vh;overflow-y:auto;border-radius:20px;padding:22px;direction:rtl;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.5);">
+    <button onclick="closeBulkDateModal()" style="position:absolute;top:12px;left:12px;width:38px;height:38px;border-radius:50%;background:#f44336;color:#fff;border:none;font-size:20px;cursor:pointer;font-weight:bold;">×</button>
+    <h2 id="bulkDateTitle" style="text-align:center;color:#7b1fa2;margin:0 0 15px;font-size:19px;font-weight:900;">📅 تسوية تواريخ المباشرة</h2>
+    <p style="text-align:center;color:#666;font-size:12px;margin:0 0 15px;">حدد الأشخاص اللي تبي توحد تاريخ مباشرتهم</p>
+
+    <input id="bulkDateSearch" placeholder="🔍 ابحث بالاسم" style="width:100%;padding:12px;border:2px solid #7b1fa2;border-radius:10px;margin-bottom:10px;font-size:14px;">
+
+    <div style="display:flex;gap:8px;margin-bottom:10px;">
+      <button onclick="bulkDateSelectAll(true)" style="flex:1;background:#4caf50;border-color:#4caf50;padding:10px;margin:0;font-size:13px;">☑️ تحديد الكل</button>
+      <button onclick="bulkDateSelectAll(false)" style="flex:1;background:#607d8b;border-color:#607d8b;padding:10px;margin:0;font-size:13px;">☐ إلغاء الكل</button>
+    </div>
+
+    <div id="bulkDateList" style="max-height:260px;overflow-y:auto;border:2px solid #7b1fa2;border-radius:12px;padding:6px;margin-bottom:12px;background:#f9f9f9;"></div>
+
+    <div id="bulkDateCount" style="text-align:center;color:#7b1fa2;font-weight:800;font-size:13px;margin-bottom:12px;padding:8px;background:rgba(123,31,162,0.1);border-radius:8px;">✅ محدد: 0</div>
+
+    <label style="font-size:14px;color:#0f766e;font-weight:800;margin-bottom:6px;display:block;">📅 التاريخ الموحد الجديد:</label>
+    <input type="date" id="bulkDateNewDate" style="width:100%;padding:14px;border:2px solid #0f766e;border-radius:10px;margin-bottom:10px;font-size:16px;font-weight:bold;">
+
+    <div style="margin-bottom:12px;">
+      <div style="font-size:12px;color:#666;margin-bottom:6px;font-weight:800;">⚡ اختصارات سريعة:</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button onclick="setBulkDateQuick(1)" style="flex:1;min-width:80px;background:#4caf50;border-color:#4caf50;padding:10px;margin:0;font-size:12px;">1 من الشهر</button>
+        <button onclick="setBulkDateQuick(15)" style="flex:1;min-width:80px;background:#2196f3;border-color:#2196f3;padding:10px;margin:0;font-size:12px;">15 من الشهر</button>
+        <button onclick="setBulkDateQuick(30)" style="flex:1;min-width:80px;background:#ff9800;border-color:#ff9800;padding:10px;margin:0;font-size:12px;">30 من الشهر</button>
+        <button onclick="setBulkDateLastDay()" style="flex:1;min-width:80px;background:#9c27b0;border-color:#9c27b0;padding:10px;margin:0;font-size:12px;">آخر يوم</button>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;">
+      <button onclick="closeBulkDateModal()" style="flex:1;background:#607d8b;border-color:#607d8b;padding:14px;margin:0;font-size:15px;">❌ إلغاء</button>
+      <button onclick="saveBulkDate()" style="flex:2;background:#2e7d32;border-color:#2e7d32;padding:14px;margin:0;font-size:15px;">💾 تسوية المحددين</button>
     </div>
   </div>
 </div>
@@ -1125,6 +1214,11 @@ let vehiclePhotoBase64 = '';
 let reportMediaFiles = [];
 let currentNotificationData = { name: '', jobTitle: '', startDate: '', photo: '' };
 
+// 🎯 نظام حالة الموظفين
+let currentStatusPerson = null;
+let workerFilter = 'working';
+let driverFilter = 'working';
+
 loadSettings();
 applySettings();
 applyBackground();
@@ -1147,7 +1241,7 @@ const DRIVER_TYPES = {
   large_compactor: 'سائق كباسة كبيرة',
   small_compactor: 'سائق كباسة صغيرة',
   cleaning_supervisor: 'مشرف نظافة',
-executive_manager: 'مدير تنفيذي',
+  executive_manager: 'مدير تنفيذي',
   municipal_cooperative_supervisor: 'مشرف متعاون من البلدية'
 };
 
@@ -1158,6 +1252,18 @@ const VEHICLE_TYPES = {
   large_garbage_truck: 'صندوق قمامة كبير',
   dump_truck: 'قلاب'
 };
+
+const STATUS_LABELS = {
+  active: { label: '🟢 يعمل', class: 'status-active' },
+  vacation: { label: '🔵 إجازة', class: 'status-vacation' },
+  absconded: { label: '🚨 هارب', class: 'status-absconded' },
+  resigned: { label: '⚪ استقال', class: 'status-resigned' }
+};
+
+function statusBadgeHTML(status) {
+  const s = STATUS_LABELS[status] || STATUS_LABELS.active;
+  return '<span class="status-badge ' + s.class + '">' + s.label + '</span>';
+}
 
 function isOwnerOrAdmin() {
   return currentUserRole === 'owner' || currentUserRole === 'admin';
@@ -1221,30 +1327,20 @@ function calculateWorkDuration(startDate) {
   return r.trim() || 'اليوم';
 }
 
-// 🗓️ حساب كم باقي يوم لراتب شخص
-// القاعدة: تاريخ المباشرة + شهر كامل
-// مثال: باشر 15 يناير → يستلم 15 فبراير
-// الشهور القصيرة (28) → نستخدم آخر يوم متاح
 function daysUntilSalaryFor(startDate) {
   if (!startDate) return null;
-
   const start = new Date(startDate);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-
   const salaryDay = start.getDate();
 
-  // نبني تاريخ الشهر مع مراعاة الشهور القصيرة
   function buildDate(year, month) {
     const lastDay = new Date(year, month + 1, 0).getDate();
     const targetDay = Math.min(salaryDay, lastDay);
     return new Date(year, month, targetDay);
   }
 
-  // أول راتب: بعد شهر من المباشرة
   let nextSalary = buildDate(start.getFullYear(), start.getMonth() + 1);
-
-  // نضيف شهر لين نطلع بعد اليوم
   while (nextSalary <= today) {
     nextSalary = buildDate(nextSalary.getFullYear(), nextSalary.getMonth() + 1);
   }
@@ -1253,11 +1349,9 @@ function daysUntilSalaryFor(startDate) {
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 }
 
-// 🏷️ بادج عرض الراتب
 function salaryBadgeHTML(startDate) {
   const days = daysUntilSalaryFor(startDate);
   if (days === null) return '';
-
   if (days === 0) return '<span class="salary-countdown-badge today">💰 اليوم راتبه</span>';
   if (days === 1) return '<span class="salary-countdown-badge tomorrow">💰 باقي يوم</span>';
   if (days <= 3) return '<span class="salary-countdown-badge soon">💰 باقي ' + days + ' أيام</span>';
@@ -1399,12 +1493,12 @@ async function downloadFullBackup() {
   try {
     const wb = XLSX.utils.book_new();
     const wSnap = await db.collection('workers').get();
-    const wRows = [['الاسم', 'الفريق', 'الوردية', 'تاريخ المباشرة', 'مدة العمل']];
-    wSnap.forEach(d => { const w = d.data(); wRows.push([w.name, teamLabel(w.team), w.shift, w.startDate || '', calculateWorkDuration(w.startDate)]); });
+    const wRows = [['الاسم', 'الفريق', 'الوردية', 'تاريخ المباشرة', 'مدة العمل', 'الحالة']];
+    wSnap.forEach(d => { const w = d.data(); wRows.push([w.name, teamLabel(w.team), w.shift, w.startDate || '', calculateWorkDuration(w.startDate), STATUS_LABELS[w.status || 'active'].label]); });
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(wRows), 'العمال');
     const dSnap = await db.collection('drivers').get();
-    const dRows = [['الاسم', 'الوظيفة', 'الوردية', 'تاريخ المباشرة', 'المرتب', 'رقم الحساب', 'المصرف', 'الرخصة']];
-    dSnap.forEach(d => { const dr = d.data(); dRows.push([dr.name, DRIVER_TYPES[dr.driverType] || '', dr.shift, dr.startDate || '', dr.salary || '', dr.accountNumber || '', dr.bankName || '', dr.licenseGrade || '']); });
+    const dRows = [['الاسم', 'الوظيفة', 'الوردية', 'تاريخ المباشرة', 'المرتب', 'رقم الحساب', 'المصرف', 'الرخصة', 'الحالة']];
+    dSnap.forEach(d => { const dr = d.data(); dRows.push([dr.name, DRIVER_TYPES[dr.driverType] || '', dr.shift, dr.startDate || '', dr.salary || '', dr.accountNumber || '', dr.bankName || '', dr.licenseGrade || '', STATUS_LABELS[dr.status || 'active'].label]); });
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(dRows), 'السائقين');
     const aSnap = await db.collection('attendance').orderBy('timestamp', 'desc').limit(1000).get();
     const aRows = [['الاسم', 'النوع', 'الوردية', 'الحالة', 'التاريخ', 'الوقت']];
@@ -1452,6 +1546,7 @@ function showWorkNotification(data) {
     '<div style="margin:15px 0;"><strong>الاسم:</strong> <span style="border-bottom:1px dotted #000;padding:0 30px;">' + data.name + '</span></div>' +
     '<div style="margin:15px 0;"><strong>الصفة:</strong> <span style="border-bottom:1px dotted #000;padding:0 30px;">' + data.jobTitle + '</span></div>' +
     '<div style="margin:15px 0;"><strong>التوقيع:</strong> <span style="border-bottom:1px dotted #000;padding:0 60px;">&nbsp;</span></div></div>' +
+    '<div style="text-align:center;margin-top:30px;font-weight:bold;color:#0f766e;">تحت متابعة وإشراف / ' + appSettings.supervisorName + '</div>' +
     '</div>' +
     '<div style="display:flex;gap:8px;margin-top:30px;justify-content:center;flex-wrap:wrap;">' +
     '<button onclick="printNotification()" style="padding:12px 20px;background:#9c27b0;color:#fff;border:none;border-radius:10px;font-weight:bold;cursor:pointer;">🖨️ طباعة</button>' +
@@ -1687,7 +1782,7 @@ function backToOverview() {
     ot.classList.add('active');
     document.getElementById('tab-overview').style.display = 'block';
   }
-  ['overview','daily','reports','workers','drivers','orgchart','overtime','deductions','inventory','vehicles','permissions'].forEach(t => {
+  ['overview','daily','reports','workers','drivers','orgchart','overtime','deductions','inventory','vehicles','statuses','permissions'].forEach(t => {
     const el = document.getElementById('tab-' + t);
     if (el && t !== 'overview') el.style.display = 'none';
   });
@@ -1706,7 +1801,6 @@ function applyPermissionsToTabs() {
     const n = tab.dataset.tab;
     let show = false;
     if (isViewOnly) {
-      // مشاهدة فقط: يرى جميع أقسام التشغيل والبيانات، ولا يدخل إدارة المستخدمين والصلاحيات.
       show = n !== 'permissions';
     } else {
     switch(n) {
@@ -1720,6 +1814,7 @@ function applyPermissionsToTabs() {
       case 'deductions': show = currentUserPermissions.viewDeductions === true; break;
       case 'inventory': show = currentUserPermissions.manageInventory === true; break;
       case 'vehicles': show = currentUserPermissions.manageVehicles === true; break;
+      case 'statuses': show = currentUserPermissions.viewOverview === true || currentUserRole === 'admin'; break;
       case 'permissions': show = currentUserRole === 'admin'; break;
     }
     }
@@ -1769,13 +1864,14 @@ function initializeAdmin() {
       if (!isViewOnlyUser && (tab.style.display === 'none' || getComputedStyle(tab).display === 'none')) return;
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
-      ['overview','daily','reports','workers','drivers','orgchart','overtime','deductions','inventory','vehicles','permissions'].forEach(t => {
+      ['overview','daily','reports','workers','drivers','orgchart','overtime','deductions','inventory','vehicles','statuses','permissions'].forEach(t => {
         const el = document.getElementById('tab-' + t);
         if (el) el.style.display = tab.dataset.tab === t ? 'block' : 'none';
       });
       if (tab.dataset.tab === 'deductions') loadDeductions();
       if (tab.dataset.tab === 'reports') loadReports();
       if (tab.dataset.tab === 'orgchart') renderOrgChart();
+      if (tab.dataset.tab === 'statuses') updateStatusesReport();
       if (tab.dataset.tab === 'overtime') { populateOvertimeDriverSelect(); loadOvertimeList(); }
       applyBodyClasses();
     };
@@ -1980,43 +2076,182 @@ function updateStats() {
     document.getElementById('grandTotalOvertime').textContent = th.toFixed(1);
   }).catch(() => {});
 }
-
 function watchWorkers() {
   db.collection('workers').orderBy('name').onSnapshot(sn => {
     allWorkers = sn.docs.map(d => ({ id: d.id, ...d.data() }));
     renderWorkersList();
     updateDailyMarkList();
     updateStats();
+    updateStatusesReport();
   });
 }
 
 function renderWorkersList() {
   const c1 = document.getElementById('workersList');
+  if (!c1) return;
   const s = (document.getElementById('workersSearch')?.value || '').trim();
-  const filtered = s
-    ? allWorkers.filter(w => normalizePersonName(w.name).includes(normalizePersonName(s)))
-    : allWorkers;
+
+  let filtered = filterByStatus(allWorkers, workerFilter);
+  if (s) {
+    filtered = filtered.filter(w => normalizePersonName(w.name).includes(normalizePersonName(s)));
+  }
 
   c1.innerHTML = filtered.length ? filtered.map(w => {
     const du = calculateWorkDuration(w.startDate);
+    const status = w.status || 'active';
     const db2 = canDelete() ? '<button class="del-btn" onclick="deleteWorker(\'' + w.id + '\',\'' + w.name + '\')">حذف</button>' : '';
     const ed2 = canEdit() ? '<button class="edit-btn" onclick="toggleEditWorkerForm(\'' + w.id + '\')">✏️</button>' : '';
-    return '<div class="worker-row"><img src="' + (w.photo||'') + '" onerror="this.style.visibility=\'hidden\'"><span class="name">' + w.name + '</span><span style="font-size:11px;color:#666;flex-shrink:0;">' + teamLabel(w.team) + '</span><span class="duration-badge">' + du + '</span>' + salaryBadgeHTML(w.startDate) + ed2 + db2 + '<div id="editForm-' + w.id + '" class="edit-form"></div></div>';
-  }).join('') : '<p style="text-align:center;color:#666;">' + (s ? 'لا نتائج للبحث' : 'لا يوجد عمال') + '</p>';
+    const st2 = canEdit() ? '<button class="status-btn" onclick="openStatusModal(\'' + w.id + '\',\'' + w.name + '\',\'workers\')">🔄</button>' : '';
+    return '<div class="worker-row"><img src="' + (w.photo||'') + '" onerror="this.style.visibility=\'hidden\'"><span class="name">' + w.name + '</span>' + statusBadgeHTML(status) + '<span style="font-size:11px;color:#666;flex-shrink:0;">' + teamLabel(w.team) + '</span><span class="duration-badge">' + du + '</span>' + (status === 'active' ? salaryBadgeHTML(w.startDate) : '') + st2 + ed2 + db2 + '<div id="editForm-' + w.id + '" class="edit-form"></div></div>';
+  }).join('') : '<p style="text-align:center;color:#666;">' + (s ? 'لا نتائج للبحث' : 'لا يوجد موظفين في هذه الفئة') + '</p>';
 }
 
 document.getElementById('workersSearch')?.addEventListener('input', renderWorkersList);
 
+function setWorkerFilter(filter, btn) {
+  workerFilter = filter;
+  document.querySelectorAll('#tab-workers .filter-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderWorkersList();
+}
+
+function setDriverFilter(filter, btn) {
+  driverFilter = filter;
+  document.querySelectorAll('#tab-drivers .filter-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderDriversList();
+}
+
+function filterByStatus(list, filter) {
+  return list.filter(p => {
+    const s = p.status || 'active';
+    if (filter === 'all') return true;
+    if (filter === 'working') return s === 'active' || s === 'vacation';
+    if (filter === 'active') return s === 'active';
+    if (filter === 'archive') return s === 'absconded' || s === 'resigned';
+    return true;
+  });
+}
+
+function openStatusModal(personId, personName, collection) {
+  if (!checkEditPermission()) return;
+  currentStatusPerson = { id: personId, name: personName, collection: collection };
+  document.getElementById('statusPersonName').textContent = personName;
+
+  const list = collection === 'workers' ? allWorkers : allDrivers;
+  const person = list.find(p => p.id === personId);
+  const currentStatus = person && person.status ? person.status : 'active';
+
+  document.querySelectorAll('input[name="newStatus"]').forEach(r => {
+    r.checked = r.value === currentStatus;
+  });
+
+  document.getElementById('statusChangeDate').value = getTodayISO();
+  document.getElementById('statusNote').value = person && person.statusNote ? person.statusNote : '';
+
+  document.getElementById('statusModal').style.display = 'flex';
+}
+
+function closeStatusModal() {
+  document.getElementById('statusModal').style.display = 'none';
+  currentStatusPerson = null;
+}
+
+async function saveStatusChange() {
+  if (!currentStatusPerson) return;
+  const newStatus = document.querySelector('input[name="newStatus"]:checked');
+  if (!newStatus) { alert('⚠️ اختر الحالة'); return; }
+
+  const date = document.getElementById('statusChangeDate').value;
+  const note = document.getElementById('statusNote').value.trim();
+
+  if (!date) { alert('⚠️ اختر التاريخ'); return; }
+
+  try {
+    await db.collection(currentStatusPerson.collection).doc(currentStatusPerson.id).update({
+      status: newStatus.value,
+      statusChangedAt: date,
+      statusNote: note,
+      statusUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    alert('✅ تم تغيير الحالة إلى: ' + STATUS_LABELS[newStatus.value].label);
+    closeStatusModal();
+  } catch (err) {
+    alert('❌ ' + err.message);
+  }
+}
+
+function updateStatusesReport() {
+  const all = [].concat(allWorkers, allDrivers);
+  const counts = { active: 0, vacation: 0, absconded: 0, resigned: 0 };
+  all.forEach(p => {
+    const s = p.status || 'active';
+    if (counts[s] !== undefined) counts[s]++;
+  });
+
+  const el = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+  el('statusActiveCount', counts.active);
+  el('statusVacationCount', counts.vacation);
+  el('statusAbscondedCount', counts.absconded);
+  el('statusResignedCount', counts.resigned);
+
+  const list = document.getElementById('statusesReportList');
+  if (!list) return;
+
+  const groups = [
+    { key: 'active', title: '🟢 يعملون فعلياً', color: '#4caf50', class: 'group-active' },
+    { key: 'vacation', title: '🔵 في إجازة', color: '#2196f3', class: 'group-vacation' },
+    { key: 'absconded', title: '🚨 هاربون (بدون إشعار)', color: '#f44336', class: 'group-absconded' },
+    { key: 'resigned', title: '⚪ مستقيلون رسمياً', color: '#9e9e9e', class: 'group-resigned' }
+  ];
+
+  list.innerHTML = groups.map(g => {
+    const people = all.filter(p => (p.status || 'active') === g.key);
+    if (!people.length) return '';
+    return '<div style="margin-bottom:15px;"><h3 style="color:' + g.color + ';font-size:14px;margin:0 0 8px;">' + g.title + ' (' + people.length + ')</h3>' +
+      people.map(p => {
+        const role = p.driverType !== undefined ? 'سائق' : 'عامل';
+        const extra = p.statusChangedAt ? ' - من ' + p.statusChangedAt : '';
+        const note = p.statusNote ? ' • ' + p.statusNote : '';
+        return '<div class="status-report-row ' + g.class + '"><span style="flex:1;font-weight:700;">' + p.name + ' <small style="color:#666;">(' + role + ')</small></span><span style="font-size:11px;color:#666;">' + extra + note + '</span></div>';
+      }).join('') + '</div>';
+  }).join('') || '<p style="text-align:center;color:#666;">لا يوجد بيانات</p>';
+}
+
+function exportStatusesExcel() {
+  if (!checkExportPermission()) return;
+  const all = [].concat(
+    allWorkers.map(w => Object.assign({}, w, { role: 'عامل' })),
+    allDrivers.map(d => Object.assign({}, d, { role: 'سائق' }))
+  );
+  if (!all.length) { alert('لا يوجد بيانات'); return; }
+
+  const rows = all.map(p => {
+    const status = p.status || 'active';
+    const statusLabel = STATUS_LABELS[status].label;
+    return [p.name, p.role, DRIVER_TYPES[p.driverType] || teamLabel(p.team) || '', statusLabel, p.statusChangedAt || '', p.statusNote || ''];
+  });
+
+  const ws = XLSX.utils.aoa_to_sheet([['الاسم', 'النوع', 'الوظيفة', 'الحالة', 'تاريخ التغيير', 'ملاحظة']].concat(rows));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'حالة الموظفين');
+  XLSX.writeFile(wb, 'حالة-الموظفين-' + getTodayISO() + '.xlsx');
+}
+
 function updateDailyMarkList() {
   const c2 = document.getElementById('dailyMarkList');
-  const ap = [].concat(allWorkers.map(w => Object.assign({}, w, { type: 'worker' })), allDrivers.map(d => Object.assign({}, d, { type: 'driver' })));
+  if (!c2) return;
+  const ap = [].concat(
+    allWorkers.filter(w => (w.status || 'active') === 'active').map(w => Object.assign({}, w, { type: 'worker' })),
+    allDrivers.filter(d => (d.status || 'active') === 'active').map(d => Object.assign({}, d, { type: 'driver' }))
+  );
   const canMark = canAdd();
   c2.innerHTML = ap.length ? ap.map(w => {
     if (!canMark) {
       return '<div class="worker-row"><img src="' + (w.photo||'') + '" onerror="this.style.visibility=\'hidden\'"><span class="name">' + (w.type === 'driver' ? '🚗 ' : '👷 ') + w.name + '</span><span style="font-size:11px;color:#888;">(مشاهدة فقط)</span></div>';
     }
     return '<div class="worker-row"><img src="' + (w.photo||'') + '" onerror="this.style.visibility=\'hidden\'"><span class="name">' + (w.type === 'driver' ? '🚗 ' : '👷 ') + w.name + '</span><button class="manual-mark-btn" onclick="manualMark(\'' + w.id + '\',\'' + w.name + '\',\'present\')" style="width:auto;padding:6px 10px;margin:0;background:#388e3c;border-color:#388e3c;">✅</button><button class="manual-mark-btn" onclick="manualMark(\'' + w.id + '\',\'' + w.name + '\',\'absent\')" style="width:auto;padding:6px 10px;margin:0;background:#c62828;border-color:#c62828;">✗</button><button class="manual-mark-btn" onclick="manualMark(\'' + w.id + '\',\'' + w.name + '\',\'leave\')" style="width:auto;padding:6px 10px;margin:0;background:#7b1fa2;border-color:#7b1fa2;">📝</button><button class="manual-mark-btn" onclick="manualMark(\'' + w.id + '\',\'' + w.name + '\',\'sick\')" style="width:auto;padding:6px 10px;margin:0;background:#ad1457;border-color:#ad1457;">🤒</button></div>';
-  }).join('') : '<p style="text-align:center;color:#666;">لا يوجد أشخاص</p>';
+  }).join('') : '<p style="text-align:center;color:#666;">لا يوجد أشخاص نشطون</p>';
 }
 
 function toggleEditWorkerForm(workerId) {
@@ -2105,7 +2340,7 @@ async function addWorker() {
   if (duplicate) { showDuplicateNameAlert(name, duplicate); return; }
   let pU = '';
   if (workerPhotoBase64) pU = await uploadImageToImgBB(workerPhotoBase64);
-  await db.collection('workers').add({ name, team, shift, startDate, photo: workerPhotoBase64, photoURL: pU || '', pin: '0000', createdDate: getTodayISO(), createdTime: getNowTime(), createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+  await db.collection('workers').add({ name, team, shift, startDate, status: 'active', photo: workerPhotoBase64, photoURL: pU || '', pin: '0000', createdDate: getTodayISO(), createdTime: getNowTime(), createdAt: firebase.firestore.FieldValue.serverTimestamp() });
   showWorkNotification({ name, jobTitle: teamLabel(team), startDate, photo: pU || workerPhotoBase64 });
   document.getElementById('newWorkerName').value = '';
   workerPhotoBase64 = '';
@@ -2124,21 +2359,34 @@ function watchDrivers() {
     updateDailyMarkList();
     populateOvertimeDriverSelect();
     updateStats();
+    updateStatusesReport();
   });
 }
 
 function renderDriversList() {
   const c = document.getElementById('driversList');
+  if (!c) return;
   const s = (document.getElementById('driversSearch')?.value || '').trim();
-  const f = s ? allDrivers.filter(d => normalizePersonName(d.name).includes(normalizePersonName(s))) : allDrivers;
-  if (!f.length) { c.innerHTML = '<p style="text-align:center;color:#666;">' + (s ? 'لا نتائج للبحث' : 'لا يوجد سائقين') + '</p>'; return; }
-  c.innerHTML = f.map(d => {
+
+  let filtered = filterByStatus(allDrivers, driverFilter);
+  if (s) {
+    filtered = filtered.filter(d => normalizePersonName(d.name).includes(normalizePersonName(s)));
+  }
+
+  if (!filtered.length) {
+    c.innerHTML = '<p style="text-align:center;color:#666;">' + (s ? 'لا نتائج للبحث' : 'لا يوجد موظفين في هذه الفئة') + '</p>';
+    return;
+  }
+
+  c.innerHTML = filtered.map(d => {
     const du = calculateWorkDuration(d.startDate);
     const tl = DRIVER_TYPES[d.driverType] || '';
     const p = d.photoURL || d.photo || '';
+    const status = d.status || 'active';
     const db2 = canDelete() ? '<button class="del-btn" onclick="deleteDriver(\'' + d.id + '\',\'' + d.name + '\')">حذف</button>' : '';
     const ed2 = canEdit() ? '<button class="edit-btn" onclick="toggleEditDriverForm(\'' + d.id + '\')">✏️</button>' : '';
-    return '<div class="driver-card"><div class="driver-header"><img src="' + (d.photo||d.photoURL||'') + '" onerror="this.style.visibility=\'hidden\'"><div style="flex:1;"><strong>' + d.name + '</strong><div style="font-size:12px;color:#666;">' + tl + '</div></div></div><div class="driver-info"><span class="info-tag">📅 ' + (d.startDate || '—') + '</span><span class="duration-badge">⏱️ ' + du + '</span>' + (d.salary ? '<span class="salary-badge">💰 ' + d.salary + ' د</span>' : '') + '</div><div style="margin-top:8px;">' + salaryBadgeHTML(d.startDate) + '</div><div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;"><button class="view-btn" onclick="showWorkNotification({name:\'' + d.name + '\',jobTitle:\'' + tl + '\',startDate:\'' + d.startDate + '\',photo:\'' + p + '\'})" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">📋 إفادة</button>' + ed2 + db2 + '</div><div id="driverEditForm-' + d.id + '" class="edit-form"></div></div>';
+    const st2 = canEdit() ? '<button class="status-btn" onclick="openStatusModal(\'' + d.id + '\',\'' + d.name + '\',\'drivers\')">🔄</button>' : '';
+    return '<div class="driver-card"><div class="driver-header"><img src="' + (d.photo||d.photoURL||'') + '" onerror="this.style.visibility=\'hidden\'"><div style="flex:1;"><strong>' + d.name + '</strong> ' + statusBadgeHTML(status) + '<div style="font-size:12px;color:#666;">' + tl + '</div></div></div><div class="driver-info"><span class="info-tag">📅 ' + (d.startDate || '—') + '</span><span class="duration-badge">⏱️ ' + du + '</span>' + (d.salary ? '<span class="salary-badge">💰 ' + d.salary + ' د</span>' : '') + '</div>' + (status === 'active' ? '<div style="margin-top:8px;">' + salaryBadgeHTML(d.startDate) + '</div>' : '') + '<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;"><button class="view-btn" onclick="showWorkNotification({name:\'' + d.name + '\',jobTitle:\'' + tl + '\',startDate:\'' + d.startDate + '\',photo:\'' + p + '\'})" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">📋 إفادة</button>' + st2 + ed2 + db2 + '</div><div id="driverEditForm-' + d.id + '" class="edit-form"></div></div>';
   }).join('');
 }
 
@@ -2201,7 +2449,7 @@ async function addDriver() {
   if (duplicate) { showDuplicateNameAlert(name, duplicate); return; }
   let pU = '';
   if (driverPhotoBase64) pU = await uploadImageToImgBB(driverPhotoBase64);
-  await db.collection('drivers').add({ name, driverType, shift, startDate, salary, accountNumber, bankName, licenseGrade, photo: driverPhotoBase64, photoURL: pU || '', checkPhoto: driverCheckBase64, pin: '0000', createdDate: getTodayISO(), createdTime: getNowTime(), createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+  await db.collection('drivers').add({ name, driverType, shift, startDate, salary, accountNumber, bankName, licenseGrade, status: 'active', photo: driverPhotoBase64, photoURL: pU || '', checkPhoto: driverCheckBase64, pin: '0000', createdDate: getTodayISO(), createdTime: getNowTime(), createdAt: firebase.firestore.FieldValue.serverTimestamp() });
   showWorkNotification({ name, jobTitle: DRIVER_TYPES[driverType] || '', startDate, photo: pU || driverPhotoBase64 });
   document.getElementById('newDriverName').value = '';
   document.getElementById('newDriverSalary').value = '';
@@ -2216,6 +2464,127 @@ function deleteDriver(id, name) {
   if (confirm('حذف ' + name + '؟')) db.collection('drivers').doc(id).delete();
 }
 
+// ============================================
+// 📅 تسوية التواريخ الجماعية
+// ============================================
+let bulkDateType = 'workers';
+let bulkDateSelectedIds = new Set();
+
+function openBulkDateModal(type) {
+  if (!checkEditPermission()) return;
+  bulkDateType = type;
+  bulkDateSelectedIds.clear();
+  const title = type === 'workers' ? '📅 تسوية تواريخ العمال' : '📅 تسوية تواريخ السائقين';
+  document.getElementById('bulkDateTitle').textContent = title;
+  document.getElementById('bulkDateSearch').value = '';
+  document.getElementById('bulkDateNewDate').value = '';
+  renderBulkDateList();
+  document.getElementById('bulkDateModal').style.display = 'flex';
+}
+
+function closeBulkDateModal() {
+  document.getElementById('bulkDateModal').style.display = 'none';
+  bulkDateSelectedIds.clear();
+}
+
+function getBulkList() {
+  return bulkDateType === 'workers' ? allWorkers : allDrivers;
+}
+
+function renderBulkDateList() {
+  const c = document.getElementById('bulkDateList');
+  const s = (document.getElementById('bulkDateSearch')?.value || '').trim();
+  const all = getBulkList();
+  const filtered = s
+    ? all.filter(w => normalizePersonName(w.name).includes(normalizePersonName(s)))
+    : all;
+
+  if (!filtered.length) {
+    c.innerHTML = '<p style="text-align:center;color:#666;padding:15px;font-size:13px;">' + (s ? 'لا نتائج للبحث' : 'لا يوجد بيانات') + '</p>';
+    updateBulkDateCount();
+    return;
+  }
+
+  c.innerHTML = filtered.map(w => {
+    const checked = bulkDateSelectedIds.has(w.id) ? 'checked' : '';
+    const dateStr = w.startDate || '—';
+    return '<label style="display:flex;align-items:center;gap:8px;padding:10px 8px;border-bottom:1px solid #eee;cursor:pointer;font-size:13px;">' +
+      '<input type="checkbox" ' + checked + ' onchange="toggleBulkDateSelect(\'' + w.id + '\', this.checked)" style="width:20px;height:20px;margin:0;accent-color:#7b1fa2;flex-shrink:0;">' +
+      '<span style="flex:1;color:#0f766e;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + w.name + '</span>' +
+      '<span style="font-size:11px;color:#666;background:rgba(123,31,162,0.1);padding:3px 8px;border-radius:6px;flex-shrink:0;">📅 ' + dateStr + '</span>' +
+    '</label>';
+  }).join('');
+  updateBulkDateCount();
+}
+
+function toggleBulkDateSelect(id, checked) {
+  if (checked) bulkDateSelectedIds.add(id);
+  else bulkDateSelectedIds.delete(id);
+  updateBulkDateCount();
+}
+
+function updateBulkDateCount() {
+  const el = document.getElementById('bulkDateCount');
+  if (el) el.textContent = '✅ محدد: ' + bulkDateSelectedIds.size;
+}
+
+function bulkDateSelectAll(select) {
+  const s = (document.getElementById('bulkDateSearch')?.value || '').trim();
+  const all = getBulkList();
+  const filtered = s
+    ? all.filter(w => normalizePersonName(w.name).includes(normalizePersonName(s)))
+    : all;
+
+  if (select) filtered.forEach(w => bulkDateSelectedIds.add(w.id));
+  else bulkDateSelectedIds.clear();
+
+  renderBulkDateList();
+}
+
+function setBulkDateQuick(day) {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const d = String(day).padStart(2, '0');
+  document.getElementById('bulkDateNewDate').value = year + '-' + month + '-' + d;
+}
+
+function setBulkDateLastDay() {
+  const now = new Date();
+  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  setBulkDateQuick(lastDay);
+}
+
+async function saveBulkDate() {
+  if (!checkEditPermission()) return;
+  const newDate = document.getElementById('bulkDateNewDate').value;
+  if (!newDate) { alert('⚠️ اختر التاريخ الجديد'); return; }
+  if (bulkDateSelectedIds.size === 0) { alert('⚠️ حدد شخص واحد على الأقل'); return; }
+
+  const count = bulkDateSelectedIds.size;
+  const kind = bulkDateType === 'workers' ? 'عامل' : 'سائق';
+  if (!confirm('⚠️ تأكيد التسوية:\n\n• عدد المحددين: ' + count + ' ' + kind + '\n• التاريخ الجديد: ' + newDate + '\n\nهل أنت متأكد؟')) return;
+
+  try {
+    const collectionName = bulkDateType === 'workers' ? 'workers' : 'drivers';
+    const batch = db.batch();
+    bulkDateSelectedIds.forEach(id => {
+      const ref = db.collection(collectionName).doc(id);
+      batch.update(ref, { startDate: newDate });
+    });
+    await batch.commit();
+    alert('✅ تم تحديث تاريخ ' + count + ' ' + kind + ' بنجاح');
+    closeBulkDateModal();
+  } catch (err) {
+    alert('❌ خطأ: ' + err.message);
+  }
+}
+
+document.getElementById('bulkDateSearch')?.addEventListener('input', renderBulkDateList);
+
+// ============================================
+// ⏰ الوقت الإضافي
+// ============================================
 function populateOvertimeMonthSelect() {
   const sel = document.getElementById('overtimeMonthSelect');
   if (!sel) return;
@@ -2322,6 +2691,9 @@ function exportOvertimeExcel() {
   });
 }
 
+// ============================================
+// 📋 التقارير
+// ============================================
 async function saveReport() {
   if (!checkAddPermission()) return;
   const date = document.getElementById('reportDate').value;
@@ -2444,6 +2816,9 @@ async function deleteReport(reportId) {
   alert('✅ تم الحذف');
 }
 
+// ============================================
+// 💰 الخصومات
+// ============================================
 async function loadDeductionSettings() { deductionAmountValue = appSettings.deductionAmount; }
 
 async function loadDeductions() {
@@ -2458,6 +2833,9 @@ async function loadDeductions() {
   c.innerHTML = Object.keys(ded).map(name => { const d = ded[name], a = d * deductionAmountValue; tot += a; return '<div class="worker-row"><span class="name">' + name + '</span><span class="deduction-badge">' + d + ' يوم</span><span class="deduction-badge">-' + a + ' د</span></div>'; }).join('') + '<div style="margin-top:10px;text-align:center;font-weight:bold;color:#0f766e;">الإجمالي: ' + tot + ' دينار</div>';
 }
 
+// ============================================
+// 📦 المخزن
+// ============================================
 function watchInventory() {
   db.collection('inventory').orderBy('name').onSnapshot(sn => {
     allInventory = sn.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -2485,6 +2863,9 @@ function deleteItem(id, name) {
   if (confirm('حذف ' + name + '؟')) db.collection('inventory').doc(id).delete();
 }
 
+// ============================================
+// 🚛 الآليات
+// ============================================
 function loadVehicles() {
   db.collection('vehicles').onSnapshot(sn => {
     document.getElementById('vehiclesList').innerHTML = sn.empty ? '<p style="text-align:center;color:#666;">لا توجد آليات</p>' : sn.docs.map(doc => {
@@ -2515,6 +2896,9 @@ function deleteVehicle(id, number) {
   if (confirm('حذف ' + number + '؟')) db.collection('vehicles').doc(id).delete();
 }
 
+// ============================================
+// 🔑 المستخدمين
+// ============================================
 async function addUser() {
   if (!isOwnerOrAdmin()) { alert('🚫 لا تملك صلاحية إدارة المستخدمين.'); return; }
   const name = document.getElementById('newUserName').value.trim();
@@ -2655,6 +3039,9 @@ function deleteUser(id, name) {
   if (confirm('حذف ' + name + '؟')) db.collection('systemUsers').doc(id).delete();
 }
 
+// ============================================
+// 📊 تصدير Excel
+// ============================================
 function exportAttendanceExcel() {
   if (!checkExportPermission()) return;
   if (!latestAttendanceRecords.length) { alert('لا يوجد حضور'); return; }
@@ -2669,8 +3056,8 @@ function exportAttendanceExcel() {
 function exportWorkersExcel() {
   if (!checkExportPermission()) return;
   if (!allWorkers.length) { alert('لا يوجد عمال'); return; }
-  const rows = allWorkers.map(w => [w.name, teamLabel(w.team), w.shift==='both'?'كلاهما':w.shift==='night'?'ليل':'صباح', w.startDate || '', calculateWorkDuration(w.startDate)]);
-  const ws = XLSX.utils.aoa_to_sheet([['الاسم','الفريق','الوردية','تاريخ المباشرة','مدة العمل']].concat(rows));
+  const rows = allWorkers.map(w => [w.name, teamLabel(w.team), w.shift==='both'?'كلاهما':w.shift==='night'?'ليل':'صباح', w.startDate || '', calculateWorkDuration(w.startDate), STATUS_LABELS[w.status || 'active'].label]);
+  const ws = XLSX.utils.aoa_to_sheet([['الاسم','الفريق','الوردية','تاريخ المباشرة','مدة العمل','الحالة']].concat(rows));
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'العمال');
   XLSX.writeFile(wb, 'عمال.xlsx');
@@ -2679,8 +3066,8 @@ function exportWorkersExcel() {
 function exportDriversExcel() {
   if (!checkExportPermission()) return;
   if (!allDrivers.length) { alert('لا يوجد سائقين'); return; }
-  const rows = allDrivers.map(d => [d.name, DRIVER_TYPES[d.driverType] || '', d.startDate || '', calculateWorkDuration(d.startDate), d.salary || '', d.bankName || '', d.licenseGrade || '']);
-  const ws = XLSX.utils.aoa_to_sheet([['الاسم','الوظيفة','تاريخ المباشرة','مدة العمل','المرتب','المصرف','الرخصة']].concat(rows));
+  const rows = allDrivers.map(d => [d.name, DRIVER_TYPES[d.driverType] || '', d.startDate || '', calculateWorkDuration(d.startDate), d.salary || '', d.bankName || '', d.licenseGrade || '', STATUS_LABELS[d.status || 'active'].label]);
+  const ws = XLSX.utils.aoa_to_sheet([['الاسم','الوظيفة','تاريخ المباشرة','مدة العمل','المرتب','المصرف','الرخصة','الحالة']].concat(rows));
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'السائقين');
   XLSX.writeFile(wb, 'السائقين-والمشرفين.xlsx');

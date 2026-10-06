@@ -223,7 +223,7 @@
     border: 2px solid #0f766e; font-size: 15px; margin-bottom: 10px;
     background: rgba(255,255,255,0.95); color: #333; font-family: inherit;
   }
-  input[type="date"] { display:block; width:100%; max-width:100%; min-width:0; min-height:50px; height:50px; box-sizing:border-box; padding:12px 16px; margin:0 0 10px; font:inherit; border:2px solid #0f766e; border-radius:12px; background:rgba(255,255,255,0.95); color:#333; -webkit-appearance:none; appearance:none; }
+  input[type="date"], input[type="time"] { display:block; width:100%; max-width:100%; min-width:0; min-height:50px; height:50px; box-sizing:border-box; padding:12px 16px; margin:0 0 10px; font:inherit; border:2px solid #0f766e; border-radius:12px; background:rgba(255,255,255,0.95); color:#333; -webkit-appearance:none; appearance:none; }
   input:focus, textarea:focus { outline: none; box-shadow: 0 0 0 4px rgba(15,118,110,0.15); }
   input::placeholder, textarea::placeholder { color: #999; }
   .stats { display: flex; flex-wrap: wrap; gap: 10px; }
@@ -728,7 +728,17 @@
     <div id="tab-daily" style="display:none;">
       <div class="card">
         <h2>✅ تسجيل يدوي</h2>
-        <div class="date-display" id="dailyDateDisplay"></div>
+
+        <label style="font-size:14px;color:#0f766e;font-weight:800;margin-bottom:6px;display:block;">📅 التاريخ:</label>
+        <input type="date" id="manualAttendanceDate" style="width:100%;padding:12px;border:2px solid #0f766e;border-radius:10px;margin-bottom:10px;font-size:15px;">
+
+        <label style="font-size:14px;color:#0f766e;font-weight:800;margin-bottom:6px;display:block;">🕐 الوقت (اختياري):</label>
+        <input type="time" id="manualAttendanceTime" style="width:100%;padding:12px;border:2px solid #0f766e;border-radius:10px;margin-bottom:10px;font-size:15px;">
+
+        <div style="text-align:center;font-size:12px;color:#666;padding:8px;background:rgba(15,118,110,0.1);border-radius:8px;margin-bottom:10px;font-weight:700;">
+          💡 اختر التاريخ والوقت، ثم اضغط على أزرار الحالة بجانب كل شخص
+        </div>
+
         <div class="shift-selector">
           <div class="shift-btn morning active" onclick="selectAdminShift('morning')">🌅 صباح</div>
           <div class="shift-btn night" onclick="selectAdminShift('night')">🌙 ليل</div>
@@ -1219,7 +1229,6 @@
     <button class="save-settings-btn" onclick="saveAllSettings()">💾 حفظ جميع الإعدادات</button>
   </div>
 </div>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
@@ -2087,6 +2096,8 @@ function setDefaultDates() {
   document.getElementById('newDriverStartDate').value = getTodayISO();
   const ot = document.getElementById('overtimeDate');
   if (ot) ot.value = getTodayISO();
+  const manualDate = document.getElementById('manualAttendanceDate');
+  if (manualDate) manualDate.value = getTodayISO();
 }
 
 function populateTeamSelect() {
@@ -2151,7 +2162,8 @@ function watchAttendance() {
       const m = meta[r.status] || { c: '#607d8b', l: r.status };
       const icon = r.personType === 'driver' ? '🚗 ' : '👷 ';
       const delBtn = canDelete() ? '<button class="del-btn" onclick="deleteAttendance(\'' + r.id + '\',\'' + r.workerName + '\')" style="margin-right:6px;">🗑️</button>' : '';
-      return '<div class="row" style="align-items:center;"><div style="flex:1;"><div>' + icon + r.workerName + '</div><div style="font-size:12px;color:#666;">' + (r.time || '--') + ' ' + (r.shift==='morning'?'🌅':'🌙') + '</div></div><span class="badge" style="background:' + m.c + ';">' + m.l + '</span>' + delBtn + '</div>';
+      const manualTag = r.manualEntry ? '<span style="font-size:10px;color:#f57c00;background:rgba(245,124,0,0.15);padding:2px 6px;border-radius:6px;margin-right:4px;">يدوي</span>' : '';
+      return '<div class="row" style="align-items:center;"><div style="flex:1;"><div>' + icon + r.workerName + manualTag + '</div><div style="font-size:12px;color:#666;">' + (r.time || '--') + ' ' + (r.shift==='morning'?'🌅':'🌙') + '</div></div><span class="badge" style="background:' + m.c + ';">' + m.l + '</span>' + delBtn + '</div>';
     }).join('');
   });
 }
@@ -2215,8 +2227,7 @@ function updateStats() {
     document.getElementById('grandTotalOvertime').textContent = th.toFixed(1);
   }).catch(() => {});
 }
-
-function watchWorkers() {
+ function watchWorkers() {
   db.collection('workers').orderBy('name').onSnapshot(sn => {
     allWorkers = sn.docs.map(d => ({ id: d.id, ...d.data() }));
     renderWorkersList();
@@ -2395,6 +2406,66 @@ function updateDailyMarkList() {
   }).join('') : '<p style="text-align:center;color:#666;">لا يوجد أشخاص نشطون</p>';
 }
 
+// 🎯 دالة التسجيل اليدوي مع التاريخ والوقت
+async function manualMark(workerId, workerName, status) {
+  if (!checkAddPermission()) return;
+
+  const dateInput = document.getElementById('manualAttendanceDate');
+  const timeInput = document.getElementById('manualAttendanceTime');
+
+  const date = dateInput && dateInput.value ? dateInput.value : getTodayISO();
+  let time = timeInput && timeInput.value ? timeInput.value : '';
+
+  // تحويل الوقت من 24 ساعة إلى 12 ساعة مع ص/م
+  if (time && time.includes(':')) {
+    const [h, m] = time.split(':').map(Number);
+    const period = h >= 12 ? 'م' : 'ص';
+    const hour12 = h % 12 || 12;
+    time = hour12 + ':' + String(m).padStart(2, '0') + ' ' + period;
+  } else {
+    time = getNowTime();
+  }
+
+  try {
+    await db.collection('attendance').add({
+      workerId,
+      workerName,
+      personType: allDrivers.some(d => d.id === workerId) ? 'driver' : 'worker',
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      date: date,
+      time: time,
+      status,
+      shift: adminSelectedShift,
+      hasDeduction: status === 'absent',
+      manualEntry: true,
+      manualEntryBy: currentUser ? currentUser.name : ''
+    });
+
+    const statusLabel = {
+      present: 'حاضر ✅',
+      absent: 'غائب ✗',
+      leave: 'إذن 📝',
+      sick: 'مريض 🤒'
+    }[status] || status;
+
+    const dateStr = new Date(date).toLocaleDateString('ar-LY', { year: 'numeric', month: 'long', day: 'numeric' });
+
+    // إشعار خفيف (Toast)
+    const toast = document.createElement('div');
+    toast.textContent = '✅ تم تسجيل ' + workerName + ' - ' + statusLabel + ' - ' + dateStr;
+    toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#4caf50,#2e7d32);color:#fff;padding:12px 20px;border-radius:25px;font-weight:800;font-size:13px;z-index:99999;box-shadow:0 5px 20px rgba(76,175,80,0.5);font-family:inherit;';
+    document.body.appendChild(toast);
+    setTimeout(() => {
+      toast.style.transition = 'opacity 0.3s';
+      toast.style.opacity = '0';
+      setTimeout(() => toast.remove(), 300);
+    }, 2000);
+
+  } catch (err) {
+    alert('❌ فشل التسجيل: ' + err.message);
+  }
+}
+
 function toggleEditWorkerForm(workerId) {
   if (!checkEditPermission()) return;
   const form = document.getElementById('editForm-' + workerId);
@@ -2448,11 +2519,6 @@ async function saveEditWorker(workerId) {
 function deleteWorkerWithConfirm(id, name) {
   if (!checkDeletePermission()) return;
   if (confirm('⚠️ حذف "' + name + '" نهائياً؟')) db.collection('workers').doc(id).delete().then(() => alert('✅ تم الحذف'));
-}
-
-async function manualMark(workerId, workerName, status) {
-  if (!checkAddPermission()) return;
-  await db.collection('attendance').add({ workerId, workerName, timestamp: firebase.firestore.FieldValue.serverTimestamp(), date: getTodayISO(), time: getNowTime(), status, shift: adminSelectedShift, hasDeduction: status === 'absent' });
 }
 
 function findDuplicatePersonName(name, excludeType, excludeId) {
@@ -3385,7 +3451,7 @@ function exportVehiclesExcel() {
 document.getElementById('loginScreen').style.display = 'block';
 document.getElementById('mainApp').style.display = 'none';
 
-// ✅ تسجيل Service Worker
+// ✅ Service Worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js')
@@ -3407,15 +3473,18 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-// ✅ زر "تثبيت التطبيق"
+// ✅ زر التثبيت
 let deferredPrompt = null;
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
   const btn = document.createElement('button');
   btn.id = 'pwaInstallBtn';
-  btn.innerHTML = '📲 تثبيت التطبيق';
-  btn.style.cssText = 'position:fixed;bottom:20px;right:20px;z-index:99999;padding:14px 24px;border-radius:50px;background:linear-gradient(135deg,#0f766e,#0d5c55);color:#fff;border:3px solid #fff;font-weight:900;font-size:15px;cursor:pointer;box-shadow:0 8px 25px rgba(15,118,110,0.5);font-family:inherit;';
+  btn.innerHTML = '📲';
+  btn.title = 'تثبيت التطبيق';
+  btn.style.cssText = 'position:fixed;bottom:15px;right:15px;z-index:99998;width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#0f766e,#0d5c55);color:#fff;border:2px solid #fff;font-weight:900;font-size:18px;cursor:pointer;box-shadow:0 3px 10px rgba(15,118,110,0.4);font-family:inherit;display:flex;align-items:center;justify-content:center;opacity:0.85;transition:all 0.2s;';
+  btn.onmouseenter = () => { btn.style.opacity = '1'; btn.style.transform = 'scale(1.1)'; };
+  btn.onmouseleave = () => { btn.style.opacity = '0.85'; btn.style.transform = 'scale(1)'; };
   btn.onclick = async () => {
     if (!deferredPrompt) return;
     deferredPrompt.prompt();
@@ -3428,7 +3497,6 @@ window.addEventListener('beforeinstallprompt', (e) => {
 });
 
 window.addEventListener('appinstalled', () => {
-  console.log('✅ التطبيق مثبت');
   const btn = document.getElementById('pwaInstallBtn');
   if (btn) btn.remove();
 });

@@ -6,6 +6,12 @@
 <title>نظام حضور سرت</title>
 <link rel="manifest" href="manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0f766e">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="نظام الحضور">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
   * { box-sizing: border-box; }
@@ -502,7 +508,6 @@
   .report-media-grid img { width: 80px; height: 80px; object-fit: cover; border-radius: 10px; border: 2px solid #0f766e; }
   .report-media-grid video { width: 100px; height: 80px; object-fit: cover; border-radius: 10px; border: 2px solid #d32f2f; background: #000; }
 
-  /* 🎯 معاينة ملفات التقرير مع زر X */
   .report-media-item {
     position: relative;
     display: inline-block;
@@ -1097,7 +1102,6 @@
   </div>
 </div>
 
-<!-- نافذة تغيير حالة الموظف -->
 <div id="statusModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:99999;align-items:center;justify-content:center;padding:20px;overflow-y:auto;">
   <div style="background:#fff;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;border-radius:20px;padding:24px;direction:rtl;position:relative;">
     <button onclick="closeStatusModal()" style="position:absolute;top:12px;left:12px;width:38px;height:38px;border-radius:50%;background:#f44336;color:#fff;border:none;font-size:20px;cursor:pointer;font-weight:bold;">×</button>
@@ -1139,7 +1143,6 @@
   </div>
 </div>
 
-<!-- نافذة تسوية التواريخ الجماعية -->
 <div id="bulkDateModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:99999;align-items:center;justify-content:center;padding:15px;overflow-y:auto;">
   <div style="background:#fff;max-width:620px;width:100%;max-height:92vh;overflow-y:auto;border-radius:20px;padding:22px;direction:rtl;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.5);">
     <button onclick="closeBulkDateModal()" style="position:absolute;top:12px;left:12px;width:38px;height:38px;border-radius:50%;background:#f44336;color:#fff;border:none;font-size:20px;cursor:pointer;font-weight:bold;">×</button>
@@ -1216,6 +1219,7 @@
     <button class="save-settings-btn" onclick="saveAllSettings()">💾 حفظ جميع الإعدادات</button>
   </div>
 </div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
@@ -1297,12 +1301,10 @@ let vehiclePhotoBase64 = '';
 let reportMediaFiles = [];
 let currentNotificationData = { name: '', jobTitle: '', startDate: '', photo: '' };
 
-// 🎯 نظام حالة الموظفين
 let currentStatusPerson = null;
 let workerFilter = 'working';
 let driverFilter = 'working';
 
-// 🎯 تعديل التقارير
 let editingReportId = null;
 let editingExistingMedia = { photos: [], videos: [] };
 let editingNewMediaFiles = [];
@@ -1483,7 +1485,6 @@ async function uploadImageToImgBB(base64Image) {
   } catch (e) { return null; }
 }
 
-// ✅ دالة رفع الميديا (مع فحص حجم الفيديو + timeout)
 async function uploadMedia(file) {
   const isVideo = file.type.startsWith('video/');
 
@@ -1491,7 +1492,7 @@ async function uploadMedia(file) {
     const maxSizeMB = 5;
     const fileSizeMB = file.size / 1024 / 1024;
     if (fileSizeMB > maxSizeMB) {
-      throw new Error('الفيديو كبير جداً (' + fileSizeMB.toFixed(1) + ' MB). الحد الأقصى ' + maxSizeMB + ' MB. صوّر مقطع أقصر.');
+      throw new Error('الفيديو كبير جداً (' + fileSizeMB.toFixed(1) + ' MB). الحد الأقصى ' + maxSizeMB + ' MB.');
     }
 
     try {
@@ -1502,13 +1503,12 @@ async function uploadMedia(file) {
 
       const uploadPromise = ref.put(file).then(snap => snap.ref.getDownloadURL());
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('انتهت المهلة (90 ثانية). جرب فيديو أقصر أو اتصال أفضل.')), 90000)
+        setTimeout(() => reject(new Error('انتهت المهلة (90 ثانية).')), 90000)
       );
 
       const url = await Promise.race([uploadPromise, timeoutPromise]);
       return { type: 'video', url: url };
     } catch (e) {
-      console.error('فشل رفع الفيديو:', e);
       throw new Error('فشل رفع الفيديو: ' + e.message);
     }
   } else {
@@ -1626,7 +1626,6 @@ async function downloadFullBackup() {
   } catch (err) { alert('❌ ' + err.message); }
 }
 
-// ✅ الإفادة المباشرة - بدون "تحت متابعة وإشراف"
 function showWorkNotification(data) {
   currentNotificationData = data;
   let photoHTML = '';
@@ -1753,7 +1752,6 @@ function saveNotificationWord() {
   document.getElementById(id).addEventListener('change', handleReportMedia);
 });
 
-// 🎯 دالة معالجة ملفات التقرير (مع فحص الحجم)
 function handleReportMedia(e) {
   const files = e.target.files;
   for (let i = 0; i < files.length; i++) {
@@ -1762,7 +1760,7 @@ function handleReportMedia(e) {
     const isVideo = file.type.startsWith('video/');
 
     if (isVideo && file.size > 5 * 1024 * 1024) {
-      alert('⚠️ الفيديو كبير جداً (' + sizeMB + ' MB)\n\nالحد الأقصى: 5 MB\nصوّر مقطع أقصر (15-30 ثانية)');
+      alert('⚠️ الفيديو كبير جداً (' + sizeMB + ' MB)\n\nالحد الأقصى: 5 MB');
       continue;
     }
 
@@ -1772,7 +1770,6 @@ function handleReportMedia(e) {
   e.target.value = '';
 }
 
-// 🎯 عرض معاينة الملفات مع زر X
 function renderReportMediaPreview() {
   const preview = document.getElementById('reportPhotosPreview');
   const countEl = document.getElementById('reportMediaCount');
@@ -1801,7 +1798,6 @@ function renderReportMediaPreview() {
   }).join('');
 }
 
-// 🎯 حذف ملف واحد
 function removeReportMedia(idx) {
   if (idx < 0 || idx >= reportMediaFiles.length) return;
   if (!confirm('حذف هذا الملف؟')) return;
@@ -1809,7 +1805,6 @@ function removeReportMedia(idx) {
   renderReportMediaPreview();
 }
 
-// 🎯 حذف كل الملفات
 function clearAllReportMedia() {
   if (reportMediaFiles.length === 0) return;
   if (!confirm('حذف جميع الملفات (' + reportMediaFiles.length + ')؟')) return;
@@ -2069,7 +2064,7 @@ function printOrgChart() {
   const content = document.getElementById('orgChartContent');
   if (!content) return;
   const printWindow = window.open('', '_blank');
-  if (!printWindow) { alert('يرجى السماح بفتح النوافذ المنبثقة لطباعة الهيكل الوظيفي.'); return; }
+  if (!printWindow) { alert('يرجى السماح بفتح النوافذ المنبثقة'); return; }
   const title = 'الهيكل الوظيفي - شركة الخدمات';
   printWindow.document.open();
   printWindow.document.write('<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>' + title + '</title><style>' +
@@ -2220,7 +2215,8 @@ function updateStats() {
     document.getElementById('grandTotalOvertime').textContent = th.toFixed(1);
   }).catch(() => {});
 }
- function watchWorkers() {
+
+function watchWorkers() {
   db.collection('workers').orderBy('name').onSnapshot(sn => {
     allWorkers = sn.docs.map(d => ({ id: d.id, ...d.data() }));
     renderWorkersList();
@@ -2277,7 +2273,6 @@ function filterByStatus(list, filter) {
   });
 }
 
-// ✅ نافذة تغيير الحالة - التاريخ تلقائي غير قابل للتعديل
 function openStatusModal(personId, personName, collection) {
   if (!checkEditPermission()) return;
   currentStatusPerson = { id: personId, name: personName, collection: collection };
@@ -2297,17 +2292,11 @@ function openStatusModal(personId, personName, collection) {
   const dateDisplay = document.getElementById('statusChangeDateDisplay');
   if (dateDisplay) {
     const date = new Date(todayISO);
-    const formatted = date.toLocaleDateString('ar-LY', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+    const formatted = date.toLocaleDateString('ar-LY', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     dateDisplay.textContent = formatted;
   }
 
   document.getElementById('statusNote').value = person && person.statusNote ? person.statusNote : '';
-
   document.getElementById('statusModal').style.display = 'flex';
 }
 
@@ -2333,18 +2322,13 @@ async function saveStatusChange() {
     });
     alert('✅ تم تغيير الحالة إلى: ' + STATUS_LABELS[newStatus.value].label);
     closeStatusModal();
-  } catch (err) {
-    alert('❌ ' + err.message);
-  }
+  } catch (err) { alert('❌ ' + err.message); }
 }
 
 function updateStatusesReport() {
   const all = [].concat(allWorkers, allDrivers);
   const counts = { active: 0, vacation: 0, absconded: 0, resigned: 0 };
-  all.forEach(p => {
-    const s = p.status || 'active';
-    if (counts[s] !== undefined) counts[s]++;
-  });
+  all.forEach(p => { const s = p.status || 'active'; if (counts[s] !== undefined) counts[s]++; });
 
   const el = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
   el('statusActiveCount', counts.active);
@@ -2621,9 +2605,6 @@ function deleteDriver(id, name) {
   if (confirm('حذف ' + name + '؟')) db.collection('drivers').doc(id).delete();
 }
 
-// ============================================
-// 📅 تسوية التواريخ الجماعية
-// ============================================
 let bulkDateType = 'workers';
 let bulkDateSelectedIds = new Set();
 
@@ -2644,17 +2625,13 @@ function closeBulkDateModal() {
   bulkDateSelectedIds.clear();
 }
 
-function getBulkList() {
-  return bulkDateType === 'workers' ? allWorkers : allDrivers;
-}
+function getBulkList() { return bulkDateType === 'workers' ? allWorkers : allDrivers; }
 
 function renderBulkDateList() {
   const c = document.getElementById('bulkDateList');
   const s = (document.getElementById('bulkDateSearch')?.value || '').trim();
   const all = getBulkList();
-  const filtered = s
-    ? all.filter(w => normalizePersonName(w.name).includes(normalizePersonName(s)))
-    : all;
+  const filtered = s ? all.filter(w => normalizePersonName(w.name).includes(normalizePersonName(s))) : all;
 
   if (!filtered.length) {
     c.innerHTML = '<p style="text-align:center;color:#666;padding:15px;font-size:13px;">' + (s ? 'لا نتائج للبحث' : 'لا يوجد بيانات') + '</p>';
@@ -2688,13 +2665,9 @@ function updateBulkDateCount() {
 function bulkDateSelectAll(select) {
   const s = (document.getElementById('bulkDateSearch')?.value || '').trim();
   const all = getBulkList();
-  const filtered = s
-    ? all.filter(w => normalizePersonName(w.name).includes(normalizePersonName(s)))
-    : all;
-
+  const filtered = s ? all.filter(w => normalizePersonName(w.name).includes(normalizePersonName(s))) : all;
   if (select) filtered.forEach(w => bulkDateSelectedIds.add(w.id));
   else bulkDateSelectedIds.clear();
-
   renderBulkDateList();
 }
 
@@ -2732,16 +2705,11 @@ async function saveBulkDate() {
     await batch.commit();
     alert('✅ تم تحديث تاريخ ' + count + ' ' + kind + ' بنجاح');
     closeBulkDateModal();
-  } catch (err) {
-    alert('❌ خطأ: ' + err.message);
-  }
+  } catch (err) { alert('❌ خطأ: ' + err.message); }
 }
 
 document.getElementById('bulkDateSearch')?.addEventListener('input', renderBulkDateList);
 
-// ============================================
-// ⏰ الوقت الإضافي
-// ============================================
 function populateOvertimeMonthSelect() {
   const sel = document.getElementById('overtimeMonthSelect');
   if (!sel) return;
@@ -2848,9 +2816,6 @@ function exportOvertimeExcel() {
   });
 }
 
-// ============================================
-// 📋 التقارير
-// ============================================
 async function saveReport() {
   if (!checkAddPermission()) return;
   const date = document.getElementById('reportDate').value;
@@ -2880,7 +2845,6 @@ async function saveReport() {
         const sizeMB = (file.size / 1024 / 1024).toFixed(1);
         const isVideo = file.type.startsWith('video/');
         pt.textContent = '⏳ رفع ' + (i + 1) + ' من ' + total + ' (' + (isVideo ? '🎥 فيديو' : '📷 صورة') + ' - ' + sizeMB + ' MB)...';
-
         try {
           const result = await uploadMedia(file);
           if (result.type === 'video') videoURLs.push(result.url);
@@ -2927,9 +2891,6 @@ function loadReports() {
   });
 }
 
-// ============================================
-// ✏️ تعديل التقارير المحفوظة
-// ============================================
 function openEditReportModal(reportId) {
   if (!checkEditPermission()) return;
   editingReportId = reportId;
@@ -2944,11 +2905,7 @@ function openEditReportModal(reportId) {
     document.getElementById('editReportLocation').value = r.location || '';
     document.getElementById('editReportText').value = r.text || '';
 
-    editingExistingMedia = {
-      photos: (r.photos || []).slice(),
-      videos: (r.videos || []).slice()
-    };
-
+    editingExistingMedia = { photos: (r.photos || []).slice(), videos: (r.videos || []).slice() };
     renderEditExistingMedia();
     renderEditNewMedia();
     document.getElementById('editReportModal').style.display = 'flex';
@@ -2987,11 +2944,8 @@ function renderEditExistingMedia() {
 
 function removeExistingMedia(type, idx) {
   if (!confirm('حذف هذا الملف؟')) return;
-  if (type === 'photo') {
-    editingExistingMedia.photos.splice(idx, 1);
-  } else if (type === 'video') {
-    editingExistingMedia.videos.splice(idx, 1);
-  }
+  if (type === 'photo') editingExistingMedia.photos.splice(idx, 1);
+  else if (type === 'video') editingExistingMedia.videos.splice(idx, 1);
   renderEditExistingMedia();
 }
 
@@ -3005,7 +2959,6 @@ function handleEditReportNewMedia(e) {
     const file = files[i];
     const isVideo = file.type.startsWith('video/');
     const sizeMB = file.size / 1024 / 1024;
-
     if (isVideo && sizeMB > 5) {
       alert('⚠️ الفيديو كبير (' + sizeMB.toFixed(1) + ' MB)\nالحد الأقصى: 5 MB');
       continue;
@@ -3076,12 +3029,8 @@ async function saveReportEdit() {
     const finalVideos = [...editingExistingMedia.videos, ...newVideos];
 
     await db.collection('dailyReports').doc(editingReportId).update({
-      date,
-      workerName,
-      location,
-      text,
-      photos: finalPhotos,
-      videos: finalVideos,
+      date, workerName, location, text,
+      photos: finalPhotos, videos: finalVideos,
       mediaCount: finalPhotos.length + finalVideos.length,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     });
@@ -3167,9 +3116,6 @@ async function deleteReport(reportId) {
   alert('✅ تم الحذف');
 }
 
-// ============================================
-// 💰 الخصومات
-// ============================================
 async function loadDeductionSettings() { deductionAmountValue = appSettings.deductionAmount; }
 
 async function loadDeductions() {
@@ -3184,9 +3130,6 @@ async function loadDeductions() {
   c.innerHTML = Object.keys(ded).map(name => { const d = ded[name], a = d * deductionAmountValue; tot += a; return '<div class="worker-row"><span class="name">' + name + '</span><span class="deduction-badge">' + d + ' يوم</span><span class="deduction-badge">-' + a + ' د</span></div>'; }).join('') + '<div style="margin-top:10px;text-align:center;font-weight:bold;color:#0f766e;">الإجمالي: ' + tot + ' دينار</div>';
 }
 
-// ============================================
-// 📦 المخزن
-// ============================================
 function watchInventory() {
   db.collection('inventory').orderBy('name').onSnapshot(sn => {
     allInventory = sn.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -3214,9 +3157,6 @@ function deleteItem(id, name) {
   if (confirm('حذف ' + name + '؟')) db.collection('inventory').doc(id).delete();
 }
 
-// ============================================
-// 🚛 الآليات
-// ============================================
 function loadVehicles() {
   db.collection('vehicles').onSnapshot(sn => {
     document.getElementById('vehiclesList').innerHTML = sn.empty ? '<p style="text-align:center;color:#666;">لا توجد آليات</p>' : sn.docs.map(doc => {
@@ -3247,9 +3187,6 @@ function deleteVehicle(id, number) {
   if (confirm('حذف ' + number + '؟')) db.collection('vehicles').doc(id).delete();
 }
 
-// ============================================
-// 🔑 المستخدمين
-// ============================================
 async function addUser() {
   if (!isOwnerOrAdmin()) { alert('🚫 لا تملك صلاحية إدارة المستخدمين.'); return; }
   const name = document.getElementById('newUserName').value.trim();
@@ -3390,9 +3327,6 @@ function deleteUser(id, name) {
   if (confirm('حذف ' + name + '؟')) db.collection('systemUsers').doc(id).delete();
 }
 
-// ============================================
-// 📊 تصدير Excel
-// ============================================
 function exportAttendanceExcel() {
   if (!checkExportPermission()) return;
   if (!latestAttendanceRecords.length) { alert('لا يوجد حضور'); return; }
@@ -3450,6 +3384,90 @@ function exportVehiclesExcel() {
 
 document.getElementById('loginScreen').style.display = 'block';
 document.getElementById('mainApp').style.display = 'none';
+
+// ✅ تسجيل Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(reg => {
+        console.log('✅ Service Worker registered:', reg.scope);
+        reg.addEventListener('updatefound', () => {
+          const newWorker = reg.installing;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              if (confirm('🔄 يوجد تحديث جديد. هل تريد تحديث المنظومة؟')) {
+                newWorker.postMessage('SKIP_WAITING');
+                window.location.reload();
+              }
+            }
+          });
+        });
+      })
+      .catch(err => console.warn('⚠️ SW registration failed:', err));
+  });
+}
+
+// ✅ زر "تثبيت التطبيق"
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  const btn = document.createElement('button');
+  btn.id = 'pwaInstallBtn';
+  btn.innerHTML = '📲 تثبيت التطبيق';
+  btn.style.cssText = 'position:fixed;bottom:20px;right:20px;z-index:99999;padding:14px 24px;border-radius:50px;background:linear-gradient(135deg,#0f766e,#0d5c55);color:#fff;border:3px solid #fff;font-weight:900;font-size:15px;cursor:pointer;box-shadow:0 8px 25px rgba(15,118,110,0.5);font-family:inherit;';
+  btn.onclick = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') console.log('✅ تم التثبيت');
+    deferredPrompt = null;
+    btn.remove();
+  };
+  document.body.appendChild(btn);
+});
+
+window.addEventListener('appinstalled', () => {
+  console.log('✅ التطبيق مثبت');
+  const btn = document.getElementById('pwaInstallBtn');
+  if (btn) btn.remove();
+});
+
+// ✅ مؤشر حالة الاتصال
+function updateOnlineStatus() {
+  let indicator = document.getElementById('connectionStatus');
+  if (!indicator) {
+    indicator = document.createElement('div');
+    indicator.id = 'connectionStatus';
+    indicator.style.cssText = 'position:fixed;bottom:20px;left:20px;padding:8px 14px;border-radius:20px;color:#fff;font-size:12px;font-weight:800;z-index:99999;box-shadow:0 3px 10px rgba(0,0,0,0.3);transition:all 0.3s;font-family:inherit;';
+    document.body.appendChild(indicator);
+  }
+  if (navigator.onLine) {
+    indicator.textContent = '✅ متصل';
+    indicator.style.background = 'linear-gradient(135deg,#4caf50,#2e7d32)';
+    setTimeout(() => { indicator.style.opacity = '0'; }, 2000);
+    setTimeout(() => { indicator.style.display = 'none'; }, 2500);
+  } else {
+    indicator.textContent = '📵 بدون إنترنت';
+    indicator.style.background = 'linear-gradient(135deg,#f44336,#c62828)';
+    indicator.style.opacity = '1';
+    indicator.style.display = 'block';
+  }
+}
+window.addEventListener('online', updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+window.addEventListener('load', updateOnlineStatus);
+setTimeout(updateOnlineStatus, 500);
+
+// ✅ Firebase Offline Persistence
+if (typeof db !== 'undefined' && db && db.enablePersistence) {
+  db.enablePersistence({ synchronizeTabs: true })
+    .then(() => console.log('✅ Firebase Offline Persistence enabled'))
+    .catch(err => {
+      if (err.code === 'failed-precondition') console.warn('⚠️ Persistence in one tab only');
+      else if (err.code === 'unimplemented') console.warn('⚠️ Browser doesn\'t support persistence');
+    });
+}
 </script>
 </body>
 </html>

@@ -349,7 +349,6 @@
   .overtime-badge { background: #f57c00; color: #fff; padding: 3px 12px; border-radius: 12px; font-size: 11px; font-weight: 800; }
   .video-badge { background: #d32f2f; color: #fff; padding: 3px 12px; border-radius: 12px; font-size: 11px; font-weight: 800; }
 
-  /* 🎯 بادجات حالة الموظف */
   .status-badge {
     display: inline-block;
     padding: 3px 10px;
@@ -385,7 +384,6 @@
     50% { transform: scale(1.05); box-shadow: 0 2px 15px rgba(244,67,54,0.9); }
   }
 
-  /* 🎯 أزرار الفلتر */
   .filter-bar {
     display: flex;
     gap: 6px;
@@ -420,7 +418,6 @@
   .filter-btn.filter-vacation-btn.active { background: #2196f3; border-color: #2196f3; }
   .filter-btn.filter-archive-btn.active { background: #9e9e9e; border-color: #9e9e9e; }
 
-  /* 🎯 تقرير حالة الموظفين */
   .status-report-row {
     display: flex;
     align-items: center;
@@ -504,6 +501,40 @@
   .report-media-grid { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
   .report-media-grid img { width: 80px; height: 80px; object-fit: cover; border-radius: 10px; border: 2px solid #0f766e; }
   .report-media-grid video { width: 100px; height: 80px; object-fit: cover; border-radius: 10px; border: 2px solid #d32f2f; background: #000; }
+
+  /* 🎯 معاينة ملفات التقرير مع زر X */
+  .report-media-item {
+    position: relative;
+    display: inline-block;
+  }
+  .report-media-item .remove-media-btn {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #f44336;
+    color: #fff;
+    border: 2px solid #fff;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    transition: all 0.2s;
+    z-index: 10;
+    line-height: 1;
+  }
+  .report-media-item .remove-media-btn:hover {
+    background: #c62828;
+    transform: scale(1.15);
+  }
+
   .progress-bar { width: 100%; height: 10px; background: rgba(255,255,255,0.24); border-radius: 6px; overflow: hidden; margin-bottom: 10px; display: none; }
   .progress-fill { height: 100%; background: #4caf50; width: 0%; transition: width 0.3s; }
   .progress-text { text-align: center; font-size: 13px; color: #0f766e; margin-bottom: 10px; font-weight: 800; }
@@ -712,8 +743,9 @@
         <input id="reportLocation" placeholder="مكان العمل">
         <label>📝 نص التقرير</label>
         <textarea id="reportText" rows="4" placeholder="اكتب التقرير هنا..."></textarea>
-        <label>📸🎥 الصور والفيديوهات</label>
-        <div class="report-media-grid" id="reportPhotosPreview"></div>
+        <label style="font-size:14px;color:#0f766e;font-weight:800;margin-top:10px;display:block;">📎 الملفات المرفقة (<span id="reportMediaCount">0</span>)</label>
+        <div class="report-media-grid" id="reportPhotosPreview" style="min-height:60px;padding:8px;border:2px dashed #ccc;border-radius:10px;background:#f9f9f9;"></div>
+        <button type="button" onclick="clearAllReportMedia()" style="width:auto;padding:6px 12px;font-size:12px;background:#c62828;border-color:#c62828;margin-top:5px;display:none;" id="clearAllMediaBtn">🗑️ حذف الكل</button>
         <input type="file" id="reportPhotosInput" accept="image/*,video/*" multiple style="display:none;">
         <input type="file" id="reportPhotosInputCamera" accept="image/*" capture="environment" multiple style="display:none;">
         <input type="file" id="reportVideoInputCamera" accept="video/*" capture="environment" style="display:none;">
@@ -1026,6 +1058,45 @@
   </div>
 </div>
 
+<!-- ✏️ نافذة تعديل التقرير -->
+<div id="editReportModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:99999;align-items:center;justify-content:center;padding:20px;overflow-y:auto;">
+  <div style="background:#fff;max-width:700px;width:100%;max-height:92vh;overflow-y:auto;border-radius:20px;padding:24px;direction:rtl;position:relative;">
+    <button onclick="closeEditReportModal()" style="position:absolute;top:12px;left:12px;width:38px;height:38px;border-radius:50%;background:#f44336;color:#fff;border:none;font-size:20px;cursor:pointer;font-weight:bold;">×</button>
+    <h2 style="text-align:center;color:#f57c00;margin:0 0 15px;font-size:19px;font-weight:900;">✏️ تعديل التقرير</h2>
+
+    <label style="font-size:14px;color:#0f766e;font-weight:800;margin-bottom:6px;display:block;">📅 التاريخ:</label>
+    <input type="date" id="editReportDate" style="width:100%;padding:12px;border:2px solid #0f766e;border-radius:10px;margin-bottom:10px;">
+
+    <label style="font-size:14px;color:#0f766e;font-weight:800;margin-bottom:6px;display:block;">👷 الكاتب:</label>
+    <input id="editReportWorkerName" style="width:100%;padding:12px;border:2px solid #0f766e;border-radius:10px;margin-bottom:10px;">
+
+    <label style="font-size:14px;color:#0f766e;font-weight:800;margin-bottom:6px;display:block;">📍 الموقع:</label>
+    <input id="editReportLocation" style="width:100%;padding:12px;border:2px solid #0f766e;border-radius:10px;margin-bottom:10px;">
+
+    <label style="font-size:14px;color:#0f766e;font-weight:800;margin-bottom:6px;display:block;">📝 النص:</label>
+    <textarea id="editReportText" rows="4" style="width:100%;padding:12px;border:2px solid #0f766e;border-radius:10px;margin-bottom:12px;"></textarea>
+
+    <label style="font-size:14px;color:#0f766e;font-weight:800;margin-bottom:6px;display:block;">📎 الملفات الحالية:</label>
+    <div id="editReportExistingMedia" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;min-height:50px;padding:8px;border:2px dashed #ccc;border-radius:10px;background:#f9f9f9;"></div>
+
+    <label style="font-size:14px;color:#0f766e;font-weight:800;margin-bottom:6px;display:block;">➕ إضافة ملفات جديدة:</label>
+    <input type="file" id="editReportNewMedia" accept="image/*,video/*" multiple style="display:none;">
+    <input type="file" id="editReportNewMediaCamera" accept="image/*" capture="environment" multiple style="display:none;">
+    <input type="file" id="editReportNewVideo" accept="video/*" capture="environment" style="display:none;">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+      <button type="button" class="camera-btn" onclick="document.getElementById('editReportNewMediaCamera').click()" style="flex:1;padding:12px;margin:0;">📷 كاميرا</button>
+      <button type="button" class="video-btn" onclick="document.getElementById('editReportNewVideo').click()" style="flex:1;padding:12px;margin:0;">🎥 فيديو</button>
+      <button type="button" class="file-btn" onclick="document.getElementById('editReportNewMedia').click()" style="flex:1;padding:12px;margin:0;">🖼️ ملفات</button>
+    </div>
+    <div id="editReportNewMediaPreview" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;"></div>
+
+    <div style="display:flex;gap:8px;">
+      <button onclick="closeEditReportModal()" style="flex:1;background:#607d8b;border-color:#607d8b;padding:14px;margin:0;">❌ إلغاء</button>
+      <button onclick="saveReportEdit()" style="flex:2;background:#2e7d32;border-color:#2e7d32;padding:14px;margin:0;">💾 حفظ التعديلات</button>
+    </div>
+  </div>
+</div>
+
 <!-- نافذة تغيير حالة الموظف -->
 <div id="statusModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:99999;align-items:center;justify-content:center;padding:20px;overflow-y:auto;">
   <div style="background:#fff;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;border-radius:20px;padding:24px;direction:rtl;position:relative;">
@@ -1231,6 +1302,11 @@ let currentStatusPerson = null;
 let workerFilter = 'working';
 let driverFilter = 'working';
 
+// 🎯 تعديل التقارير
+let editingReportId = null;
+let editingExistingMedia = { photos: [], videos: [] };
+let editingNewMediaFiles = [];
+
 loadSettings();
 applySettings();
 applyBackground();
@@ -1412,7 +1488,6 @@ async function uploadMedia(file) {
   const isVideo = file.type.startsWith('video/');
 
   if (isVideo) {
-    // ✅ فحص حجم الفيديو (5 MB كحد أقصى)
     const maxSizeMB = 5;
     const fileSizeMB = file.size / 1024 / 1024;
     if (fileSizeMB > maxSizeMB) {
@@ -1425,7 +1500,6 @@ async function uploadMedia(file) {
       const path = 'reports/videos/' + ts + '_' + safe;
       const ref = storage.ref().child(path);
 
-      // ✅ timeout 90 ثانية
       const uploadPromise = ref.put(file).then(snap => snap.ref.getDownloadURL());
       const timeoutPromise = new Promise((_, reject) =>
         setTimeout(() => reject(new Error('انتهت المهلة (90 ثانية). جرب فيديو أقصر أو اتصال أفضل.')), 90000)
@@ -1438,7 +1512,6 @@ async function uploadMedia(file) {
       throw new Error('فشل رفع الفيديو: ' + e.message);
     }
   } else {
-    // صورة → ImgBB
     const base64 = await new Promise((resolve) => {
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -1553,7 +1626,7 @@ async function downloadFullBackup() {
   } catch (err) { alert('❌ ' + err.message); }
 }
 
-// ✅ دالة الإفادة - بدون "تحت متابعة وإشراف"
+// ✅ الإفادة المباشرة - بدون "تحت متابعة وإشراف"
 function showWorkNotification(data) {
   currentNotificationData = data;
   let photoHTML = '';
@@ -1680,35 +1753,68 @@ function saveNotificationWord() {
   document.getElementById(id).addEventListener('change', handleReportMedia);
 });
 
+// 🎯 دالة معالجة ملفات التقرير (مع فحص الحجم)
 function handleReportMedia(e) {
   const files = e.target.files;
-  const preview = document.getElementById('reportPhotosPreview');
   for (let i = 0; i < files.length; i++) {
     const file = files[i];
     const sizeMB = (file.size / 1024 / 1024).toFixed(1);
     const isVideo = file.type.startsWith('video/');
 
-    // ✅ رفض الفيديوهات الكبيرة
     if (isVideo && file.size > 5 * 1024 * 1024) {
       alert('⚠️ الفيديو كبير جداً (' + sizeMB + ' MB)\n\nالحد الأقصى: 5 MB\nصوّر مقطع أقصر (15-30 ثانية)');
       continue;
     }
 
     reportMediaFiles.push(file);
-    if (isVideo) {
-      const video = document.createElement('video');
-      video.src = URL.createObjectURL(file);
-      video.muted = true;
-      preview.appendChild(video);
-    } else {
-      const img = document.createElement('img');
-      const reader = new FileReader();
-      reader.onload = function(event) { img.src = event.target.result; };
-      reader.readAsDataURL(file);
-      preview.appendChild(img);
-    }
   }
+  renderReportMediaPreview();
   e.target.value = '';
+}
+
+// 🎯 عرض معاينة الملفات مع زر X
+function renderReportMediaPreview() {
+  const preview = document.getElementById('reportPhotosPreview');
+  const countEl = document.getElementById('reportMediaCount');
+  const clearBtn = document.getElementById('clearAllMediaBtn');
+
+  if (!preview) return;
+  if (countEl) countEl.textContent = reportMediaFiles.length;
+  if (clearBtn) clearBtn.style.display = reportMediaFiles.length > 0 ? 'block' : 'none';
+
+  if (reportMediaFiles.length === 0) {
+    preview.innerHTML = '<p style="text-align:center;color:#999;font-size:13px;padding:15px;width:100%;">لا توجد ملفات مرفقة</p>';
+    return;
+  }
+
+  preview.innerHTML = reportMediaFiles.map((file, idx) => {
+    const isVideo = file.type.startsWith('video/');
+    const url = URL.createObjectURL(file);
+    const icon = isVideo ? '🎥' : '📷';
+    return '<div class="report-media-item">' +
+      '<button type="button" class="remove-media-btn" onclick="removeReportMedia(' + idx + ')" title="حذف">×</button>' +
+      (isVideo
+        ? '<video src="' + url + '" muted style="width:90px;height:90px;object-fit:cover;border-radius:10px;border:2px solid #d32f2f;background:#000;"></video>'
+        : '<img src="' + url + '" style="width:90px;height:90px;object-fit:cover;border-radius:10px;border:2px solid #0f766e;">') +
+      '<div style="font-size:10px;text-align:center;color:#666;margin-top:2px;">' + icon + ' ' + (file.size / 1024).toFixed(0) + ' KB</div>' +
+    '</div>';
+  }).join('');
+}
+
+// 🎯 حذف ملف واحد
+function removeReportMedia(idx) {
+  if (idx < 0 || idx >= reportMediaFiles.length) return;
+  if (!confirm('حذف هذا الملف؟')) return;
+  reportMediaFiles.splice(idx, 1);
+  renderReportMediaPreview();
+}
+
+// 🎯 حذف كل الملفات
+function clearAllReportMedia() {
+  if (reportMediaFiles.length === 0) return;
+  if (!confirm('حذف جميع الملفات (' + reportMediaFiles.length + ')؟')) return;
+  reportMediaFiles = [];
+  renderReportMediaPreview();
 }
 
 async function login() {
@@ -2185,7 +2291,6 @@ function openStatusModal(personId, personName, collection) {
     r.checked = r.value === currentStatus;
   });
 
-  // 🎯 التاريخ تلقائي = اليوم (غير قابل للتعديل)
   const todayISO = getTodayISO();
   document.getElementById('statusChangeDate').value = todayISO;
 
@@ -2216,7 +2321,6 @@ async function saveStatusChange() {
   const newStatus = document.querySelector('input[name="newStatus"]:checked');
   if (!newStatus) { alert('⚠️ اختر الحالة'); return; }
 
-  // 🎯 نستخدم تاريخ اليوم دائماً (مش من الحقل)
   const date = getTodayISO();
   const note = document.getElementById('statusNote').value.trim();
 
@@ -2803,7 +2907,7 @@ async function saveReport() {
     document.getElementById('reportLocation').value = '';
     document.getElementById('reportText').value = '';
     reportMediaFiles = [];
-    document.getElementById('reportPhotosPreview').innerHTML = '';
+    renderReportMediaPreview();
     setTimeout(() => { pb.style.display = 'none'; pf.style.width = '0%'; pt.textContent = ''; }, 2000);
     loadReports();
   } catch (err) { alert('❌ ' + err.message); pb.style.display = 'none'; }
@@ -2818,9 +2922,184 @@ function loadReports() {
       const photos = (r.photos || []).slice(0, 3).map(p => '<img src="' + p + '" style="width:50px;height:50px;object-fit:cover;border-radius:6px;margin:2px;" onerror="this.style.display=\'none\'">').join('');
       const vc = (r.videos || []).length;
       const db2 = canDelete() ? '<button class="del-btn" onclick="deleteReport(\'' + doc.id + '\')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">حذف</button>' : '';
-      return '<div class="user-card"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;"><strong>' + r.workerName + '</strong><span style="font-size:12px;color:#666;">' + r.date + '</span></div>' + (r.location ? '<div style="font-size:12px;color:#666;">📍 ' + r.location + '</div>' : '') + '<div style="font-size:13px;margin-top:5px;">' + r.text.substring(0, 100) + '</div>' + (photos ? '<div style="display:flex;margin-top:5px;">' + photos + '</div>' : '') + (vc > 0 ? '<div style="margin-top:5px;"><span class="video-badge">🎥 ' + vc + ' فيديو</span></div>' : '') + '<div class="supervisor-signature">تحت متابعة وإشراف / ' + appSettings.supervisorName + '</div><div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;"><button class="view-btn" onclick="viewReport(\'' + doc.id + '\')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">👁️ عرض</button><button class="word-btn" onclick="exportReportWord(\'' + doc.id + '\')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">📄 Word</button><button class="print-btn" onclick="printReport(\'' + doc.id + '\')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">🖨️ طباعة</button>' + db2 + '</div></div>';
+      return '<div class="user-card"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;"><strong>' + r.workerName + '</strong><span style="font-size:12px;color:#666;">' + r.date + '</span></div>' + (r.location ? '<div style="font-size:12px;color:#666;">📍 ' + r.location + '</div>' : '') + '<div style="font-size:13px;margin-top:5px;">' + r.text.substring(0, 100) + '</div>' + (photos ? '<div style="display:flex;margin-top:5px;">' + photos + '</div>' : '') + (vc > 0 ? '<div style="margin-top:5px;"><span class="video-badge">🎥 ' + vc + ' فيديو</span></div>' : '') + '<div class="supervisor-signature">تحت متابعة وإشراف / ' + appSettings.supervisorName + '</div><div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;"><button class="view-btn" onclick="viewReport(\'' + doc.id + '\')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">👁️ عرض</button><button class="edit-btn" onclick="openEditReportModal(\'' + doc.id + '\')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">✏️ تعديل</button><button class="word-btn" onclick="exportReportWord(\'' + doc.id + '\')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">📄 Word</button><button class="print-btn" onclick="printReport(\'' + doc.id + '\')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">🖨️ طباعة</button>' + db2 + '</div></div>';
     }).join('');
   });
+}
+
+// ============================================
+// ✏️ تعديل التقارير المحفوظة
+// ============================================
+function openEditReportModal(reportId) {
+  if (!checkEditPermission()) return;
+  editingReportId = reportId;
+  editingNewMediaFiles = [];
+
+  db.collection('dailyReports').doc(reportId).get().then(doc => {
+    if (!doc.exists) { alert('التقرير غير موجود'); return; }
+    const r = doc.data();
+
+    document.getElementById('editReportDate').value = r.date || '';
+    document.getElementById('editReportWorkerName').value = r.workerName || '';
+    document.getElementById('editReportLocation').value = r.location || '';
+    document.getElementById('editReportText').value = r.text || '';
+
+    editingExistingMedia = {
+      photos: (r.photos || []).slice(),
+      videos: (r.videos || []).slice()
+    };
+
+    renderEditExistingMedia();
+    renderEditNewMedia();
+    document.getElementById('editReportModal').style.display = 'flex';
+  });
+}
+
+function closeEditReportModal() {
+  document.getElementById('editReportModal').style.display = 'none';
+  editingReportId = null;
+  editingExistingMedia = { photos: [], videos: [] };
+  editingNewMediaFiles = [];
+}
+
+function renderEditExistingMedia() {
+  const c = document.getElementById('editReportExistingMedia');
+  if (!c) return;
+  const all = [
+    ...editingExistingMedia.photos.map((url, i) => ({ type: 'photo', url, idx: i })),
+    ...editingExistingMedia.videos.map((url, i) => ({ type: 'video', url, idx: i }))
+  ];
+
+  if (!all.length) {
+    c.innerHTML = '<p style="text-align:center;color:#999;font-size:13px;padding:15px;width:100%;">لا توجد ملفات</p>';
+    return;
+  }
+
+  c.innerHTML = all.map(m => {
+    return '<div class="report-media-item">' +
+      '<button type="button" class="remove-media-btn" onclick="removeExistingMedia(\'' + m.type + '\', ' + m.idx + ')" title="حذف">×</button>' +
+      (m.type === 'video'
+        ? '<video src="' + m.url + '" muted style="width:90px;height:90px;object-fit:cover;border-radius:10px;border:2px solid #d32f2f;background:#000;"></video>'
+        : '<img src="' + m.url + '" style="width:90px;height:90px;object-fit:cover;border-radius:10px;border:2px solid #0f766e;">') +
+    '</div>';
+  }).join('');
+}
+
+function removeExistingMedia(type, idx) {
+  if (!confirm('حذف هذا الملف؟')) return;
+  if (type === 'photo') {
+    editingExistingMedia.photos.splice(idx, 1);
+  } else if (type === 'video') {
+    editingExistingMedia.videos.splice(idx, 1);
+  }
+  renderEditExistingMedia();
+}
+
+document.getElementById('editReportNewMedia')?.addEventListener('change', handleEditReportNewMedia);
+document.getElementById('editReportNewMediaCamera')?.addEventListener('change', handleEditReportNewMedia);
+document.getElementById('editReportNewVideo')?.addEventListener('change', handleEditReportNewMedia);
+
+function handleEditReportNewMedia(e) {
+  const files = e.target.files;
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    const isVideo = file.type.startsWith('video/');
+    const sizeMB = file.size / 1024 / 1024;
+
+    if (isVideo && sizeMB > 5) {
+      alert('⚠️ الفيديو كبير (' + sizeMB.toFixed(1) + ' MB)\nالحد الأقصى: 5 MB');
+      continue;
+    }
+    editingNewMediaFiles.push(file);
+  }
+  renderEditNewMedia();
+  e.target.value = '';
+}
+
+function renderEditNewMedia() {
+  const c = document.getElementById('editReportNewMediaPreview');
+  if (!c) return;
+  if (!editingNewMediaFiles.length) { c.innerHTML = ''; return; }
+  c.innerHTML = editingNewMediaFiles.map((file, idx) => {
+    const isVideo = file.type.startsWith('video/');
+    const url = URL.createObjectURL(file);
+    return '<div class="report-media-item">' +
+      '<button type="button" class="remove-media-btn" onclick="removeEditNewMedia(' + idx + ')" title="حذف">×</button>' +
+      (isVideo
+        ? '<video src="' + url + '" muted style="width:90px;height:90px;object-fit:cover;border-radius:10px;border:2px solid #4caf50;background:#000;"></video>'
+        : '<img src="' + url + '" style="width:90px;height:90px;object-fit:cover;border-radius:10px;border:2px solid #4caf50;">') +
+    '</div>';
+  }).join('');
+}
+
+function removeEditNewMedia(idx) {
+  if (idx < 0 || idx >= editingNewMediaFiles.length) return;
+  editingNewMediaFiles.splice(idx, 1);
+  renderEditNewMedia();
+}
+
+async function saveReportEdit() {
+  if (!editingReportId) return;
+  if (!checkEditPermission()) return;
+
+  const date = document.getElementById('editReportDate').value;
+  const workerName = document.getElementById('editReportWorkerName').value.trim();
+  const location = document.getElementById('editReportLocation').value.trim();
+  const text = document.getElementById('editReportText').value.trim();
+
+  if (!date || !workerName || !text) { alert('⚠️ أكمل البيانات'); return; }
+
+  const btn = event.target;
+  const oldText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '⏳ جاري الحفظ...';
+
+  try {
+    const newPhotos = [];
+    const newVideos = [];
+    const failedFiles = [];
+
+    for (let i = 0; i < editingNewMediaFiles.length; i++) {
+      const file = editingNewMediaFiles[i];
+      btn.textContent = '⏳ رفع ' + (i + 1) + ' من ' + editingNewMediaFiles.length + '...';
+      try {
+        const result = await uploadMedia(file);
+        if (result.type === 'video') newVideos.push(result.url);
+        else if (result.type === 'image') newPhotos.push(result.url);
+      } catch (err) {
+        console.error(err);
+        failedFiles.push(file.name + ': ' + err.message);
+      }
+    }
+
+    const finalPhotos = [...editingExistingMedia.photos, ...newPhotos];
+    const finalVideos = [...editingExistingMedia.videos, ...newVideos];
+
+    await db.collection('dailyReports').doc(editingReportId).update({
+      date,
+      workerName,
+      location,
+      text,
+      photos: finalPhotos,
+      videos: finalVideos,
+      mediaCount: finalPhotos.length + finalVideos.length,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    if (failedFiles.length > 0) {
+      alert('⚠️ تم الحفظ، لكن فشل رفع:\n\n' + failedFiles.join('\n'));
+    } else {
+      alert('✅ تم حفظ التعديلات');
+    }
+
+    closeEditReportModal();
+    loadReports();
+  } catch (err) {
+    alert('❌ ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = oldText;
+  }
 }
 
 function viewReport(reportId) {

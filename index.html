@@ -349,6 +349,7 @@
   .overtime-badge { background: #f57c00; color: #fff; padding: 3px 12px; border-radius: 12px; font-size: 11px; font-weight: 800; }
   .video-badge { background: #d32f2f; color: #fff; padding: 3px 12px; border-radius: 12px; font-size: 11px; font-weight: 800; }
 
+  /* 🎯 بادجات حالة الموظف */
   .status-badge {
     display: inline-block;
     padding: 3px 10px;
@@ -384,6 +385,7 @@
     50% { transform: scale(1.05); box-shadow: 0 2px 15px rgba(244,67,54,0.9); }
   }
 
+  /* 🎯 أزرار الفلتر */
   .filter-bar {
     display: flex;
     gap: 6px;
@@ -418,6 +420,7 @@
   .filter-btn.filter-vacation-btn.active { background: #2196f3; border-color: #2196f3; }
   .filter-btn.filter-archive-btn.active { background: #9e9e9e; border-color: #9e9e9e; }
 
+  /* 🎯 تقرير حالة الموظفين */
   .status-report-row {
     display: flex;
     align-items: center;
@@ -718,6 +721,9 @@
           <button class="camera-btn" onclick="document.getElementById('reportPhotosInputCamera').click()">📷 كاميرا</button>
           <button class="video-btn" onclick="document.getElementById('reportVideoInputCamera').click()">🎥 فيديو</button>
           <button class="file-btn" onclick="document.getElementById('reportPhotosInput').click()">🖼️ من الملفات</button>
+        </div>
+        <div style="font-size:11px;color:#c62828;font-weight:800;text-align:center;padding:6px;background:rgba(198,40,40,0.1);border-radius:8px;margin-bottom:8px;">
+          ⚠️ الفيديو: الحد الأقصى 5 MB - المدة 15-30 ثانية
         </div>
         <div class="progress-bar" id="uploadProgress"><div class="progress-fill" id="progressFill"></div></div>
         <div class="progress-text" id="progressText"></div>
@@ -1220,6 +1226,7 @@ let vehiclePhotoBase64 = '';
 let reportMediaFiles = [];
 let currentNotificationData = { name: '', jobTitle: '', startDate: '', photo: '' };
 
+// 🎯 نظام حالة الموظفين
 let currentStatusPerson = null;
 let workerFilter = 'working';
 let driverFilter = 'working';
@@ -1400,19 +1407,38 @@ async function uploadImageToImgBB(base64Image) {
   } catch (e) { return null; }
 }
 
+// ✅ دالة رفع الميديا (مع فحص حجم الفيديو + timeout)
 async function uploadMedia(file) {
   const isVideo = file.type.startsWith('video/');
+
   if (isVideo) {
+    // ✅ فحص حجم الفيديو (5 MB كحد أقصى)
+    const maxSizeMB = 5;
+    const fileSizeMB = file.size / 1024 / 1024;
+    if (fileSizeMB > maxSizeMB) {
+      throw new Error('الفيديو كبير جداً (' + fileSizeMB.toFixed(1) + ' MB). الحد الأقصى ' + maxSizeMB + ' MB. صوّر مقطع أقصر.');
+    }
+
     try {
       const ts = Date.now();
       const safe = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
       const path = 'reports/videos/' + ts + '_' + safe;
       const ref = storage.ref().child(path);
-      const snap = await ref.put(file);
-      const url = await snap.ref.getDownloadURL();
+
+      // ✅ timeout 90 ثانية
+      const uploadPromise = ref.put(file).then(snap => snap.ref.getDownloadURL());
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('انتهت المهلة (90 ثانية). جرب فيديو أقصر أو اتصال أفضل.')), 90000)
+      );
+
+      const url = await Promise.race([uploadPromise, timeoutPromise]);
       return { type: 'video', url: url };
-    } catch (e) { throw new Error('فشل رفع الفيديو: ' + e.message); }
+    } catch (e) {
+      console.error('فشل رفع الفيديو:', e);
+      throw new Error('فشل رفع الفيديو: ' + e.message);
+    }
   } else {
+    // صورة → ImgBB
     const base64 = await new Promise((resolve) => {
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -1432,6 +1458,7 @@ async function uploadMedia(file) {
       reader.readAsDataURL(file);
     });
     const url = await uploadImageToImgBB(base64);
+    if (!url) throw new Error('فشل رفع الصورة');
     return { type: 'image', url: url };
   }
 }
@@ -1526,6 +1553,7 @@ async function downloadFullBackup() {
   } catch (err) { alert('❌ ' + err.message); }
 }
 
+// ✅ دالة الإفادة - بدون "تحت متابعة وإشراف"
 function showWorkNotification(data) {
   currentNotificationData = data;
   let photoHTML = '';
@@ -1657,8 +1685,17 @@ function handleReportMedia(e) {
   const preview = document.getElementById('reportPhotosPreview');
   for (let i = 0; i < files.length; i++) {
     const file = files[i];
+    const sizeMB = (file.size / 1024 / 1024).toFixed(1);
+    const isVideo = file.type.startsWith('video/');
+
+    // ✅ رفض الفيديوهات الكبيرة
+    if (isVideo && file.size > 5 * 1024 * 1024) {
+      alert('⚠️ الفيديو كبير جداً (' + sizeMB + ' MB)\n\nالحد الأقصى: 5 MB\nصوّر مقطع أقصر (15-30 ثانية)');
+      continue;
+    }
+
     reportMediaFiles.push(file);
-    if (file.type.startsWith('video/')) {
+    if (isVideo) {
       const video = document.createElement('video');
       video.src = URL.createObjectURL(file);
       video.muted = true;
@@ -2077,8 +2114,7 @@ function updateStats() {
     document.getElementById('grandTotalOvertime').textContent = th.toFixed(1);
   }).catch(() => {});
 }
-
-function watchWorkers() {
+ function watchWorkers() {
   db.collection('workers').orderBy('name').onSnapshot(sn => {
     allWorkers = sn.docs.map(d => ({ id: d.id, ...d.data() }));
     renderWorkersList();
@@ -2135,6 +2171,7 @@ function filterByStatus(list, filter) {
   });
 }
 
+// ✅ نافذة تغيير الحالة - التاريخ تلقائي غير قابل للتعديل
 function openStatusModal(personId, personName, collection) {
   if (!checkEditPermission()) return;
   currentStatusPerson = { id: personId, name: personName, collection: collection };
@@ -2148,6 +2185,7 @@ function openStatusModal(personId, personName, collection) {
     r.checked = r.value === currentStatus;
   });
 
+  // 🎯 التاريخ تلقائي = اليوم (غير قابل للتعديل)
   const todayISO = getTodayISO();
   document.getElementById('statusChangeDate').value = todayISO;
 
@@ -2178,6 +2216,7 @@ async function saveStatusChange() {
   const newStatus = document.querySelector('input[name="newStatus"]:checked');
   if (!newStatus) { alert('⚠️ اختر الحالة'); return; }
 
+  // 🎯 نستخدم تاريخ اليوم دائماً (مش من الحقل)
   const date = getTodayISO();
   const note = document.getElementById('statusNote').value.trim();
 
@@ -2421,53 +2460,8 @@ function toggleEditDriverForm(driverId) {
     '<label>🏦 رقم الحساب</label><input id="editDriverAccount-' + driverId + '" value="' + (d.accountNumber || '') + '">' +
     '<label>🏛️ المصرف</label><input id="editDriverBank-' + driverId + '" value="' + (d.bankName || '') + '">' +
     '<label>🚗 الرخصة</label><input id="editDriverLicense-' + driverId + '" value="' + (d.licenseGrade || '') + '">' +
-
-    '<div class="photo-section"><h3>📸 الصورة الشخصية</h3>' +
-    (d.photo ? '<img src="' + d.photo + '" class="current-photo">' : '<div class="no-photo-text">لا توجد صورة</div>') +
-    '<input type="file" id="editDriverPhoto-' + driverId + '" accept="image/*" style="display:none;">' +
-    '<input type="file" id="editDriverPhotoCam-' + driverId + '" accept="image/*" capture="user" style="display:none;">' +
-    '<div class="photo-buttons">' +
-    '<button type="button" class="camera-btn" onclick="document.getElementById(\'editDriverPhotoCam-' + driverId + '\').click()">📷 كاميرا</button>' +
-    '<button type="button" class="file-btn" onclick="document.getElementById(\'editDriverPhoto-' + driverId + '\').click()">🖼️ من الملفات</button>' +
-    '</div>' +
-    '<img id="editDriverPhotoPreview-' + driverId + '" style="width:100%;max-height:120px;object-fit:cover;border-radius:8px;display:none;margin-top:8px;">' +
-    '</div>' +
-
-    '<div class="photo-section"><h3>📄 صورة الصك</h3>' +
-    (d.checkPhoto ? '<img src="' + d.checkPhoto + '" class="current-photo">' : '<div class="no-photo-text">لا توجد صورة صك</div>') +
-    '<input type="file" id="editDriverCheck-' + driverId + '" accept="image/*" style="display:none;">' +
-    '<input type="file" id="editDriverCheckCam-' + driverId + '" accept="image/*" capture="environment" style="display:none;">' +
-    '<div class="photo-buttons">' +
-    '<button type="button" class="camera-btn" onclick="document.getElementById(\'editDriverCheckCam-' + driverId + '\').click()">📷 كاميرا</button>' +
-    '<button type="button" class="file-btn" onclick="document.getElementById(\'editDriverCheck-' + driverId + '\').click()">🖼️ من الملفات</button>' +
-    '</div>' +
-    '<img id="editDriverCheckPreview-' + driverId + '" style="width:100%;max-height:120px;object-fit:cover;border-radius:8px;display:none;margin-top:8px;">' +
-    '</div>' +
-
     '<button onclick="saveEditDriver(\'' + driverId + '\')">💾 حفظ</button>' + dB;
   form.style.display = 'block';
-
-  let newPhoto = '';
-  const handlePhoto = async (e) => {
-    const file = e.target.files[0]; if (!file) return;
-    newPhoto = await compressImage(file);
-    const p = document.getElementById('editDriverPhotoPreview-' + driverId);
-    p.src = newPhoto; p.style.display = 'block';
-  };
-  document.getElementById('editDriverPhoto-' + driverId).addEventListener('change', handlePhoto);
-  document.getElementById('editDriverPhotoCam-' + driverId).addEventListener('change', handlePhoto);
-  window['newDriverPhotoFor_' + driverId] = () => newPhoto;
-
-  let newCheck = '';
-  const handleCheck = async (e) => {
-    const file = e.target.files[0]; if (!file) return;
-    newCheck = await compressImage(file, 600, 0.5);
-    const p = document.getElementById('editDriverCheckPreview-' + driverId);
-    p.src = newCheck; p.style.display = 'block';
-  };
-  document.getElementById('editDriverCheck-' + driverId).addEventListener('change', handleCheck);
-  document.getElementById('editDriverCheckCam-' + driverId).addEventListener('change', handleCheck);
-  window['newDriverCheckFor_' + driverId] = () => newCheck;
 }
 
 async function saveEditDriver(driverId) {
@@ -2482,21 +2476,6 @@ async function saveEditDriver(driverId) {
     bankName: document.getElementById('editDriverBank-' + driverId).value,
     licenseGrade: document.getElementById('editDriverLicense-' + driverId).value
   };
-
-  const newPhoto = window['newDriverPhotoFor_' + driverId] ? window['newDriverPhotoFor_' + driverId]() : '';
-  if (newPhoto) {
-    data.photo = newPhoto;
-    const u = await uploadImageToImgBB(newPhoto);
-    if (u) data.photoURL = u;
-  }
-
-  const newCheck = window['newDriverCheckFor_' + driverId] ? window['newDriverCheckFor_' + driverId]() : '';
-  if (newCheck) {
-    data.checkPhoto = newCheck;
-    const u2 = await uploadImageToImgBB(newCheck);
-    if (u2) data.checkPhotoURL = u2;
-  }
-
   await db.collection('drivers').doc(driverId).update(data);
   const editForm = document.getElementById('driverEditForm-' + driverId);
   if (editForm) { editForm.style.display = 'none'; editForm.innerHTML = ''; }
@@ -2538,6 +2517,9 @@ function deleteDriver(id, name) {
   if (confirm('حذف ' + name + '؟')) db.collection('drivers').doc(id).delete();
 }
 
+// ============================================
+// 📅 تسوية التواريخ الجماعية
+// ============================================
 let bulkDateType = 'workers';
 let bulkDateSelectedIds = new Set();
 
@@ -2653,6 +2635,9 @@ async function saveBulkDate() {
 
 document.getElementById('bulkDateSearch')?.addEventListener('input', renderBulkDateList);
 
+// ============================================
+// ⏰ الوقت الإضافي
+// ============================================
 function populateOvertimeMonthSelect() {
   const sel = document.getElementById('overtimeMonthSelect');
   if (!sel) return;
@@ -2759,6 +2744,9 @@ function exportOvertimeExcel() {
   });
 }
 
+// ============================================
+// 📋 التقارير
+// ============================================
 async function saveReport() {
   if (!checkAddPermission()) return;
   const date = document.getElementById('reportDate').value;
@@ -2778,25 +2766,45 @@ async function saveReport() {
     const photoURLs = [];
     const videoURLs = [];
     const total = reportMediaFiles.length;
-    for (let i = 0; i < total; i++) {
-      pt.textContent = 'جاري رفع ' + (i + 1) + ' من ' + total + '...';
-      try {
-        const result = await uploadMedia(reportMediaFiles[i]);
-        if (result.type === 'video') videoURLs.push(result.url);
-        else photoURLs.push(result.url);
-      } catch (err) { console.error(err); }
-      pf.style.width = (10 + Math.round(((i + 1) / total) * 85)) + '%';
+    const failedFiles = [];
+
+    if (total === 0) {
+      pf.style.width = '100%';
+    } else {
+      for (let i = 0; i < total; i++) {
+        const file = reportMediaFiles[i];
+        const sizeMB = (file.size / 1024 / 1024).toFixed(1);
+        const isVideo = file.type.startsWith('video/');
+        pt.textContent = '⏳ رفع ' + (i + 1) + ' من ' + total + ' (' + (isVideo ? '🎥 فيديو' : '📷 صورة') + ' - ' + sizeMB + ' MB)...';
+
+        try {
+          const result = await uploadMedia(file);
+          if (result.type === 'video') videoURLs.push(result.url);
+          else if (result.type === 'image') photoURLs.push(result.url);
+        } catch (err) {
+          console.error('فشل رفع:', file.name, err);
+          failedFiles.push(file.name + ': ' + err.message);
+        }
+        pf.style.width = (10 + Math.round(((i + 1) / total) * 85)) + '%';
+      }
     }
+
     await db.collection('dailyReports').doc(rid).update({ photos: photoURLs, videos: videoURLs, mediaCount: photoURLs.length + videoURLs.length });
     pf.style.width = '100%';
     pt.textContent = '✅ تم الحفظ';
-    alert('✅ تم حفظ التقرير');
+
+    if (failedFiles.length > 0) {
+      alert('⚠️ تم حفظ التقرير، لكن فشل رفع بعض الملفات:\n\n' + failedFiles.join('\n'));
+    } else {
+      alert('✅ تم حفظ التقرير بنجاح');
+    }
+
     document.getElementById('reportWorkerName').value = '';
     document.getElementById('reportLocation').value = '';
     document.getElementById('reportText').value = '';
     reportMediaFiles = [];
     document.getElementById('reportPhotosPreview').innerHTML = '';
-    setTimeout(() => { pb.style.display = 'none'; pf.style.width = '0%'; }, 2000);
+    setTimeout(() => { pb.style.display = 'none'; pf.style.width = '0%'; pt.textContent = ''; }, 2000);
     loadReports();
   } catch (err) { alert('❌ ' + err.message); pb.style.display = 'none'; }
 }
@@ -2810,7 +2818,7 @@ function loadReports() {
       const photos = (r.photos || []).slice(0, 3).map(p => '<img src="' + p + '" style="width:50px;height:50px;object-fit:cover;border-radius:6px;margin:2px;" onerror="this.style.display=\'none\'">').join('');
       const vc = (r.videos || []).length;
       const db2 = canDelete() ? '<button class="del-btn" onclick="deleteReport(\'' + doc.id + '\')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">حذف</button>' : '';
-      return '<div class="user-card"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;"><strong>' + r.workerName + '</strong><span style="font-size:12px;color:#666;">' + r.date + '</span></div>' + (r.location ? '<div style="font-size:12px;color:#666;">📍 ' + r.location + '</div>' : '') + '<div style="font-size:13px;margin-top:5px;">' + r.text.substring(0, 100) + '</div>' + (photos ? '<div style="display:flex;margin-top:5px;">' + photos + '</div>' : '') + (vc > 0 ? '<div style="margin-top:5px;"><span class="video-badge">🎥 ' + vc + ' فيديو</span></div>' : '') + '<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;"><button class="view-btn" onclick="viewReport(\'' + doc.id + '\')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">👁️ عرض</button><button class="word-btn" onclick="exportReportWord(\'' + doc.id + '\')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">📄 Word</button><button class="print-btn" onclick="printReport(\'' + doc.id + '\')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">🖨️ طباعة</button>' + db2 + '</div></div>';
+      return '<div class="user-card"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;"><strong>' + r.workerName + '</strong><span style="font-size:12px;color:#666;">' + r.date + '</span></div>' + (r.location ? '<div style="font-size:12px;color:#666;">📍 ' + r.location + '</div>' : '') + '<div style="font-size:13px;margin-top:5px;">' + r.text.substring(0, 100) + '</div>' + (photos ? '<div style="display:flex;margin-top:5px;">' + photos + '</div>' : '') + (vc > 0 ? '<div style="margin-top:5px;"><span class="video-badge">🎥 ' + vc + ' فيديو</span></div>' : '') + '<div class="supervisor-signature">تحت متابعة وإشراف / ' + appSettings.supervisorName + '</div><div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;"><button class="view-btn" onclick="viewReport(\'' + doc.id + '\')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">👁️ عرض</button><button class="word-btn" onclick="exportReportWord(\'' + doc.id + '\')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">📄 Word</button><button class="print-btn" onclick="printReport(\'' + doc.id + '\')" style="width:auto;padding:6px 12px;font-size:12px;margin:0;">🖨️ طباعة</button>' + db2 + '</div></div>';
     }).join('');
   });
 }
@@ -2880,6 +2888,9 @@ async function deleteReport(reportId) {
   alert('✅ تم الحذف');
 }
 
+// ============================================
+// 💰 الخصومات
+// ============================================
 async function loadDeductionSettings() { deductionAmountValue = appSettings.deductionAmount; }
 
 async function loadDeductions() {
@@ -2894,6 +2905,9 @@ async function loadDeductions() {
   c.innerHTML = Object.keys(ded).map(name => { const d = ded[name], a = d * deductionAmountValue; tot += a; return '<div class="worker-row"><span class="name">' + name + '</span><span class="deduction-badge">' + d + ' يوم</span><span class="deduction-badge">-' + a + ' د</span></div>'; }).join('') + '<div style="margin-top:10px;text-align:center;font-weight:bold;color:#0f766e;">الإجمالي: ' + tot + ' دينار</div>';
 }
 
+// ============================================
+// 📦 المخزن
+// ============================================
 function watchInventory() {
   db.collection('inventory').orderBy('name').onSnapshot(sn => {
     allInventory = sn.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -2921,6 +2935,9 @@ function deleteItem(id, name) {
   if (confirm('حذف ' + name + '؟')) db.collection('inventory').doc(id).delete();
 }
 
+// ============================================
+// 🚛 الآليات
+// ============================================
 function loadVehicles() {
   db.collection('vehicles').onSnapshot(sn => {
     document.getElementById('vehiclesList').innerHTML = sn.empty ? '<p style="text-align:center;color:#666;">لا توجد آليات</p>' : sn.docs.map(doc => {
@@ -2951,6 +2968,9 @@ function deleteVehicle(id, number) {
   if (confirm('حذف ' + number + '؟')) db.collection('vehicles').doc(id).delete();
 }
 
+// ============================================
+// 🔑 المستخدمين
+// ============================================
 async function addUser() {
   if (!isOwnerOrAdmin()) { alert('🚫 لا تملك صلاحية إدارة المستخدمين.'); return; }
   const name = document.getElementById('newUserName').value.trim();
@@ -3091,6 +3111,9 @@ function deleteUser(id, name) {
   if (confirm('حذف ' + name + '؟')) db.collection('systemUsers').doc(id).delete();
 }
 
+// ============================================
+// 📊 تصدير Excel
+// ============================================
 function exportAttendanceExcel() {
   if (!checkExportPermission()) return;
   if (!latestAttendanceRecords.length) { alert('لا يوجد حضور'); return; }

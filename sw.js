@@ -12,9 +12,12 @@ const CACHE_FILES = [
   './offline.html',
   './background.jpg',
   './logo.png',
+  './icon-192.png',
+  './icon-512.png',
   './firebase-config.js'
 ];
 
+// التثبيت - تخزين الملفات
 self.addEventListener('install', (event) => {
   console.log('🔧 تثبيت Service Worker...');
   event.waitUntil(
@@ -27,6 +30,7 @@ self.addEventListener('install', (event) => {
   );
 });
 
+// التنشيط - حذف الكاشات القديمة
 self.addEventListener('activate', (event) => {
   console.log('🚀 تشغيل Service Worker...');
   event.waitUntil(
@@ -43,6 +47,7 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+// الاعتراض - خدمة الملفات
 self.addEventListener('fetch', (event) => {
   const { request } = event;
 
